@@ -1,0 +1,38 @@
+{
+  "scripts": {
+    "start": "jest --watch",
+    "build": "tsc -p .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/js-yaml": "^3.11.2",
+    "@types/lodash": "^4.14.118",
+    "@types/node": "^10.12.10",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "js-yaml": "^3.12.0",
+    "lodash": "^4.17.11"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/flycheck_/"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/src/__test__/setup.js",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
+  }
+}
