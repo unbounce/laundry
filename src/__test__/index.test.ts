@@ -16,6 +16,28 @@ test('missing resources', () => {
   expect(validate('{}')).toMatchObject(expected);
 });
 
+test('required property', () => {
+  const expected =  [
+    {
+      path: ['Root', 'Resources', 'RecordSet', 'Name'],
+      message: expect.stringMatching(/required/)
+    }
+  ]
+  const template = `
+Resources:
+  RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties: {}
+`
+  expect(validate(template)).toMatchObject(expected);
+});
+
 test('valid', () => {
-  expect(validate('Resources: {}')).toEqual([]);
+  const template = `
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties: {}
+`
+  expect(validate(template)).toEqual([]);
 });

@@ -1,7 +1,48 @@
 import * as yaml from 'js-yaml';
-
 import * as _ from 'lodash';
-// import spec from './CloudFormationResourceSpecification.json';
+
+import spec from './CloudFormationResourceSpecification.json';
+type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
+type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
+type Type = string; // TODO better type
+type ResourceType = {
+  Attributes?: {
+    [attribute: string]: {
+      PrimitiveType?: PrimitiveType
+      Type?: Type,
+      PrimitiveItemType?: PrimitiveType
+      ItemType?: Type,
+    }
+  },
+  Documentation: string,
+  Properties: {
+    [property: string]: {
+      Documentation: string,
+      Required: boolean,
+      PrimitiveType?: PrimitiveType
+      Type?: Type,
+      PrimitiveItemType?: PrimitiveType
+      ItemType?: Type,
+      UpdateType: UpdateType
+    }
+  }
+}
+type PropertyType = {
+  Documentation: string,
+  Properties: {
+    [property: string]: {
+      Documentation: string,
+      Required: boolean,
+      PrimitiveType?: PrimitiveType
+      Type?: Type,
+      PrimitiveItemType?: PrimitiveType
+      ItemType?: Type,
+      UpdateType: UpdateType
+    }
+  }
+}
+const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTypes;
+const PropertyTypes: { [propertyType: string]: PropertyType } = spec.PropertyTypes;
 
 // Based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html
 const rootProperties = [
@@ -71,15 +112,15 @@ class Walker {
     const path = this.pushPath('Root');
     _.forEach(this.visitors, (v) => v.Root(path, root));
 
-    // this.AWSTemplateFormatVersion(_.get(root, 'AWSTemplateFormatVersion'));
-    // this.Description
-    // this.Metadata
-    // this.Parameters
-    // this.Mappings
-    // this.Conditions
-    // this.Transform
+    this.AWSTemplateFormatVersion(_.get(root, 'AWSTemplateFormatVersion'));
+    this.Description(_.get(root, 'Description'));
+    this.Metadata(_.get(root, 'Metadata'));
+    this.Parameters(_.get(root, 'Parameters'));
+    this.Mappings(_.get(root, 'Mappings'));
+    this.Conditions(_.get(root, 'Conditions'));
+    this.Transform(_.get(root, 'Transform'));
     this.Resources(_.get(root, 'Resources'));
-    // this.Outputs
+    this.Outputs(_.get(root, 'Outputs'));
     this.popPath();
   }
 
@@ -115,9 +156,9 @@ class Walker {
     this.popPath();
   }
 
-  Mappings(): void {}
-  Conditions(): void {}
-  Transform(): void {}
+  Mappings(mappings: any): void {}
+  Conditions(conditions: any): void {}
+  Transform(transform: any): void {}
 
   Resources(resources: any): void {
     let path = this.pushPath('Resources');
@@ -133,7 +174,7 @@ class Walker {
     this.popPath();
   }
 
-  Outputs(): void {}
+  Outputs(outputs: any): void {}
 }
 
 export type Error = {
@@ -149,42 +190,54 @@ class Validator extends Visitor {
   }
 
   Resources(path: Path, resources: any) {
-    this.validate(
-      path,
-      resources,
-      this.isRequired,
-      this.isObject
-    );
+    this.isPresent(path, resources) && this.isObject(path, resources);
+  }
+
+  Resource(path: Path, resource: any) {
+    if(this.isObject(path, resource)) {
+      if(this.isPresent(path, resource.Type)) {
+        const s: ResourceType = _.get(ResourceTypes, resource.Type);
+        if(s) {
+          _.forEach(s.Properties, (property, name) => {
+            if(property.Required) {
+              this.isPresent(path.concat(name), resource[name]);
+            }
+          });
+        } else {
+          this.errors.push({path, message: `invalid type: ${resource.Type}`})
+        }
+      }
+    }
   }
 
   //
 
-  private isRequired(path: Path, o: any): boolean {
+  private isPresent(path: Path, o: any): boolean {
     if(_.isNil(o)) {
-      this.errors.push({path: path, message: 'is required'});
-      return true;
-    } else {
+      this.errors.push({path, message: 'is required'});
       return false;
+    } else {
+      return true;
     }
   }
 
   private isObject(path: Path, o: any): boolean {
     if(!_.isObject(o)) {
-      this.errors.push({path: path, message: 'must be an object'});
-      return true;
-    } else {
+      this.errors.push({path, message: 'must be an object'});
       return false;
+    } else {
+      return true;
     }
   }
 
   // Call validation fns until one finds a validation error and returns true
-  private validate(path: Path, o: any, ...fns: Array<(path: Path, o: any) => boolean>) {
-    for(const fn of fns) {
-      if(fn.call(this, path, o)) {
-        return;
-      }
-    }
-  }
+  // private validate(path: Path, o: any, ...fns: Array<(path: Path, o: any) => boolean>) {
+  //   for(const fn of fns) {
+  //     if(!fn.call(this, path, o)) {
+  //       return;
+  //     }
+  //   }
+  // }
 
 }
 
