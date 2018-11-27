@@ -45,17 +45,6 @@ const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTyp
 const PropertyTypes: { [propertyType: string]: PropertyType } = spec.PropertyTypes;
 
 // Based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html
-const rootProperties = [
-  'AWSTemplateFormatVersion',
-  'Description',
-  'Metadata',
-  'Parameters',
-  'Mappings',
-  'Conditions',
-  'Transform',
-  'Resources',
-  'Outputs'
-];
 
 export type Path = string[];
 
