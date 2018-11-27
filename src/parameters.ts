@@ -3,6 +3,8 @@ import * as validate from './validate';
 import {Validator} from './validate';
 import {Path, Error} from './types';
 
+// Based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html
+
 const required = {
   Type: (path: Path, type: any, errors: Error[]) => {
     const docs = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html#aws-specific-parameter-types';
@@ -44,29 +46,92 @@ const required = {
 };
 
 const optional = {
-  AllowedPattern: (path: Path, allowedPattern: any, errors: Error[]) => {
+  AllowedPattern: (path: Path, parameter: object, allowedPattern: any, errors: Error[]) => {
     if(validate.string(path, allowedPattern, errors)) {
-      // if(_.get(parameters, 'Type') !== 'String') {
-      //   errors.push({path, message: 'can only be used with Type: String'});
-      // }
+      if(_.get(parameter, 'Type') !== 'String') {
+        errors.push({path, message: 'can only be specified with Type String'});
+      }
     }
   },
-  AllowedValues: (path: Path, allowedValues: any, errors: Error[]) => validate.list(path, allowedValues, errors),
-  ConstraintDescription: (path: Path, allowedValues: any, errors: Error[]) => validate.list(path, allowedValues, errors),
-  Default: (value: any) => {
-    validate.optional(value);
-    // TODO apply constraints to default
+  AllowedValues: (path: Path, parameter: object, allowedValues: any, errors: Error[]) => {
+    validate.list(path, allowedValues, errors);
+    const type = _.get(parameter, 'Type');
+    if(_.isArray(allowedValues) && type) {
+      _.forEach(allowedValues, (allowedValue, i) => {
+        if(type === 'Number') {
+          if(!_.isNumber(_.parseInt(allowedValue))) {
+            errors.push({ path: path.concat(i.toString()), message: 'does not match Type Number' });
+          }
+        } else {
+          validate.string(path.concat(i.toString()), allowedValue, errors);
+        }
+      });
+    }
   },
-  Description: (path: Path, description: any, errors: Error[]) => {
+  ConstraintDescription: (path: Path, parameter: object, allowedValues: any, errors: Error[]) => {
+    validate.list(path, allowedValues, errors);
+  },
+  Default: (path: Path, parameter: object, value: any, errors: Error[]) => {
+    validate.optional(value);
+    const type = _.get(parameter, 'Type')
+    if(type === 'Number') {
+      if(!_.isNumber(value)) {
+        errors.push({ path, message: 'does not match Type Number' });
+      }
+    } else if(type) {
+      validate.string(path, value, errors);
+    }
+
+    const maxLength = _.parseInt(_.get(parameter, 'MaxLength'));
+    if(maxLength) {
+      if(type === 'String' && _.isString(value) && value.length > maxLength) {
+        errors.push({ path, message: 'length must be less than MaxLength' });
+      }
+    }
+
+    const maxValue = _.parseInt(_.get(parameter, 'MaxValue'));
+    const num = _.parseInt(value);
+    if(maxValue) {
+      if(type === 'Number' && num && num > maxValue) {
+        errors.push({ path, message: 'must be less than MaxValue' });
+      }
+    }
+
+    const allowedValues = _.get(parameter, 'AllowedValues');
+    if(allowedValues && _.isArray(allowedValues) && !_.includes(allowedValues, value)) {
+      errors.push({ path, message: 'must match AllowedValues' });
+    }
+
+    const allowedPattern = _.get(parameter, 'AllowedPattern');
+    const regex = new RegExp(allowedPattern);
+    if(allowedPattern && !regex.exec(value)) {
+      errors.push({ path, message: 'must match AllowedPattern' });
+    }
+  },
+  Description: (path: Path, parameter: object, description: any, errors: Error[]) => {
     if(validate.string(path, description, errors)) {
       if(description.length > 4000) {
         errors.push({path, message: 'must be less than 4000 characters'});
       }
     }
   },
-  MaxLength: (path: Path, maxLength: any, errors: Error[]) => validate.number(path, maxLength, errors),
-  MaxValue: (path: Path, maxLength: any, errors: Error[]) => validate.number(path, maxLength, errors),
-  NoEcho: (path: Path, noEcho: any, errors: Error[]) => validate.boolean(path, noEcho, errors),
+  MaxLength: (path: Path, parameter: object, maxLength: any, errors: Error[]) => {
+    validate.number(path, maxLength, errors);
+    const type = _.get(parameter, 'Type')
+    if(type !== 'String') {
+      errors.push({path, message: 'can only be specified with Type String'});
+    }
+  },
+  MaxValue: (path: Path, parameter: object, maxLength: any, errors: Error[]) => {
+    validate.number(path, maxLength, errors);
+    const type = _.get(parameter, 'Type')
+    if(type !== 'Number') {
+      errors.push({path, message: 'can only be specified with Type Number'});
+    }
+  },
+  NoEcho: (path: Path, parameter: object, noEcho: any, errors: Error[]) => {
+    validate.boolean(path, noEcho, errors);
+  },
 };
 
 export class ParametersValidator extends Validator {
@@ -76,10 +141,10 @@ export class ParametersValidator extends Validator {
       this.forEachWithPath(path, parameters, (path, parameter, name) => {
         if(validate.object(path, parameter, this.errors)) {
           _.forEach(parameter, (value, key) => {
-            const s = _.get(optional, name);
+            const s = _.get(optional, key);
             if(s) {
-              s(path.concat(key), value, this.errors);
-            } if(!_.includes(_.keys(required), key)) {
+              s(path.concat(key), parameter, value, this.errors);
+            } else if(!_.includes(_.keys(required), key)) {
               this.errors.push({ path: path.concat(key), message: 'invalid property'});
             }
           });

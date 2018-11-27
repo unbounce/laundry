@@ -19,7 +19,7 @@ export function required(path: Path, o: any, errors: Error[]): boolean {
 
 export function object(path: Path, o: any, errors: Error[]): boolean {
   if(!_.isObject(o)) {
-    errors.push({path, message: 'must be an object'});
+    errors.push({path, message: 'must be an Object'});
     return false;
   } else {
     return true;
@@ -28,7 +28,7 @@ export function object(path: Path, o: any, errors: Error[]): boolean {
 
 export function list(path: Path, o: any, errors: Error[]): boolean {
    if(!_.isArray(o)) {
-    errors.push({path, message: 'must be a list'});
+    errors.push({path, message: 'must be a List'});
     return false;
   } else {
     return true;
@@ -37,7 +37,7 @@ export function list(path: Path, o: any, errors: Error[]): boolean {
 
 export function string(path: Path, o: any, errors: Error[]): boolean {
   if(!_.isString(o)) {
-    errors.push({path, message: 'must be a string'});
+    errors.push({path, message: 'must be a String'});
     return false;
   } else {
     return true;
@@ -46,7 +46,7 @@ export function string(path: Path, o: any, errors: Error[]): boolean {
 
 export function number(path: Path, o: any, errors: Error[]): boolean {
   if(!_.isNumber(o)) {
-    errors.push({path, message: 'must be a number'});
+    errors.push({path, message: 'must be a Number'});
     return false;
   } else {
     return true;
@@ -55,7 +55,7 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
 
 export function boolean(path: Path, o: any, errors: Error[]): boolean {
   if(!_.isBoolean(o)) {
-    errors.push({path, message: 'must be a boolean'});
+    errors.push({path, message: 'must be a Boolean'});
     return false;
   } else {
     return true;

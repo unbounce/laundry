@@ -33,7 +33,7 @@ describe('lint', () => {
   test('empty template', () => {
     const expected = {
       path: ['Root'],
-      message: expect.stringMatching(/object/)
+      message: expect.stringMatching(/Object/)
     };
     expect(lint('')[0]).toMatchObject(expected);
   });
@@ -50,7 +50,7 @@ describe('lint', () => {
     test('non-string', () => {
       const expected = [{
         path: ['Root', 'Description'],
-        message: expect.stringMatching(/string/)
+        message: expect.stringMatching(/String/)
       }];
       const template = yaml.dump({
         Description: {},
@@ -84,7 +84,7 @@ describe('lint', () => {
     test('non-string', () => {
       const expected = [{
         path: ['Root', 'AWSTemplateFormatVersion'],
-        message: expect.stringMatching(/string/)
+        message: expect.stringMatching(/String/)
       }];
       const template = yaml.dump({
         AWSTemplateFormatVersion: {},
@@ -179,11 +179,11 @@ describe('lint', () => {
       expect(lint(template)).toMatchObject(expected);
     });
 
-    test('invalid resource property list type', () => {
+    test('invalid resource property List type', () => {
       const expected = [
         {
           path: ['Root', 'Resources', 'Bucket', 'Properties', 'Tags', '0'],
-          message: expect.stringMatching(/object/)
+          message: expect.stringMatching(/Object/)
         }
       ];
       const template = yaml.dump({
@@ -205,7 +205,7 @@ describe('lint', () => {
       const expected = [
         {
           path: ['Root', 'Parameters'],
-          message: expect.stringMatching(/object/)
+          message: expect.stringMatching(/Object/)
         }
       ];
       const input = lintWithProperty('Parameters', 'test');
@@ -237,6 +237,337 @@ describe('lint', () => {
     test('SSM AWS Type', () => {
       const input = lintWithProperty('Parameters.Foo.Type', 'AWS::SSM::Parameter::Value<AWS::EC2::Subnet::Id>');
       expect(input).toEqual([]);
+    });
+
+    describe('Default', () => {
+
+      test('invalid default', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/Number/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              Default: 'not a number'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('exceed MaxLength', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/length/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MaxLength: 1,
+              Default: 'foo'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('not exceed MaxLength', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MaxLength: 3,
+              Default: 'foo'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('exceed MaxValue', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/MaxValue/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              MaxValue: 1,
+              Default: 2
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('not exceed MaxValue', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              MaxValue: 2,
+              Default: 2
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('not in AllowedValues', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/AllowedValues/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              AllowedValues: [1, 2],
+              Default: 3
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('in AllowedValues', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              AllowedValues: [1, 2],
+              Default: 2
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('matching AllowedPattern', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedPattern: '^abc$',
+              Default: 'abc'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('not matching AllowedPattern', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/AllowedPattern/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedPattern: '^abc$',
+              Default: 'foo'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+    });
+
+    describe('AllowedValues', () => {
+      test('with non List', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'AllowedValues'],
+            message: expect.stringMatching(/List/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedValues: 'a'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('with List', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedValues: ['a'],
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('values match Type', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedValues: ['a', 'b'],
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('values do not match Type', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'AllowedValues', '1'],
+            message: expect.stringMatching(/String/)
+          },
+          {
+            path: ['Root', 'Parameters', 'Foo', 'AllowedValues', '3'],
+            message: expect.stringMatching(/String/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedValues: ['a', 1, 'b', 2],
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+    });
+
+    describe('MaxLength', () => {
+      test('with non String', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'MaxLength'],
+            message: expect.stringMatching(/String/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              MaxLength: 1,
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('with String', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MaxLength: 1,
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+    });
+
+    describe('MaxValue', () => {
+      test('with non Number', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'MaxValue'],
+            message: expect.stringMatching(/Number/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MaxValue: 1,
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('with Number', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'Number',
+              MaxValue: 1,
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+    });
+
+    describe('AllowedPattern', () => {
+      test('with String', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedPattern: '^[a-z]$'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
+      test('with non String', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'AllowedPattern'],
+            message: expect.stringMatching(/String/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              AllowedPattern: {}
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
     });
   });
 });
