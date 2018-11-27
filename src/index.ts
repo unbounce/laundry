@@ -202,6 +202,15 @@ class Validator extends Visitor {
     }
   }
 
+  protected isString(path: Path, o: any): boolean {
+    if(!_.isString(o)) {
+      this.errors.push({path, message: 'must be a string'});
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   protected forEachWithPath<T>(path: Path, as: Array<T>, fn: (path: Path, a: T, i: number|string) => void): void {
     _.forEach(as, (a, i) => {
       fn(path.concat(i.toString()), a, i);
@@ -217,6 +226,22 @@ class RootValidator extends Validator {
 
   Resources(path: Path, resources: any) {
     this.isPresent(path, resources) && this.isObject(path, resources);
+  }
+
+  Description(path: Path, description: any) {
+    if (_.isUndefined(description)) return;
+
+    _.isUndefined(description) || this.isString(path, description);
+  }
+
+  AWSTemplateFormatVersion(path: Path, version: any) {
+    if (_.isUndefined(version)) return;
+
+    if(this.isString(path, version)) {
+      if(!version.match(/\d{4}-\d{2}-\d{2}/)) {
+        this.errors.push({path, message: 'must be in the format 2010-09-09'});
+      }
+    }
   }
 }
 
@@ -282,7 +307,7 @@ class ResourcePropertyValidator extends Validator {
                 throw new ResourceSpecificationError('No property type');
               }
             } else {
-              this.errors.push({path: path, message: 'invalid property'});
+              this.errors.push({path, message: 'invalid property'});
             }
           });
         }
@@ -316,7 +341,7 @@ class ResourcePropertyValidator extends Validator {
       default:
         throw new ResourceSpecificationError('Unknown PrimitiveType');
     }
-     if(!predicate.apply(property)) {
+    if(!predicate.apply(property)) {
       this.errors.push({path, message: `must be a ${primitiveType}`});
     }
   }
@@ -342,11 +367,11 @@ class ResourcePropertyValidator extends Validator {
                   }
                 });
               } else {
-                this.errors.push({path: path, message: 'must be a List'});
+                this.errors.push({path, message: 'must be a List'});
               }
             }
           } else {
-            this.errors.push({path: path, message: 'invalid property'});
+            this.errors.push({path, message: 'invalid property'});
           }
         });
       }

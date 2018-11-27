@@ -9,6 +9,58 @@ test('empty template', () => {
   expect(validate('')[0]).toMatchObject(expected);
 });
 
+test('Description as invalid string', () => {
+  const template = yaml.dump({
+    Description: 'test',
+    Resources: {}
+  });
+  expect(validate(template)).toEqual([]);
+});
+
+test('Description as non-string', () => {
+  const expected = [{
+    path: ['Root', 'Description'],
+    message: expect.stringMatching(/string/)
+  }];
+  const template = yaml.dump({
+    Description: {},
+    Resources: {}
+  });
+  expect(validate(template)).toMatchObject(expected);
+});
+
+test('AWSTemplateFormatVersion as valid string', () => {
+  const template = yaml.dump({
+    AWSTemplateFormatVersion: '2010-09-09',
+    Resources: {}
+  });
+  expect(validate(template)).toEqual([]);
+});
+
+test('AWSTemplateFormatVersion as valid string', () => {
+  const expected = [{
+    path: ['Root', 'AWSTemplateFormatVersion'],
+    message: expect.stringMatching(/format/)
+  }];
+  const template = yaml.dump({
+    AWSTemplateFormatVersion: 'test',
+    Resources: {}
+  });
+  expect(validate(template)).toMatchObject(expected);
+});
+
+test('AWSTemplateFormatVersion as non-string', () => {
+  const expected = [{
+    path: ['Root', 'AWSTemplateFormatVersion'],
+    message: expect.stringMatching(/string/)
+  }];
+  const template = yaml.dump({
+    AWSTemplateFormatVersion: {},
+    Resources: {}
+  });
+  expect(validate(template)).toMatchObject(expected);
+});
+
 test('missing resources', () => {
   const expected = [{
     path: ['Root', 'Resources'],
@@ -113,7 +165,7 @@ test('invalid resource property list type', () => {
   expect(validate(template)).toMatchObject(expected);
 });
 
-test('valid', () => {
+test('valid template', () => {
   const template = yaml.dump({
     Resources: {
       Bucket: {

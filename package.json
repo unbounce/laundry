@@ -24,7 +24,10 @@
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/flycheck_/"
+      ".*flycheck.*"
+    ],
+    "watchPathIgnorePatterns": [
+      ".*flycheck.*"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/src/__test__/setup.js",
     "moduleFileExtensions": [
