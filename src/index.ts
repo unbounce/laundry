@@ -146,7 +146,7 @@ class Walker {
     const path = this.pushPath('Parameters');
     _.forEach(this.visitors, (v) => v.Parameters(path, parameters));
 
-    if(_.isObject(parameters)) {
+     if(_.isObject(parameters)) {
       _.forEach(parameters, (parameter, name) => {
         this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Parameter(path, parameter));
@@ -164,7 +164,7 @@ class Walker {
     let path = this.pushPath('Resources');
     _.forEach(this.visitors, (v) => v.Resources(path, resources));
 
-    if(_.isObject(resources)) {
+     if(_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
         let path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Resource(path, resource));
@@ -181,39 +181,22 @@ export type Error = {
   path: Path,
   message: String
 };
+class ResourceSpecificationError extends Error {
+  constructor(message: string) {
+    super(`${message} - there may be an error in the CloudFormation Resource Specification`);
+  }
+}
 
 class Validator extends Visitor {
-  public errors: Error[] = []
+  protected errors: Error[];
 
-  Root(path: Path, root: any) {
-    this.isObject(path, root);
+  constructor(errors: Error[]) {
+    super();
+    this.errors = errors;
   }
 
-  Resources(path: Path, resources: any) {
-    this.isPresent(path, resources) && this.isObject(path, resources);
-  }
-
-  Resource(path: Path, resource: any) {
-    if(this.isObject(path, resource)) {
-      if(this.isPresent(path, resource.Type)) {
-        const s: ResourceType = _.get(ResourceTypes, resource.Type);
-        if(s) {
-          _.forEach(s.Properties, (property, name) => {
-            if(property.Required) {
-              this.isPresent(path.concat(name), resource[name]);
-            }
-          });
-        } else {
-          this.errors.push({path, message: `invalid type: ${resource.Type}`})
-        }
-      }
-    }
-  }
-
-  //
-
-  private isPresent(path: Path, o: any): boolean {
-    if(_.isNil(o)) {
+  protected isPresent(path: Path, o: any): boolean {
+     if(_.isNil(o)) {
       this.errors.push({path, message: 'is required'});
       return false;
     } else {
@@ -221,8 +204,8 @@ class Validator extends Visitor {
     }
   }
 
-  private isObject(path: Path, o: any): boolean {
-    if(!_.isObject(o)) {
+  protected isObject(path: Path, o: any): boolean {
+     if(!_.isObject(o)) {
       this.errors.push({path, message: 'must be an object'});
       return false;
     } else {
@@ -230,20 +213,169 @@ class Validator extends Visitor {
     }
   }
 
-  // Call validation fns until one finds a validation error and returns true
-  // private validate(path: Path, o: any, ...fns: Array<(path: Path, o: any) => boolean>) {
-  //   for(const fn of fns) {
-  //     if(!fn.call(this, path, o)) {
-  //       return;
-  //     }
-  //   }
-  // }
+  protected forEachWithPath<T>(path: Path, as: Array<T>, fn: (path: Path, a: T, i: number|string) => void): void {
+    _.forEach(as, (a, i) => {
+      fn(path.concat(i.toString()), a, i);
+    });
+  }
 
 }
 
+class RootValidator extends Validator {
+  Root(path: Path, root: any) {
+    this.isObject(path, root);
+  }
+
+  Resources(path: Path, resources: any) {
+    this.isPresent(path, resources) && this.isObject(path, resources);
+  }
+}
+
+class ResourceTypeValidator extends Validator {
+  Resource(path: Path, resource: any) {
+     if(_.isObject(resource)) {
+       if(this.isPresent(path, resource.Type)) {
+        const s: ResourceType = _.get(ResourceTypes, resource.Type);
+         if(!s) {
+          this.errors.push({
+            path: path.concat('Type'),
+            message: `invalid type ${resource.Type}`
+          });
+        }
+      }
+    }
+  }
+}
+
+class RequriedResourcePropertyValidator extends Validator {
+  Resource(path: Path, resource: any) {
+     if(_.isObject(resource)) {
+      const s: ResourceType = _.get(ResourceTypes, resource.Type);
+       if(s) {
+        _.forEach(s.Properties, (property, name) => {
+           if(property.Required) {
+            this.isPresent(path.concat(name), resource[name]);
+          }
+        });
+      }
+    }
+  }
+}
+
+class ResourcePropertyValidator extends Validator {
+  Resource(path: Path, resource: any) {
+    if(_.isObject(resource)) {
+      const resourceType: ResourceType = _.get(ResourceTypes, resource.Type);
+      if(resourceType) {
+        if(_.isObject(resource.Properties)) {
+          this.forEachWithPath(path.concat('Properties'), resource.Properties, (path, property, name) => {
+            const propertyType = resourceType.Properties[name];
+            if(propertyType) {
+              if(propertyType.PrimitiveType) {
+                this.isPrimitiveType(path, propertyType.PrimitiveType, property);
+              } else if(propertyType.Type === 'List') {
+                if(_.isArray(property)) {
+                  this.forEachWithPath(path, property, (path, v, i) => {
+                    if(propertyType.PrimitiveItemType) {
+                      this.isPrimitiveType(path, propertyType.PrimitiveItemType, v);
+                    } else if(propertyType.ItemType) {
+                      this.isType(path, propertyType.ItemType, v);
+                    } else {
+                      throw new ResourceSpecificationError('No property type');
+                    }
+                  });
+                } else {
+                  this.errors.push({ path, message: 'must be a List'});
+                }
+              } else if(propertyType.Type) {
+                this.isType(path, propertyType.Type, property);
+              } else {
+                throw new ResourceSpecificationError('No property type');
+              }
+            } else {
+              this.errors.push({path: path, message: 'invalid property'});
+            }
+          });
+        }
+      }
+    }
+  }
+
+  isPrimitiveType(path: Path, primitiveType: PrimitiveType, property: any) {
+    let predicate: (a: any) => boolean;
+    switch(primitiveType) {
+      case 'Boolean':
+        predicate = _.isBoolean;
+        break;
+      case 'Double':
+        predicate = _.isFinite;
+        break;
+      case 'Integer':
+        predicate = _.isInteger;
+        break;
+      case 'Json':
+        predicate = _.isPlainObject;
+        break;
+      case 'Long':
+        predicate = _.isFinite;
+        break;
+      case 'String':
+        predicate = _.isString;
+        break;
+      case 'Timestamp':
+        predicate = _.isString; // TODO better check
+      default:
+        throw new ResourceSpecificationError('Unknown PrimitiveType');
+    }
+     if(!predicate.apply(property)) {
+      this.errors.push({path, message: `must be a ${primitiveType}`});
+    }
+  }
+
+  isType(path: Path, type: Type, properties: any) {
+    const propertyType = _.get(PropertyTypes, type);
+     if(propertyType) {
+       if(this.isObject(path, properties)) {
+         this.forEachWithPath(path, properties, (path, property, name) => {
+          const s = _.get(propertyType.Properties, name);
+           if(s) {
+             if(s.PrimitiveItemType) {
+              this.isPrimitiveType(path, s.PrimitiveItemType, property);
+            } else  if(s.Type === 'List') {
+               if(_.isArray(property)) {
+                 this.forEachWithPath(path, property, (path, v, k) => {
+                   if(s.PrimitiveItemType) {
+                    this.isPrimitiveType(path, s.PrimitiveItemType, v);
+                  } else  if(s.ItemType) {
+                    this.isType(path, s.ItemType, v);
+                  } else {
+                    throw new ResourceSpecificationError('Unknown List Type')
+                  }
+                });
+              } else {
+                this.errors.push({path: path, message: 'must be a List'});
+              }
+            }
+          } else {
+            this.errors.push({path: path, message: 'invalid property'});
+          }
+        });
+      }
+    } else {
+      throw new ResourceSpecificationError('Unknown Type');
+    }
+  }
+}
+
 export function validate(template: string) {
-  const validator = new Validator();
-  const walker = new Walker([validator]);
+  const errors: Error[] = [];
+  const validators = [
+    new RootValidator(errors),
+    new ResourceTypeValidator(errors),
+    new RequriedResourcePropertyValidator(errors),
+    new ResourcePropertyValidator(errors)
+  ];
+  const walker = new Walker(validators);
   walker.Root(yaml.load(template));
-  return validator.errors;
+  return errors;
 }
