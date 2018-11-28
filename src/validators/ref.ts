@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 
-import * as validate from './validate';
-import * as yaml from './yaml';
-import {Validator} from './validate';
-import {Path, Error} from './types';
-import {ResourceTypes, Attributes} from './spec';
+import * as validate from '../validate';
+import * as yaml from '../yaml';
+import {Validator} from '../validate';
+import {Path, Error} from '../types';
+import {ResourceTypes, Attributes} from '../spec';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -19,7 +19,7 @@ const psedoParameters = [
   'AWS::URLSuffix'
 ];
 
-export class RefsValidator extends Validator {
+export class RefValidator extends Validator {
   // Validates that !Refs reference a valid resource or parameter
 
   private parameters: { [name: string]: string|undefined } = {}
