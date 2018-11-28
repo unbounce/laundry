@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import {ParametersValidator} from './parameters';
 import {RefsValidator} from './refs';
+import {TagsValidator} from './validators/tags';
 import {Path, Error, ResourceSpecificationError} from './types';
 import {Visitor, Walker} from './ast';
 
@@ -101,96 +102,13 @@ class ResourcePropertyValidator extends Validator {
           this.forEachWithPath(path.concat('Properties'), resource.Properties, (path, property, name) => {
             const propertyType = resourceType.Properties[name];
             if(propertyType) {
-              if(propertyType.PrimitiveType) {
-                this.validatePrimitiveType(path, propertyType.PrimitiveType, property);
-              } else if(propertyType.Type === 'List') {
-                if(_.isArray(property)) {
-                  this.forEachWithPath(path, property, (path, v, i) => {
-                    if(propertyType.PrimitiveItemType) {
-                      this.validatePrimitiveType(path, propertyType.PrimitiveItemType, v);
-                    } else if(propertyType.ItemType) {
-                      this.validateType(path, propertyType.ItemType, v);
-                    } else {
-                      throw new ResourceSpecificationError('No property type');
-                    }
-                  });
-                } else {
-                  this.errors.push({ path, message: 'must be a List'});
-                }
-              } else if(propertyType.Type) {
-                this.validateType(path, propertyType.Type, property);
-              } else {
-                throw new ResourceSpecificationError('No property type');
-              }
+              validate.spec(path, propertyType, property, this.errors);
             } else {
               this.errors.push({path, message: 'invalid property'});
             }
           });
         }
       }
-    }
-  }
-
-  validatePrimitiveType(path: Path, primitiveType: PrimitiveType, property: any) {
-    let predicate: (path: Path, o: any, errors: Error[]) => boolean;
-    switch(primitiveType) {
-      case 'Boolean':
-        predicate = validate.boolean;
-        break;
-      case 'Double':
-        predicate = validate.number;
-        break;
-      case 'Integer':
-        predicate = validate.number;
-        break;
-      case 'Json':
-        predicate = validate.object;
-        break;
-      case 'Long':
-        predicate = validate.number;
-        break;
-      case 'String':
-        predicate = validate.string;
-        break;
-      case 'Timestamp':
-        predicate = validate.string; // TODO better check
-      default:
-        throw new ResourceSpecificationError('Unknown PrimitiveType');
-    }
-    predicate.call(undefined, path, property, this.errors);
-  }
-
-  validateType(path: Path, type: Type, properties: any) {
-    const propertyType = _.get(PropertyTypes, type);
-     if(propertyType) {
-       if(validate.object(path, properties, this.errors)) {
-         this.forEachWithPath(path, properties, (path, property, name) => {
-          const s = _.get(propertyType.Properties, name);
-           if(s) {
-             if(s.PrimitiveItemType) {
-              this.validatePrimitiveType(path, s.PrimitiveItemType, property);
-            } else  if(s.Type === 'List') {
-               if(_.isArray(property)) {
-                 this.forEachWithPath(path, property, (path, v, k) => {
-                   if(s.PrimitiveItemType) {
-                    this.validatePrimitiveType(path, s.PrimitiveItemType, v);
-                  } else  if(s.ItemType) {
-                    this.validateType(path, s.ItemType, v);
-                  } else {
-                    throw new ResourceSpecificationError('Unknown List Type')
-                  }
-                });
-              } else {
-                this.errors.push({path, message: 'must be a List'});
-              }
-            }
-          } else {
-            this.errors.push({path, message: 'invalid property'});
-          }
-        });
-      }
-    } else {
-      throw new ResourceSpecificationError('Unknown Type');
     }
   }
 }
@@ -203,7 +121,8 @@ export function lint(template: string) {
     new ResourceTypeValidator(errors),
     new RequriedResourcePropertyValidator(errors),
     new ResourcePropertyValidator(errors),
-    new RefsValidator(errors)
+    new RefsValidator(errors),
+    new TagsValidator(errors)
   ];
   const walker = new Walker(validators);
   walker.Root(yaml.load(template));

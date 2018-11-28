@@ -568,7 +568,6 @@ describe('lint', () => {
         });
         expect(lint(template)).toMatchObject(expected);
       });
-
     });
 
     describe('!Ref', () => {
@@ -635,6 +634,22 @@ describe('lint', () => {
             }
           }
         });
+        expect(lint(template)).toMatchObject(expected);
+      });
+      test('invalid value', () => {
+        const expected = [
+          {
+            path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName', 'Ref'],
+            message: expect.stringMatching(/String/)
+          }
+        ];
+        const template = `
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref [AWS::Region]
+`
         expect(lint(template)).toMatchObject(expected);
       });
     });

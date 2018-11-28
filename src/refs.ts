@@ -20,6 +20,8 @@ const psedoParameters = [
 ];
 
 export class RefsValidator extends Validator {
+  // Validates that !Refs reference a valid resource or parameter
+
   private parameters: { [name: string]: string|undefined } = {}
   private resources: { [name: string]: Attributes|undefined } = {}
 
@@ -40,7 +42,7 @@ export class RefsValidator extends Validator {
   }
 
   ResourceProperty(path: Path, name: string, value: any) {
-    if(value instanceof yaml.Ref) {
+    if(value instanceof yaml.Ref && _.isString(value.data)) {
       if(!_.includes(_.keys(this.parameters), value.data) &&
          !_.includes(_.keys(this.resources), value.data) &&
          !_.includes(psedoParameters, value.data)) {
