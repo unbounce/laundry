@@ -17,6 +17,7 @@ export class Visitor {
   Mapping(path: Path, mapping: any): void {}
   Condition(path: Path, condition: any): void {}
   Resource(path: Path, resource: any): void {}
+  ResourceProperty(path: Path, name: string, value: any): void {}
   Output(path: Path, output: any): void {}
 }
 
@@ -114,11 +115,22 @@ export class Walker {
 
      if(_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
-        let path = this.pushPath(name);
+        path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Resource(path, resource));
+        const properties = _.get(resource, 'Properties');
+        if(_.isObject(properties)) {
+          path = this.pushPath('Properties');
+          _.forEach(properties, (value, key) => {
+            path = this.pushPath(key);
+            _.forEach(this.visitors, (v) => v.ResourceProperty(path, key, value));
+            this.popPath();
+          });
+          this.popPath();
+        }
         this.popPath();
       });
     }
+
     this.popPath();
   }
 

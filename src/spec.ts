@@ -3,26 +3,24 @@ import spec from './CloudFormationResourceSpecification.json';
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
 export type Type = string; // TODO better type
+export type PropertyValueType = {
+  PrimitiveType?: PrimitiveType
+  Type?: Type,
+  PrimitiveItemType?: PrimitiveType
+  ItemType?: Type,
+}
+export type Attributes = {
+  [attribute: string]: PropertyValueType
+};
 export type ResourceType = {
-  Attributes?: {
-    [attribute: string]: {
-      PrimitiveType?: PrimitiveType
-      Type?: Type,
-      PrimitiveItemType?: PrimitiveType
-      ItemType?: Type,
-    }
-  },
+  Attributes?: Attributes,
   Documentation: string,
   Properties: {
     [property: string]: {
       Documentation: string,
       Required: boolean,
-      PrimitiveType?: PrimitiveType
-      Type?: Type,
-      PrimitiveItemType?: PrimitiveType
-      ItemType?: Type,
       UpdateType: UpdateType
-    }
+    } & PropertyValueType
   }
 }
 export type PropertyType = {
@@ -31,12 +29,8 @@ export type PropertyType = {
     [property: string]: {
       Documentation: string,
       Required: boolean,
-      PrimitiveType?: PrimitiveType
-      Type?: Type,
-      PrimitiveItemType?: PrimitiveType
-      ItemType?: Type,
       UpdateType: UpdateType
-    }
+    } & PropertyValueType
   }
 }
 export const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTypes;

@@ -2,6 +2,12 @@ import * as _ from 'lodash';
 
 import {Visitor} from './ast';
 import {Path, Error} from './types';
+import {PropertyValueType} from './spec';
+import * as yaml from './yaml';
+
+function validateTag(tag: yaml.Tag<any>, spec: PropertyValueType): boolean {
+  return _.isEqual(spec, tag.spec);
+}
 
 export function optional(o: any): boolean {
   // Used to short-circuit validation checks
@@ -18,7 +24,7 @@ export function required(path: Path, o: any, errors: Error[]): boolean {
 }
 
 export function object(path: Path, o: any, errors: Error[]): boolean {
-  if(!_.isObject(o)) {
+  if(!_.isPlainObject(o)) {
     errors.push({path, message: 'must be an Object'});
     return false;
   } else {
@@ -36,11 +42,13 @@ export function list(path: Path, o: any, errors: Error[]): boolean {
 }
 
 export function string(path: Path, o: any, errors: Error[]): boolean {
-  if(!_.isString(o)) {
+  if(o instanceof yaml.Tag && validateTag(o, { PrimitiveType: 'String' })){
+    return true;
+  } else if (_.isString(o)) {
+    return true;
+  } else {
     errors.push({path, message: 'must be a String'});
     return false;
-  } else {
-    return true;
   }
 }
 
@@ -74,8 +82,11 @@ export class Validator extends Visitor {
     this.errors = errors;
   }
 
-
-  protected forEachWithPath<T>(path: Path, as: Array<T>, fn: (path: Path, a: T, i: number|string) => void): void {
+  protected forEachWithPath<T>(
+    path: Path,
+    as: Array<T>,
+    fn: (path: Path, a: T, i: number|string) => void)
+  : void {
     _.forEach(as, (a, i) => {
       fn(path.concat(i.toString()), a, i);
     });

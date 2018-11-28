@@ -1,10 +1,11 @@
-import * as yaml from 'js-yaml';
 import * as _ from 'lodash';
 
 import {ParametersValidator} from './parameters';
+import {RefsValidator} from './refs';
 import {Path, Error, ResourceSpecificationError} from './types';
 import {Visitor, Walker} from './ast';
 
+import * as yaml from './yaml';
 import * as validate from './validate';
 import {Validator} from './validate';
 import {
@@ -131,34 +132,32 @@ class ResourcePropertyValidator extends Validator {
   }
 
   validatePrimitiveType(path: Path, primitiveType: PrimitiveType, property: any) {
-    let predicate: (a: any) => boolean;
+    let predicate: (path: Path, o: any, errors: Error[]) => boolean;
     switch(primitiveType) {
       case 'Boolean':
-        predicate = _.isBoolean;
+        predicate = validate.boolean;
         break;
       case 'Double':
-        predicate = _.isFinite;
+        predicate = validate.number;
         break;
       case 'Integer':
-        predicate = _.isInteger;
+        predicate = validate.number;
         break;
       case 'Json':
-        predicate = _.isPlainObject;
+        predicate = validate.object;
         break;
       case 'Long':
-        predicate = _.isFinite;
+        predicate = validate.number;
         break;
       case 'String':
-        predicate = _.isString;
+        predicate = validate.string;
         break;
       case 'Timestamp':
-        predicate = _.isString; // TODO better check
+        predicate = validate.string; // TODO better check
       default:
         throw new ResourceSpecificationError('Unknown PrimitiveType');
     }
-    if(!predicate.apply(property)) {
-      this.errors.push({path, message: `must be a ${primitiveType}`});
-    }
+    predicate.call(undefined, path, property, this.errors);
   }
 
   validateType(path: Path, type: Type, properties: any) {
@@ -203,7 +202,8 @@ export function lint(template: string) {
     new ParametersValidator(errors),
     new ResourceTypeValidator(errors),
     new RequriedResourcePropertyValidator(errors),
-    new ResourcePropertyValidator(errors)
+    new ResourcePropertyValidator(errors),
+    new RefsValidator(errors)
   ];
   const walker = new Walker(validators);
   walker.Root(yaml.load(template));

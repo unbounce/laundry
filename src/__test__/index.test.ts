@@ -1,6 +1,7 @@
-import {lint} from '../index';
 import * as _ from 'lodash';
-import * as yaml from 'js-yaml';
+
+import {lint} from '../index';
+import * as yaml from '../yaml';
 
 const testTemplate = {
   Resources: {
@@ -568,6 +569,74 @@ describe('lint', () => {
         expect(lint(template)).toMatchObject(expected);
       });
 
+    });
+
+    describe('!Ref', () => {
+      test('parameter', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+            }
+          },
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: new yaml.Ref('Foo')
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('resource', () => {
+        const template = yaml.dump({
+          Resources: {
+            A: {Type: 'AWS::S3::Bucket'},
+            B: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: new yaml.Ref('A')
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('pseudo parameter', () => {
+        const template = yaml.dump({
+          Resources: {
+            A: {Type: 'AWS::S3::Bucket'},
+            B: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: new yaml.Ref('AWS::Region')
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('invalid name', () => {
+        const expected = [
+          {
+            path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'],
+            message: expect.stringMatching(/Parameter or Resource/)
+          }
+        ];
+        const template = yaml.dump({
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: new yaml.Ref('Baz')
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
     });
   });
 });
