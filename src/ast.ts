@@ -3,8 +3,6 @@ import * as _ from 'lodash';
 import {Path} from './types';
 
 export class Visitor {
-  // Root
-
   Root(path: Path, root: any): void {}
   AWSTemplateFormatVersion(path: Path, version: any): void {}
   Description(path: Path, description: any): void {}
@@ -15,19 +13,11 @@ export class Visitor {
   Transform(path: Path, transform: any): void {}
   Resources(path: Path, resources: any): void {}
   Outputs(path: Path, outputs: any): void {}
-
   Parameter(path: Path, parameter: any): void {}
-
   Mapping(path: Path, mapping: any): void {}
-
   Condition(path: Path, condition: any): void {}
-
   Resource(path: Path, resource: any): void {}
-  // Properties(path: Path, properties: any): void {}
-  // Property(path: Path, property: any): void {}
-
   Output(path: Path, output: any): void {}
-
 }
 
 export class Walker {
@@ -40,8 +30,8 @@ export class Walker {
 
   private pushPath(s: string): Path {
     // Push new path onto the stack without modifying existing one
-    const prevPath = _.get(this.paths, this.paths.length - 1, []);
-    const path = [...prevPath, s];
+    const prevPath: string[] = _.get(this.paths, this.paths.length - 1, []);
+    const path = prevPath.concat(s);
     this.paths.push(path);
     return path;
   }
@@ -64,6 +54,7 @@ export class Walker {
     this.Transform(_.get(root, 'Transform'));
     this.Resources(_.get(root, 'Resources'));
     this.Outputs(_.get(root, 'Outputs'));
+
     this.popPath();
   }
 
@@ -99,9 +90,23 @@ export class Walker {
     this.popPath();
   }
 
-  Mappings(mappings: any): void {}
-  Conditions(conditions: any): void {}
-  Transform(transform: any): void {}
+  Mappings(mappings: any): void {
+    const path = this.pushPath('Mappings');
+    _.forEach(this.visitors, (v) => v.Parameters(path, mappings));
+    this.popPath();
+  }
+
+  Conditions(conditions: any): void {
+    const path = this.pushPath('Conditions');
+    _.forEach(this.visitors, (v) => v.Parameters(path, conditions));
+    this.popPath();
+  }
+
+  Transform(transform: any): void {
+    const path = this.pushPath('Transform');
+    _.forEach(this.visitors, (v) => v.Parameters(path, transform));
+    this.popPath();
+  }
 
   Resources(resources: any): void {
     let path = this.pushPath('Resources');
@@ -117,5 +122,9 @@ export class Walker {
     this.popPath();
   }
 
-  Outputs(outputs: any): void {}
+  Outputs(outputs: any): void {
+    const path = this.pushPath('Outputs');
+    _.forEach(this.visitors, (v) => v.Parameters(path, outputs));
+    this.popPath();
+  }
 }
