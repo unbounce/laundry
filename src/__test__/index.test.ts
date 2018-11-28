@@ -570,6 +570,103 @@ describe('lint', () => {
       });
     });
 
+    describe('Ref', () => {
+      test('parameter', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+            }
+          },
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: {
+                  Ref: 'Foo'
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('resource', () => {
+        const template = yaml.dump({
+          Resources: {
+            A: {Type: 'AWS::S3::Bucket'},
+            B: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: {
+                  Ref: 'A'
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('pseudo parameter', () => {
+        const template = yaml.dump({
+          Resources: {
+            A: {Type: 'AWS::S3::Bucket'},
+            B: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: {
+                  Ref: 'AWS::Region'
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('invalid name', () => {
+        const expected = [
+          {
+            path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'],
+            message: expect.stringMatching(/Parameter or Resource/)
+          }
+        ];
+        const template = yaml.dump({
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: {
+                  Ref: 'Baz'
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+      test.only('invalid value', () => {
+        const expected = [
+          {
+            path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName', 'Ref'],
+            message: expect.stringMatching(/String/)
+          }
+        ];
+        const template = yaml.dump({
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                BucketName: {
+                  Ref: ['Baz']
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+    });
+
     describe('!Ref', () => {
       test('parameter', () => {
         const template = yaml.dump({

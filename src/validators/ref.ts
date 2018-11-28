@@ -5,6 +5,7 @@ import * as yaml from '../yaml';
 import {Validator} from '../validate';
 import {Path, Error} from '../types';
 import {ResourceTypes, Attributes} from '../spec';
+import {toCfnFn} from '../util';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'

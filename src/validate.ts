@@ -11,7 +11,7 @@ import {
 import * as yaml from './yaml';
 import {forEachWithPath} from './util';
 
-function validateTag(tag: yaml.Tag<any>, spec: PropertyValueType): boolean {
+export function cfnFn(tag: yaml.CfnFn<any>, spec: PropertyValueType): boolean {
   return _.isEqual(spec, tag.returnSpec);
 }
 
@@ -48,7 +48,7 @@ export function list(path: Path, o: any, errors: Error[]): boolean {
 }
 
 export function string(path: Path, o: any, errors: Error[]): boolean {
-  if(o instanceof yaml.Tag && validateTag(o, { PrimitiveType: 'String' })){
+  if(o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'String' })) {
     return true;
   } else if (_.isString(o)) {
     return true;

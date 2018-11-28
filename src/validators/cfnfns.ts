@@ -6,23 +6,23 @@ import {Validator} from '../validate';
 import {Path, Error} from '../types';
 import {ResourceTypes, Attributes} from '../spec';
 
-function tagName(tag: yaml.Tag<any>) {
+function cfnFnName(tag: yaml.CfnFn<any>) {
   return tag.constructor.name;
 }
 
-export class TagsValidator extends Validator {
-  stack: yaml.Tag<any>[] = [];
+export class CfnFnsValidator extends Validator {
+  stack: yaml.CfnFn<any>[] = [];
 
   ResourceProperty(path: Path, name: string, value: any) {
-    if(value instanceof yaml.Tag) {
-      this.Tag(path.concat(tagName(value)), value);
+    if(value instanceof yaml.CfnFn) {
+      this.CfnFn(path.concat(cfnFnName(value)), value);
     }
   }
 
-  Tag(path: Path, tag: yaml.Tag<any>) {
+  CfnFn(path: Path, tag: yaml.CfnFn<any>) {
     _.forEach(this.stack, (tag) => {
       if(!_.includes(tag.supportedFns, tag.constructor)) {
-        this.errors.push({ path, message: `can not be used within ${tagName(tag)}`});
+        this.errors.push({ path, message: `can not be used within ${cfnFnName(tag)}`});
       }
     });
 
@@ -40,9 +40,9 @@ export class TagsValidator extends Validator {
       }
     }
 
-    if(tag.data instanceof yaml.Tag) {
+    if(tag.data instanceof yaml.CfnFn) {
       this.stack.push(tag);
-      this.Tag(path.concat(tagName(tag.data)), tag.data);
+      this.CfnFn(path.concat(cfnFnName(tag.data)), tag.data);
       this.stack.pop();
     }
   }
