@@ -18,9 +18,7 @@ export class RootValidator extends Validator {
   }
 
   AWSTemplateFormatVersion(path: Path, version: any) {
-    if (_.isUndefined(version)) return;
-
-    if(validate.string(path, version, this.errors)) {
+    if(validate.optional(version) && validate.string(path, version, this.errors)) {
       if(!version.match(/\d{4}-\d{2}-\d{2}/)) {
         this.errors.push({path, message: 'must be in the format 2010-09-09'});
       }

@@ -6,12 +6,12 @@ import {Validator} from '../validate';
 import {Path, Error} from '../types';
 import {ResourceTypes, Attributes} from '../spec';
 
-function cfnFnName(tag: yaml.CfnFn<any>) {
+function cfnFnName(tag: yaml.CfnFn) {
   return tag.constructor.name;
 }
 
 export class CfnFnsValidator extends Validator {
-  stack: yaml.CfnFn<any>[] = [];
+  stack: yaml.CfnFn[] = [];
 
   Resource(path: Path, resource: any) {
     const properties = _.get(resource, 'Properties');
@@ -25,7 +25,7 @@ export class CfnFnsValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, resourceType: string, tag: yaml.CfnFn<any>) {
+  CfnFn(path: Path, resourceType: string, tag: yaml.CfnFn) {
     _.forEach(this.stack, (tag) => {
       if(!_.includes(tag.supportedFns, tag.constructor)) {
         this.errors.push({ path, message: `can not be used within ${cfnFnName(tag)}`});

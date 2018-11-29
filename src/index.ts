@@ -20,20 +20,20 @@ function convertCfnFns(o: any): any {
   if(cfnFn) {
     cfnFn.data = convertCfnFns(cfnFn.data);
     return cfnFn;
+  } else if(_.isArray(o)) {
+    return _.map(o, convertCfnFns);
+  } else if(_.isObject(o)) {
+    return _.mapValues(o, (a: any) => {
+      if (_.isArray(a)) {
+        return _.map(a, convertCfnFns);
+      } else if (_.isObject(a)) {
+        return convertCfnFns(a);
+      } else {
+        return a;
+      }
+    });
   } else {
-    if(_.isObject(o)) {
-      return _.mapValues(o, function(a: any) {
-        if (_.isArray(a)) {
-          return _.map(a, convertCfnFns);
-        } else if (_.isObject(a)) {
-          return convertCfnFns(a);
-        } else {
-          return a;
-        }
-      });
-    } else {
-      return o;
-    }
+    return o;
   }
 }
 

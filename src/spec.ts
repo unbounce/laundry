@@ -1,3 +1,4 @@
+import {Path, Error} from './types';
 import spec from './CloudFormationResourceSpecification.json';
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
@@ -7,7 +8,7 @@ export type PropertyValueType = {
   PrimitiveType?: PrimitiveType
   Type?: Type,
   PrimitiveItemType?: PrimitiveType
-  ItemType?: Type,
+  ItemType?: Type
 }
 export type Attributes = {
   [attribute: string]: PropertyValueType

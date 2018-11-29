@@ -11,12 +11,14 @@ import {
 import * as yaml from './yaml';
 import {forEachWithPath} from './util';
 
-export function cfnFn(tag: yaml.CfnFn<any>, spec: PropertyValueType): boolean {
-  const a = _.isEqual(spec, tag.returnSpec);
-  if(!a) {
-    console.log('cfnFn', spec, tag.returnSpec);
+export function cfnFn(tag: yaml.CfnFn, spec: PropertyValueType): boolean {
+  let returnSpec;
+  if(_.isFunction(tag.returnSpec)) {
+    returnSpec = tag.returnSpec();
+  } else {
+    returnSpec = tag.returnSpec;
   }
-  return a;
+  return _.isEqual(spec, returnSpec);
 }
 
 export function optional(o: any): boolean {
@@ -56,6 +58,8 @@ export function string(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isString(o)) {
     return true;
+  } else if (_.isNumber(o)) { // YAML interprets number only
+    return true;
   } else {
     errors.push({path, message: `must be a String, got ${JSON.stringify(o)}`});
     return false;
@@ -78,7 +82,7 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if(_.isBoolean(o)) {
     return true;
-  } else if(_.includes(['true', 'false'], o)) {
+  } else if(_.isString(o) && o.match(/^(true|false)$/i)) {
     return true;
   } else {
     errors.push({path, message: 'must be a Boolean'});
@@ -145,29 +149,31 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
    if(propertyType) {
      if(object(path, properties, errors)) {
        forEachWithPath(path, properties, (path, property, name) => {
-        const s = _.get(propertyType.Properties, name);
+         const s = _.get(propertyType.Properties, name);
          if(s) {
            if(s.PrimitiveType) {
              primitiveType(path, s.PrimitiveType, property, errors);
-          } else if(s.Type === 'List') {
-            if(_.isArray(property)) {
-              forEachWithPath(path, property, (path, v, k) => {
-                if(s.PrimitiveItemType) {
-                  primitiveType(path, s.PrimitiveItemType, v, errors);
-                } else if(s.ItemType) {
-                  complexType(path, resourceType, s.ItemType, v, errors);
-                } else {
-                  throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
-                }
-              });
-            } else {
-              errors.push({path, message: 'must be a List'});
-            }
-          }
-        } else {
-          errors.push({path, message: 'invalid property'});
-        }
-      });
+           } else if(s.Type === 'Map') {
+             object(path, property, errors);
+           } else if(s.Type === 'List') {
+             if(_.isArray(property)) {
+               forEachWithPath(path, property, (path, v, k) => {
+                 if(s.PrimitiveItemType) {
+                   primitiveType(path, s.PrimitiveItemType, v, errors);
+                 } else if(s.ItemType) {
+                   complexType(path, resourceType, s.ItemType, v, errors);
+                 } else {
+                   throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
+                 }
+               });
+             } else {
+               errors.push({path, message: 'must be a List'});
+             }
+           }
+         } else {
+           errors.push({path, message: 'invalid property'});
+         }
+       });
     }
   } else {
     throw new ResourceSpecificationError(`Unknown Type '${propertyType}'`, path);
@@ -177,6 +183,8 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
 export function spec(path: Path, resourceType: string, propertyType: PropertyValueType, property: any, errors: Error[]) {
   if(propertyType.PrimitiveType) {
     primitiveType(path, propertyType.PrimitiveType, property, errors);
+  } else if(propertyType.Type === 'Map') {
+    object(path, property, errors);
   } else if(propertyType.Type === 'List') {
     if(_.isArray(property)) {
       forEachWithPath(path, property, (path, v, i) => {

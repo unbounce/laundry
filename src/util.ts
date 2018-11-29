@@ -13,8 +13,15 @@ export function forEachWithPath<T>(
   });
 }
 
-export function toCfnFn(o: any): yaml.CfnFn<any>|undefined {
+export function isCfnFn(o: any): o is yaml.CfnFn {
+  return o instanceof yaml.CfnFn;
+}
+
+export function toCfnFn(o: any): yaml.CfnFn|undefined {
   if(_.isObject(o)) {
+    if(o instanceof yaml.CfnFn) {
+      return o;
+    }
     const keys = _.keys(o);
     if(keys.length === 1) {
       const name = keys[0];
