@@ -20,7 +20,7 @@ function lintWithProperty(key: string, value: any) {
 describe('lint', () => {
 
   test('valid template', () => {
-    const template = yaml.dump({
+    const template = JSON.stringify({
       Resources: {
         Bucket: {
           Type: 'AWS::S3::Bucket',
@@ -259,6 +259,40 @@ describe('lint', () => {
           Resources: {}
         });
         expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('exceed MinLength', () => {
+        const expected = [
+          {
+            path: ['Root', 'Parameters', 'Foo', 'Default'],
+            message: expect.stringMatching(/length/)
+          }
+        ];
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MinLength: 10,
+              Default: 'foo'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+
+      test('not exceed MinLength', () => {
+        const template = yaml.dump({
+          Parameters: {
+            Foo: {
+              Type: 'String',
+              MinLength: 3,
+              Default: 'foo'
+            }
+          },
+          Resources: {}
+        });
+        expect(lint(template)).toEqual([]);
       });
 
       test('exceed MaxLength', () => {
@@ -751,4 +785,5 @@ Resources:
       });
     });
   });
+
 });

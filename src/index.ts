@@ -21,7 +21,7 @@ function convertCfnFns(o: any): any {
     cfnFn.data = convertCfnFns(cfnFn.data);
     return cfnFn;
   } else {
-    if(_.isObject) {
+    if(_.isObject(o)) {
       return _.mapValues(o, function(a: any) {
         if (_.isArray(a)) {
           return _.map(a, convertCfnFns);
@@ -31,6 +31,8 @@ function convertCfnFns(o: any): any {
           return a;
         }
       });
+    } else {
+      return o;
     }
   }
 }

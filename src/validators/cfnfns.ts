@@ -13,13 +13,19 @@ function cfnFnName(tag: yaml.CfnFn<any>) {
 export class CfnFnsValidator extends Validator {
   stack: yaml.CfnFn<any>[] = [];
 
-  ResourceProperty(path: Path, name: string, value: any) {
-    if(value instanceof yaml.CfnFn) {
-      this.CfnFn(path.concat(cfnFnName(value)), value);
+  Resource(path: Path, resource: any) {
+    const properties = _.get(resource, 'Properties');
+    const resourceType = _.get(resource, 'Type');
+    if(_.isObject(properties)) {
+      _.forEach(properties, (value, key) => {
+        if(value instanceof yaml.CfnFn) {
+          this.CfnFn(path.concat(['Properties', key, cfnFnName(value)]), resourceType, value);
+        }
+      });
     }
   }
 
-  CfnFn(path: Path, tag: yaml.CfnFn<any>) {
+  CfnFn(path: Path, resourceType: string, tag: yaml.CfnFn<any>) {
     _.forEach(this.stack, (tag) => {
       if(!_.includes(tag.supportedFns, tag.constructor)) {
         this.errors.push({ path, message: `can not be used within ${cfnFnName(tag)}`});
@@ -29,8 +35,9 @@ export class CfnFnsValidator extends Validator {
     if(tag.paramSpec) {
       const paramErrors: Error[] = [];
       _.forEach(tag.paramSpec, (spec) => {
-        validate.spec(path, spec, tag.data, paramErrors);
+        validate.spec(path, resourceType, spec, tag.data, paramErrors);
       });
+      //  TODO this sucks
       // If no specs passed
       if(tag.paramSpec.length === paramErrors.length) {
         this.errors.push({
@@ -42,7 +49,7 @@ export class CfnFnsValidator extends Validator {
 
     if(tag.data instanceof yaml.CfnFn) {
       this.stack.push(tag);
-      this.CfnFn(path.concat(cfnFnName(tag.data)), tag.data);
+      this.CfnFn(path.concat(cfnFnName(tag.data)), resourceType, tag.data);
       this.stack.pop();
     }
   }

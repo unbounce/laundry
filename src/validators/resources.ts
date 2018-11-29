@@ -16,14 +16,17 @@ import {
 export class ResourceTypeValidator extends Validator {
   Resource(path: Path, resource: any) {
      if(_.isObject(resource)) {
-       if(validate.required(path, resource.Type, this.errors)) {
-        const s: ResourceType = _.get(ResourceTypes, resource.Type);
-         if(!s) {
-          this.errors.push({
-            path: path.concat('Type'),
-            message: `invalid type ${resource.Type}`
-          });
-        }
+       const resourceType = _.get(resource, 'Type');
+       if(validate.required(path, resourceType, this.errors)) {
+         if(!_.startsWith(resourceType, 'Custom::')) {
+           const s: ResourceType = _.get(ResourceTypes, resourceType);
+           if(!s) {
+             this.errors.push({
+               path: path.concat('Type'),
+               message: `invalid type ${resource.Type}`
+             });
+           }
+         }
       }
     }
   }
@@ -31,12 +34,12 @@ export class ResourceTypeValidator extends Validator {
 
 export class RequriedResourcePropertyValidator extends Validator {
   Resource(path: Path, resource: any) {
-     if(_.isObject(resource)) {
+    if(_.isObject(resource)) {
       const s: ResourceType = _.get(ResourceTypes, resource.Type);
-       if(s) {
+      if(s) {
         _.forEach(s.Properties, (property, name) => {
-           if(property.Required) {
-             validate.required(path.concat(name), resource[name], this.errors);
+          if(property.Required) {
+            validate.required(path.concat(['Properties', name]), _.get(resource, ['Properties', name]), this.errors);
           }
         });
       }
@@ -53,7 +56,7 @@ export class ResourcePropertyValidator extends Validator {
           this.forEachWithPath(path.concat('Properties'), resource.Properties, (path, property, name) => {
             const propertyType = resourceType.Properties[name];
             if(propertyType) {
-              validate.spec(path, propertyType, property, this.errors);
+              validate.spec(path, resource.Type, propertyType, property, this.errors);
             } else {
               this.errors.push({path, message: 'invalid property'});
             }

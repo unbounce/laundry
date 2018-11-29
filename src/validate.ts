@@ -12,7 +12,11 @@ import * as yaml from './yaml';
 import {forEachWithPath} from './util';
 
 export function cfnFn(tag: yaml.CfnFn<any>, spec: PropertyValueType): boolean {
-  return _.isEqual(spec, tag.returnSpec);
+  const a = _.isEqual(spec, tag.returnSpec);
+  if(!a) {
+    console.log('cfnFn', spec, tag.returnSpec);
+  }
+  return a;
 }
 
 export function optional(o: any): boolean {
@@ -53,26 +57,32 @@ export function string(path: Path, o: any, errors: Error[]): boolean {
   } else if (_.isString(o)) {
     return true;
   } else {
-    errors.push({path, message: 'must be a String'});
+    errors.push({path, message: `must be a String, got ${JSON.stringify(o)}`});
     return false;
   }
 }
 
 export function number(path: Path, o: any, errors: Error[]): boolean {
-  if(!_.isNumber(o)) {
+  if(_.isNumber(o)) {
+    return true;
+  } else if(_.isString(o) && _.isFinite(_.parseInt(o))) {
+    return true;
+  } else {
     errors.push({path, message: 'must be a Number'});
     return false;
-  } else {
-    return true;
   }
 }
 
 export function boolean(path: Path, o: any, errors: Error[]): boolean {
-  if(!_.isBoolean(o)) {
+  if(o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Boolean' })) {
+    return true;
+  } else if(_.isBoolean(o)) {
+    return true;
+  } else if(_.includes(['true', 'false'], o)) {
+    return true;
+  } else {
     errors.push({path, message: 'must be a Boolean'});
     return false;
-  } else {
-    return true;
   }
 }
 
@@ -100,53 +110,54 @@ export class Validator extends Visitor {
 
 }
 
-export function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, errors: Error[]) {
-  let predicate: (path: Path, o: any, errors: Error[]) => boolean;
+function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, errors: Error[]) {
+  let validator: (path: Path, o: any, errors: Error[]) => boolean;
   switch(primitiveType) {
     case 'Boolean':
-      predicate = boolean;
+      validator = boolean;
       break;
     case 'Double':
-      predicate = number;
+      validator = number;
       break;
     case 'Integer':
-      predicate = number;
+      validator = number;
       break;
     case 'Json':
-      predicate = object;
+      validator = object;
       break;
     case 'Long':
-      predicate = number;
+      validator = number;
       break;
     case 'String':
-      predicate = string;
+      validator = string;
       break;
     case 'Timestamp':
-      predicate = string; // TODO better check
+      validator = string; // TODO better check
     default:
-      throw new ResourceSpecificationError('Unknown PrimitiveType');
+      throw new ResourceSpecificationError(`Unknown PrimitiveType '${primitiveType}'`, path);
   }
-  predicate.call(undefined, path, property, errors);
+  validator.call(undefined, path, property, errors);
 }
 
-export function complexType(path: Path, type: Type, properties: any, errors: Error[]) {
-  const propertyType = _.get(PropertyTypes, type);
+function complexType(path: Path, resourceType: string, type: Type, properties: any, errors: Error[]) {
+  // TODO check that resourceType is valid
+  const propertyType = _.get(PropertyTypes, `${resourceType}.${type}`) || _.get(PropertyTypes, type);
    if(propertyType) {
      if(object(path, properties, errors)) {
        forEachWithPath(path, properties, (path, property, name) => {
         const s = _.get(propertyType.Properties, name);
          if(s) {
-           if(s.PrimitiveItemType) {
-             primitiveType(path, s.PrimitiveItemType, property, errors);
-          } else  if(s.Type === 'List') {
-             if(_.isArray(property)) {
-               forEachWithPath(path, property, (path, v, k) => {
+           if(s.PrimitiveType) {
+             primitiveType(path, s.PrimitiveType, property, errors);
+          } else if(s.Type === 'List') {
+            if(_.isArray(property)) {
+              forEachWithPath(path, property, (path, v, k) => {
                 if(s.PrimitiveItemType) {
                   primitiveType(path, s.PrimitiveItemType, v, errors);
-                } else  if(s.ItemType) {
-                  complexType(path, s.ItemType, v, errors);
+                } else if(s.ItemType) {
+                  complexType(path, resourceType, s.ItemType, v, errors);
                 } else {
-                  throw new ResourceSpecificationError('Unknown List Type')
+                  throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
                 }
               });
             } else {
@@ -159,11 +170,11 @@ export function complexType(path: Path, type: Type, properties: any, errors: Err
       });
     }
   } else {
-    throw new ResourceSpecificationError('Unknown Type');
+    throw new ResourceSpecificationError(`Unknown Type '${propertyType}'`, path);
   }
 }
 
-export function spec(path: Path, propertyType: PropertyValueType, property: any, errors: Error[]) {
+export function spec(path: Path, resourceType: string, propertyType: PropertyValueType, property: any, errors: Error[]) {
   if(propertyType.PrimitiveType) {
     primitiveType(path, propertyType.PrimitiveType, property, errors);
   } else if(propertyType.Type === 'List') {
@@ -172,17 +183,17 @@ export function spec(path: Path, propertyType: PropertyValueType, property: any,
         if(propertyType.PrimitiveItemType) {
           primitiveType(path, propertyType.PrimitiveItemType, v, errors);
         } else if(propertyType.ItemType) {
-          complexType(path, propertyType.ItemType, v, errors);
+          complexType(path, resourceType, propertyType.ItemType, v, errors);
         } else {
-          throw new ResourceSpecificationError('No property type');
+          throw new ResourceSpecificationError('No property type', path);
         }
       });
     } else {
       errors.push({ path, message: 'must be a List'});
     }
   } else if(propertyType.Type) {
-    complexType(path, propertyType.Type, property, errors);
+    complexType(path, resourceType, propertyType.Type, property, errors);
   } else {
-    throw new ResourceSpecificationError('No property type');
+    throw new ResourceSpecificationError('No property type', path);
   }
 }

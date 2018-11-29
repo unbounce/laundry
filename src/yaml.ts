@@ -13,6 +13,10 @@ export class CfnFn<T> {
   constructor(data: T) {
     this.data = data;
   }
+
+  toString() {
+    return `${this.constructor.name} ${this.data}`
+  }
 }
 
 export class Ref extends CfnFn<string> {
@@ -53,7 +57,7 @@ export class ImportValue extends CfnFn<string | object> {
 export class Base64 extends CfnFn<string|object> {
   doc = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-base64.html';
   returnSpec = {PrimitiveType: 'String'};
-  supportedFns: SupportedFns = []; // Any that returns a string
+  supportedFns: SupportedFns = [Ref, Sub, FindInMap, GetAtt, ImportValue, Base64, Cidr, GetAZs, Join, Split, Select, And, Equals, If, Not, Or];
 }
 
 export class Cidr extends CfnFn<[string, string, string]> {

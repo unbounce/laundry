@@ -93,19 +93,19 @@ export class Walker {
 
   Mappings(mappings: any): void {
     const path = this.pushPath('Mappings');
-    _.forEach(this.visitors, (v) => v.Parameters(path, mappings));
+    _.forEach(this.visitors, (v) => v.Mappings(path, mappings));
     this.popPath();
   }
 
   Conditions(conditions: any): void {
     const path = this.pushPath('Conditions');
-    _.forEach(this.visitors, (v) => v.Parameters(path, conditions));
+    _.forEach(this.visitors, (v) => v.Conditions(path, conditions));
     this.popPath();
   }
 
   Transform(transform: any): void {
     const path = this.pushPath('Transform');
-    _.forEach(this.visitors, (v) => v.Parameters(path, transform));
+    _.forEach(this.visitors, (v) => v.Transform(path, transform));
     this.popPath();
   }
 
@@ -136,7 +136,7 @@ export class Walker {
 
   Outputs(outputs: any): void {
     const path = this.pushPath('Outputs');
-    _.forEach(this.visitors, (v) => v.Parameters(path, outputs));
+    _.forEach(this.visitors, (v) => v.Outputs(path, outputs));
     this.popPath();
   }
 }

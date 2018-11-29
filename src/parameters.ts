@@ -69,13 +69,13 @@ const optional = {
     }
   },
   ConstraintDescription: (path: Path, parameter: object, allowedValues: any, errors: Error[]) => {
-    validate.list(path, allowedValues, errors);
+    validate.string(path, allowedValues, errors);
   },
   Default: (path: Path, parameter: object, value: any, errors: Error[]) => {
     validate.optional(value);
     const type = _.get(parameter, 'Type')
     if(type === 'Number') {
-      if(!_.isNumber(value)) {
+      if(!validate.number(path, value, [])){
         errors.push({ path, message: 'does not match Type Number' });
       }
     } else if(type) {
@@ -86,6 +86,13 @@ const optional = {
     if(maxLength) {
       if(type === 'String' && _.isString(value) && value.length > maxLength) {
         errors.push({ path, message: 'length must be less than MaxLength' });
+      }
+    }
+
+    const minLength = _.parseInt(_.get(parameter, 'MinLength'));
+    if(minLength) {
+      if(type === 'String' && _.isString(value) && value.length < minLength) {
+        errors.push({ path, message: 'length must be less than MinLength' });
       }
     }
 
@@ -113,6 +120,13 @@ const optional = {
       if(description.length > 4000) {
         errors.push({path, message: 'must be less than 4000 characters'});
       }
+    }
+  },
+  MinLength: (path: Path, parameter: object, minLength: any, errors: Error[]) => {
+    validate.number(path, minLength, errors);
+    const type = _.get(parameter, 'Type')
+    if(type !== 'String') {
+      errors.push({path, message: 'can only be specified with Type String'});
     }
   },
   MaxLength: (path: Path, parameter: object, maxLength: any, errors: Error[]) => {
