@@ -3,6 +3,7 @@ import {ParametersValidator} from './parameters';
 import {RootValidator} from './validators/root';
 import {RefValidator} from './validators/ref';
 import {CfnFnsValidator} from './validators/cfnfns';
+import GetAttValidator from './validators/GetAttValidator';
 import {
   ResourceTypeValidator,
   RequriedResourcePropertyValidator,
@@ -15,6 +16,7 @@ import * as yaml from './yaml';
 import {Validator} from './validate';
 import {toCfnFn} from './util';
 
+// Convert `{ Ref: '...' }` etc to `new Ref(...)`
 function convertCfnFns(o: any): any {
   const cfnFn = toCfnFn(o);
   if(cfnFn) {
@@ -46,7 +48,8 @@ export function lint(template: string) {
     new RequriedResourcePropertyValidator(errors),
     new ResourcePropertyValidator(errors),
     new RefValidator(errors),
-    new CfnFnsValidator(errors)
+    new CfnFnsValidator(errors),
+    new GetAttValidator(errors),
   ];
   const walker = new Walker(validators);
   const input = convertCfnFns(yaml.load(template));

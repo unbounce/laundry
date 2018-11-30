@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import {Ref} from '../yaml';
 import {toCfnFn} from '../util';
 
-describe.only('toCfnFn', () => {
+describe('toCfnFn', () => {
   test('Ref', () => {
-    expect(toCfnFn({ Ref: 'abc'})).toMatchObject(new Ref('abc'))
+    expect(toCfnFn({ Ref: 'abc'})).toMatchObject(new Ref('abc', 'JSON'))
   });
 });

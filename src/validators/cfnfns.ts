@@ -4,11 +4,8 @@ import * as validate from '../validate';
 import * as yaml from '../yaml';
 import {Validator} from '../validate';
 import {Path, Error} from '../types';
-import {ResourceTypes, Attributes} from '../spec';
-
-function cfnFnName(tag: yaml.CfnFn) {
-  return tag.constructor.name;
-}
+import {ResourceTypes, Attributes, PropertyValueType} from '../spec';
+import {cfnFnName} from '../util';
 
 export class CfnFnsValidator extends Validator {
   stack: yaml.CfnFn[] = [];
@@ -33,17 +30,10 @@ export class CfnFnsValidator extends Validator {
     });
 
     if(tag.paramSpec) {
-      const paramErrors: Error[] = [];
-      _.forEach(tag.paramSpec, (spec) => {
-        validate.spec(path, resourceType, spec, tag.data, paramErrors);
-      });
-      //  TODO this sucks
-      // If no specs passed
-      if(tag.paramSpec.length === paramErrors.length) {
-        this.errors.push({
-          path,
-          message: _.join(_.map(paramErrors, (e) => e.message), ' or ')
-        })
+      if(_.isFunction(tag.paramSpec)) {
+        tag.paramSpec(path, this.errors);
+      } else if(_.isObject(tag.paramSpec)) {
+        validate.spec(path, resourceType, tag.paramSpec as PropertyValueType, tag.data, this.errors);
       }
     }
 

@@ -11,7 +11,7 @@ import {
 import * as yaml from './yaml';
 import {forEachWithPath} from './util';
 
-export function cfnFn(tag: yaml.CfnFn, spec: PropertyValueType): boolean {
+export function cfnFn(tag: yaml.CfnFn<any>, spec: PropertyValueType): boolean {
   let returnSpec;
   if(_.isFunction(tag.returnSpec)) {
     returnSpec = tag.returnSpec();
@@ -100,6 +100,10 @@ export class Validator extends Visitor {
   constructor(errors: Error[]) {
     super();
     this.errors = errors;
+  }
+
+  public error(path: Path, message: string) {
+    this.errors.push({ path, message, source: this.constructor.name });
   }
 
   protected forEachWithPath<T>(

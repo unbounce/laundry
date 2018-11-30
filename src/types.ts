@@ -2,7 +2,8 @@ export type Path = string[];
 
 export type Error = {
   path: Path,
-  message: String
+  message: string,
+  source?: string,
 };
 
 export class ResourceSpecificationError extends Error {

@@ -10,26 +10,21 @@ import {toCfnFn} from '../util';
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
 };
-
-// From https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html
-const psedoParameters = [
-  'AWS::Partition',
-  'AWS::Region',
-  'AWS::StackId',
-  'AWS::StackName',
-  'AWS::URLSuffix'
-];
-
 export class RefValidator extends Validator {
-  // Validates that !Refs reference a valid resource or parameter
 
-  private parameters: { [name: string]: string|undefined } = {}
-  private resources: { [name: string]: Attributes|undefined } = {}
+  refs = [
+    // From https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html
+    'AWS::Partition',
+    'AWS::Region',
+    'AWS::StackId',
+    'AWS::StackName',
+    'AWS::URLSuffix'
+  ];
 
   Parameters(path: Path, parameters: any) {
     if(_.isObject(parameters)) {
       _.forEach(parameters, (parameter, name) => {
-        this.parameters[name] = _.get(parameter, 'Type');
+        this.refs.push(name);
       });
     }
   }
@@ -37,16 +32,14 @@ export class RefValidator extends Validator {
   Resources(path: Path, resources: any) {
     if(_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
-        this.resources[name] = _.get(ResourceTypes, [name, 'Attributes']);;
+        this.refs.push(name);
       });
     }
   }
 
   ResourceProperty(path: Path, name: string, value: any) {
     if(value instanceof yaml.Ref && _.isString(value.data)) {
-      if(!_.includes(_.keys(this.parameters), value.data) &&
-         !_.includes(_.keys(this.resources), value.data) &&
-         !_.includes(psedoParameters, value.data)) {
+      if(!_.includes(this.refs, value.data)) {
         this.errors.push({ path, message: 'not a valid Parameter or Resource'});
       }
     }
