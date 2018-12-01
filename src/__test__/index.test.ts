@@ -132,7 +132,7 @@ describe('lint', () => {
   });
 
   describe('Resources', () => {
-    test('missing resources', () => {
+    test('missing Resources', () => {
       const expected = [{
         path: ['Root', 'Resources'],
         message: expect.stringMatching(/required/)
@@ -141,23 +141,25 @@ describe('lint', () => {
     });
 
     test('required property', () => {
-      const expected = [
-        {
-          path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Name'],
-          message: expect.stringMatching(/required/)
-        },
-        {
-          path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Type'],
-          message: expect.stringMatching(/required/)
-        }
-      ]
+      const expected = [{
+        path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Name'],
+        message: expect.stringMatching(/required/)
+      }];
       const template = yaml.dump({
-        Resources: {
-          RecordSet: {
-            Type: 'AWS::Route53::RecordSet',
-            Properties: {}
-          }
-        }
+        Resources: {RecordSet: {Type: 'AWS::Route53::RecordSet', Properties: { Type: 'A' }}}
+      });
+      expect(lint(template)).toMatchObject(expected);
+    });
+
+    test('required property AWS::NoValue', () => {
+      const expected = [{
+        path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Name'],
+        message: expect.stringMatching(/required/)
+      }];
+      const template = yaml.dump({
+        Resources: {RecordSet: {
+          Type: 'AWS::Route53::RecordSet',
+          Properties: { Type: 'A', Name: new yaml.Ref('AWS::NoValue', 'YAML') }}}
       });
       expect(lint(template)).toMatchObject(expected);
     });

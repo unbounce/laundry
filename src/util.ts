@@ -13,6 +13,10 @@ export function forEachWithPath<T>(
   });
 }
 
+export function isNoValue(o: any) {
+  return o instanceof yaml.Ref && o.data === 'AWS::NoValue';
+}
+
 export function isCfnFn(o: any): o is yaml.CfnFn {
   return o instanceof yaml.CfnFn;
 }

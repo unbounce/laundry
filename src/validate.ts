@@ -9,7 +9,7 @@ import {
   Type
 } from './spec';
 import * as yaml from './yaml';
-import {forEachWithPath} from './util';
+import {forEachWithPath, isNoValue} from './util';
 
 export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   let returnSpec;
@@ -27,7 +27,7 @@ export function optional(o: any): boolean {
 }
 
 export function required(path: Path, o: any, errors: Error[]): boolean {
-   if(_.isNil(o)) {
+  if(_.isNil(o) || isNoValue(o)) {
     errors.push({path, message: 'is required'});
     return false;
   } else {

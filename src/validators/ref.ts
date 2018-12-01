@@ -17,7 +17,8 @@ export class RefValidator extends Validator {
     'AWS::Region',
     'AWS::StackId',
     'AWS::StackName',
-    'AWS::URLSuffix'
+    'AWS::URLSuffix',
+    'AWS::NoValue'
   ];
 
   Parameters(path: Path, parameters: any) {
