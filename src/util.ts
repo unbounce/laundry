@@ -74,6 +74,15 @@ export function toCfnFn(o: any): yaml.CfnFn|undefined {
   }
 }
 
-export function cfnFnName(tag: yaml.CfnFn) {
-  return tag.constructor.name;
+export function cfnFnName(cfnFn: yaml.CfnFn) {
+  const name = cfnFn.constructor.name;
+  if(cfnFn.isYAML()) {
+    return name;
+  } else {
+    if(name === 'Ref') {
+      return name;
+    } else {
+      return `Fn::${name}`;
+    }
+  }
 }

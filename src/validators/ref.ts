@@ -5,7 +5,6 @@ import * as yaml from '../yaml';
 import {Validator} from '../validate';
 import {Path, Error} from '../types';
 import {ResourceTypes, Attributes} from '../spec';
-import {toCfnFn} from '../util';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -37,11 +36,11 @@ export class RefValidator extends Validator {
     }
   }
 
-  ResourceProperty(path: Path, name: string, value: any) {
+  CfnFn(path: Path, value: yaml.CfnFn) {
     if(value instanceof yaml.Ref && _.isString(value.data)) {
       if(!_.includes(this.refs, value.data)) {
         this.errors.push({
-          path: path.concat('Ref'),
+          path,
           message: `${value.data} is not a valid Parameter or Resource`
         });
       }

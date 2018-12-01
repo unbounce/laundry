@@ -11,12 +11,12 @@ import {
 import * as yaml from './yaml';
 import {forEachWithPath} from './util';
 
-export function cfnFn(tag: yaml.CfnFn<any>, spec: PropertyValueType): boolean {
+export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   let returnSpec;
-  if(_.isFunction(tag.returnSpec)) {
-    returnSpec = tag.returnSpec();
+  if(_.isFunction(cfnFn.returnSpec)) {
+    returnSpec = cfnFn.returnSpec();
   } else {
-    returnSpec = tag.returnSpec;
+    returnSpec = cfnFn.returnSpec;
   }
   return _.isEqual(spec, returnSpec);
 }

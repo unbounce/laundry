@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 
 import {Path} from './types';
+import {CfnFn} from './yaml';
+import {cfnFnName} from './util';
 
 export class Visitor {
   Root(path: Path, root: any): void {}
@@ -18,6 +20,7 @@ export class Visitor {
   Condition(path: Path, condition: any): void {}
   Resource(path: Path, resource: any): void {}
   ResourceProperty(path: Path, name: string, value: any): void {}
+  CfnFn(path: Path, value: CfnFn): void {}
   Output(path: Path, output: any): void {}
 }
 
@@ -123,6 +126,7 @@ export class Walker {
           _.forEach(properties, (value, key) => {
             path = this.pushPath(key);
             _.forEach(this.visitors, (v) => v.ResourceProperty(path, key, value));
+            this.recursivelyVisitCfnFn(path, value);
             this.popPath();
           });
           this.popPath();
@@ -132,6 +136,21 @@ export class Walker {
     }
 
     this.popPath();
+  }
+
+  private recursivelyVisitCfnFn(path: Path, value: any) {
+    if(value instanceof CfnFn) {
+      path = this.pushPath(cfnFnName(value));
+      _.forEach(this.visitors, (v) => v.CfnFn(path, value));
+      this.recursivelyVisitCfnFn(path, value.data);
+      this.popPath();
+    } else if(_.isObject(value)) {
+      _.forEach(value, (v, i) => {
+        path = this.pushPath(i.toString());
+        this.recursivelyVisitCfnFn(path, v);
+        this.popPath();
+      });
+    }
   }
 
   Outputs(outputs: any): void {

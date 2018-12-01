@@ -43,7 +43,7 @@ export default class SubValidator extends Validator {
     }
   }
 
-  ResourceProperty(path: Path, name: string, value: any) {
+  CfnFn(path: Path, value: yaml.CfnFn) {
     // If you specify template parameter names or resource logical IDs, such as
     // ${InstanceTypeParameter}, AWS CloudFormation returns the same values as if
     // you used the Ref intrinsic function. If you specify resource attributes,
@@ -64,7 +64,6 @@ export default class SubValidator extends Validator {
       } else {
         return;
       }
-      path = path.concat('Sub');
       const r = /\$\{([^!][^}]*)\}/g
       let match;
       while(match = r.exec(template)) {

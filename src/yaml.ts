@@ -127,6 +127,7 @@ export class ImportValue extends CfnFn {
 
 export class Base64 extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-base64.html';
+  [paramSpec] = {PrimitiveType: 'String'};
   [returnSpec] = {PrimitiveType: 'String'};
   [supportedFns]: SupportedFns = [Ref, Sub, FindInMap, GetAtt, ImportValue, Base64, Cidr, GetAZs, Join, Split, Select, And, Equals, If, Not, Or];
 }
@@ -154,7 +155,7 @@ export class Split extends CfnFn {
 }
 export class Select extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-select.html';
-  [returnSpec] = {PrimitiveType: 'String'}
+  [returnSpec] = {PrimitiveType: 'String'};
   allowedFns = [FindInMap, GetAtt, GetAZs, If, Split, Ref];
 }
 // export class GetParam extends CfnFn {
@@ -231,17 +232,16 @@ function tag(cls: any) {
 
 const types = _.concat(
   tag(Ref),
+  tag(Sub),
+  tag(GetAtt),
+
   tag(Base64),
   tag(FindInMap),
-  tag(GetAtt),
   tag(GetAZs),
   tag(ImportValue),
   tag(Join),
   tag(Split),
-  tag(Ref),
-  tag(Ref),
   tag(Select),
-  tag(Sub),
   // tag(GetParam),
   tag(And),
   tag(Equals),
