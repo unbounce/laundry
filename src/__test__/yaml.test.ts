@@ -1,4 +1,4 @@
-import {load, dump, Ref, GetAtt, CfnFn} from '../yaml';
+import {load, dump, Ref, CfnFn} from '../yaml';
 
 describe('load', () => {
   test('with ref', () => {
@@ -24,10 +24,3 @@ describe('dump', () => {
     expect(dump(input)).toEqual('foo:\n  Ref: bar\n');
   });
 })
-
-describe('GetAtt', () => {
-  test('instanceof', () => {
-    const getAtt = new GetAtt('a', 'YAML');
-    expect(getAtt instanceof CfnFn).toBeTruthy();
-  });
-});

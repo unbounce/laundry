@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
 import {Path, Error} from './types';
 import {PropertyValueType} from './spec';
+import * as validate from './validate';
 
 type SupportedFns = Array<typeof CfnFn>;
 type PropertyValueTypeFn = () => PropertyValueType;
@@ -21,15 +22,15 @@ const supportedFns = Symbol('supportedFns');
 const data = Symbol('data');
 const doc = Symbol('doc');
 
-export class CfnFn<T = any> {
-  public [data]: T;
+export class CfnFn {
+  public [data]: any;
   public [supportedFns]: SupportedFns = [];
   public [doc]: string = 'http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html';
   public [paramSpec]: PropertyValueType|ParamSpecFn;
   public [returnSpec]: PropertyValueType|PropertyValueTypeFn = {};
   public [style]: Style;
 
-  constructor(d: T, s: Style) {
+  constructor(d: any, s: Style) {
     this[data] = d;
     this[style] = s;
     let name = this.constructor.name;
@@ -40,11 +41,11 @@ export class CfnFn<T = any> {
     this[name] = d;
   }
 
-  set data(d: T) {
+  set data(d: any) {
     this[data] = d;
   }
 
-  get data(): T {
+  get data(): any {
     return this[data];
   }
 
@@ -73,39 +74,44 @@ export class CfnFn<T = any> {
   }
 }
 
-export class Ref extends CfnFn<string> {
+export class Ref extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html';
   [paramSpec] =  {PrimitiveType: 'String'};
   [returnSpec] = {PrimitiveType: 'String'};
 }
 
-export class Sub extends CfnFn<string | [string, object]> {
+export class Sub extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html';
-  [paramSpec] =  {PrimitiveType: 'String'};
+  [paramSpec] = (path: Path, errors: Error[]) => {
+    if (_.isArray(this.data) && this.data.length === 2) {
+      validate.string(path.concat('0'), this.data[0], errors);
+      validate.object(path.concat('1'), this.data[1], errors);
+    } else if(!_.isString(this.data)) {
+      errors.push({path, message: 'must be a String or List of Sting and Map'});
+    }
+  };
   [returnSpec] = {PrimitiveType: 'String'};
   [supportedFns]: SupportedFns = [Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref];
 }
 
-export class FindInMap extends CfnFn<[string, string, string]> {
+export class FindInMap extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-findinmap.html';
   [returnSpec] = {PrimitiveType: 'String'};
   [supportedFns]: SupportedFns = [FindInMap, Ref];
 }
 
-export class GetAtt extends CfnFn<string | [string, string]> {
+export class GetAtt extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html';
-  [paramSpec] =  (path: Path, errors: Error[]) => {
+  [paramSpec] = (path: Path, errors: Error[]) => {
     if(this.isYAML() && _.isString(this.data) ) {
       if(!_.includes(this.data, '.')) {
-        errors.push({path, message: 'must be in the format `Resource.Attribute`'});
+        errors.push({path, message: 'must be a String that contains a `.`'});
       }
-    } else if(_.isArray(this.data) && this.data.length === 2) {
-      errors.push({path, message: 'must be in the format `[Resource, Attribute]`'});
-    } else {
+    } else if(!(_.isArray(this.data) && this.data.length === 2 && _.every(this.data, _.isString))) {
       if(this.isYAML()) {
-        errors.push({path, message: 'must be in the format `Resource.Attribute` or `[Resource, Attribute]`'});
+        errors.push({path, message: 'must be a String or a List of two Strings'});
       } else {
-        errors.push({path, message: 'must be in the format `[Resource, Attribute]`'});
+        errors.push({path, message: 'must be a List of two Strings'});
       }
     }
   };
@@ -113,59 +119,59 @@ export class GetAtt extends CfnFn<string | [string, string]> {
   [supportedFns]: SupportedFns = [Ref]; // Only for attribute name
 }
 
-export class ImportValue extends CfnFn<string | object> {
+export class ImportValue extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html';
   [returnSpec] = {PrimitiveType: 'String'};
   [supportedFns]: SupportedFns = [Base64, FindInMap, If, Join, Select, Split, Sub, Ref];
 }
 
-export class Base64 extends CfnFn<string|object> {
+export class Base64 extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-base64.html';
   [returnSpec] = {PrimitiveType: 'String'};
   [supportedFns]: SupportedFns = [Ref, Sub, FindInMap, GetAtt, ImportValue, Base64, Cidr, GetAZs, Join, Split, Select, And, Equals, If, Not, Or];
 }
 
-export class Cidr extends CfnFn<[string, string, string]> {
+export class Cidr extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-cidr.html';
   [returnSpec] = {Type: 'List', PrimitiveItemType: 'String'};
 }
 
-export class GetAZs extends CfnFn<string> {
+export class GetAZs extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getavailabilityzones.html';
   [returnSpec] = {Type: 'List', PrimitiveItemType: 'String'};
 }
-export class Join extends CfnFn<string> {
+export class Join extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html';
   [returnSpec] = {
     PrimitiveType: 'String'
   }
   allowedFns: [Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Split, Select, Sub, Ref];
 }
-export class Split extends CfnFn<string> {
+export class Split extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-split.html';
   [returnSpec] = {Type: 'List', PrimitiveItemType: 'String'}
   allowedFns: [Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref];
 }
-export class Select extends CfnFn<[string|number, [any]]> {
+export class Select extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-select.html';
   [returnSpec] = {PrimitiveType: 'String'}
   allowedFns = [FindInMap, GetAtt, GetAZs, If, Split, Ref];
 }
-// export class GetParam extends CfnFn<string> {
+// export class GetParam extends CfnFn {
 //   [doc] = 'http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html'
 // }
 //
-export class And extends CfnFn<string[]> {
+export class And extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-and';
   [returnSpec] = {Type: 'Boolean'};
   allowedFns: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or];
 }
-export class Equals extends CfnFn<string> {
+export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
   [returnSpec] = {Type: 'Boolean'};
   allowedFns: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or];
 }
-export class If extends CfnFn<[string, string|CfnFn, string|CfnFn]> {
+export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
   allowedFns = [Base64, FindInMap, GetAtt, GetAZs, If, Join, Select, Sub, Ref];
   [returnSpec] = () => {
@@ -197,55 +203,52 @@ function paramToReturnSpec(o: any): PropertyValueType {
     return {};
   }
 }
-export class Not extends CfnFn<string> {
+export class Not extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-not';
   allowedFns: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or];
   [returnSpec] = {Type: 'Boolean'};
 }
-export class Or extends CfnFn<string> {
+export class Or extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or';
   allowedFns: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or];
   [returnSpec] = {Type: 'Boolean'};
 }
 
-function tag(cls: any, kind: 'scalar' | 'mapping' | 'sequence') {
-  // @ts-ignore
-  return new yaml.Type(`!${cls.name}`, {
-    kind,
-    // instanceOf: cls,
-    construct: (data: any) => new cls(data, 'YAML'),
-    represent: (node: any) => node.data,
-    predicate: (node: any) => node instanceof cls && node.isYAML()
-  });
+function tag(cls: any) {
+  // Accept all 'kinds' so that js-yaml will load invalid formats and then we
+  // can lint them
+  return _.map(['scalar', 'mapping', 'sequence'], (kind) => {
+    // @ts-ignore
+    // predicate is mis-typed in the type definitions
+    return new yaml.Type(`!${cls.name}`, {
+      kind,
+      construct: (data: any) => new cls(data, 'YAML'),
+      represent: (node: any) => node.data,
+      predicate: (node: any) => node instanceof cls && node.isYAML()
+    });
+  })
 }
 
-const types = [
-  tag(Ref, 'scalar'),
-  tag(Base64, 'scalar'),
-  tag(Base64, 'mapping'),
-  tag(FindInMap, 'sequence'),
-  tag(GetAtt, 'scalar'),
-  tag(GetAtt, 'sequence'),
-  tag(GetAZs, 'scalar'),
-  tag(GetAZs, 'mapping'),
-  tag(GetAZs, 'sequence'),
-  tag(ImportValue, 'scalar'),
-  tag(ImportValue, 'mapping'),
-  tag(Join, 'sequence'),
-  tag(Split, 'sequence'),
-  tag(Ref, 'scalar'),
-  tag(Ref, 'sequence'),
-  tag(Select, 'sequence'),
-  tag(Sub, 'scalar'),
-  tag(Sub, 'sequence'),
-  tag(Sub, 'mapping'),
-  // tag(GetParam, 'sequence'),
-  tag(And, 'sequence'),
-  tag(Equals, 'sequence'),
-  tag(If, 'sequence'),
-  tag(Not, 'sequence'),
-  tag(Or, 'sequence'),
-];
+const types = _.concat(
+  tag(Ref),
+  tag(Base64),
+  tag(FindInMap),
+  tag(GetAtt),
+  tag(GetAZs),
+  tag(ImportValue),
+  tag(Join),
+  tag(Split),
+  tag(Ref),
+  tag(Ref),
+  tag(Select),
+  tag(Sub),
+  // tag(GetParam),
+  tag(And),
+  tag(Equals),
+  tag(If),
+  tag(Not),
+  tag(Or),
+);
 
 const schema = yaml.Schema.create(yaml.JSON_SCHEMA, types);
 

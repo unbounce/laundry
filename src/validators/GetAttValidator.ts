@@ -19,7 +19,7 @@ export default class GetAttValidator extends Validator {
     if(_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
         const type = _.get(resource, 'Type');
-        this.resources[name] = _.keys(_.get(ResourceTypes, [type, 'Attributes']));;
+        this.resources[name] = _.keys(_.get(ResourceTypes, [type, 'Attributes'], {}));;
       });
     }
   }
@@ -42,10 +42,10 @@ export default class GetAttValidator extends Validator {
 
       if(_.includes(_.keys(this.resources), resource)) {
         if(!_.includes(this.resources[resource], attribute)) {
-          this.errors.push({ path, message: `not a valid attribute of ${resource}`});
+          this.errors.push({ path, message: `${attribute} is not a valid attribute of ${resource}`});
         }
       } else {
-        this.errors.push({ path, message: 'not a valid Resource'});
+        this.errors.push({ path, message: `${resource} is not a valid Resource`});
       }
     }
   }

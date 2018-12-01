@@ -4,6 +4,7 @@ import {RootValidator} from './validators/root';
 import {RefValidator} from './validators/ref';
 import {CfnFnsValidator} from './validators/cfnfns';
 import GetAttValidator from './validators/GetAttValidator';
+import SubValidator from './validators/SubValidator';
 import {
   ResourceTypeValidator,
   RequriedResourcePropertyValidator,
@@ -50,6 +51,7 @@ export function lint(template: string) {
     new RefValidator(errors),
     new CfnFnsValidator(errors),
     new GetAttValidator(errors),
+    new SubValidator(errors),
   ];
   const walker = new Walker(validators);
   const input = convertCfnFns(yaml.load(template));

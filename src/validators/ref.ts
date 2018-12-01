@@ -40,7 +40,10 @@ export class RefValidator extends Validator {
   ResourceProperty(path: Path, name: string, value: any) {
     if(value instanceof yaml.Ref && _.isString(value.data)) {
       if(!_.includes(this.refs, value.data)) {
-        this.errors.push({ path, message: 'not a valid Parameter or Resource'});
+        this.errors.push({
+          path: path.concat('Ref'),
+          message: `${value.data} is not a valid Parameter or Resource`
+        });
       }
     }
   }

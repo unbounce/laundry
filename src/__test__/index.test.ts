@@ -1,11 +1,19 @@
 import * as _ from 'lodash';
 
-import {Error} from '../types';
-import {lint} from '../index';
+import { Error } from '../types';
+import { lint } from '../index';
 import * as yaml from '../yaml';
 
 const testTemplate = {
   Resources: {
+    A: {
+      Type: 'AWS::S3::Bucket',
+      Properties: {}
+    },
+    B: {
+      Type: 'AWS::S3::Bucket',
+      Properties: {}
+    },
     Bucket: {
       Type: 'AWS::S3::Bucket',
       Properties: {}
@@ -14,8 +22,23 @@ const testTemplate = {
 }
 
 function lintWithProperty(key: string, value: any) {
-  const template = _.set(testTemplate, key, value);
+  const template = _.set(_.cloneDeep(testTemplate), key, value);
   return lint(yaml.dump(template))
+}
+
+function t(value: any) {
+  return yaml.dump(_.set(
+    _.cloneDeep(testTemplate),
+    ['Resources', 'Bucket', 'Properties', 'BucketName'],
+    value
+  ));
+}
+
+function e(message: string, path: string[] = []) {
+  return {
+    path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'].concat(path),
+    message: expect.stringMatching(new RegExp(message))
+  };
 }
 
 describe('lint', () => {
@@ -96,300 +119,175 @@ describe('lint', () => {
     });
   });
 
-  for(const style of ['JSON', 'YAML'] as yaml.Style[]) {
-    describe('Resources', () => {
-      test('missing resources', () => {
-        const expected = [{
-          path: ['Root', 'Resources'],
+  describe('Resources', () => {
+    test('missing resources', () => {
+      const expected = [{
+        path: ['Root', 'Resources'],
+        message: expect.stringMatching(/required/)
+      }];
+      expect(lint('{}')).toMatchObject(expected);
+    });
+
+    test('required property', () => {
+      const expected = [
+        {
+          path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Name'],
           message: expect.stringMatching(/required/)
-        }];
-        expect(lint('{}')).toMatchObject(expected);
+        },
+        {
+          path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Type'],
+          message: expect.stringMatching(/required/)
+        }
+      ]
+      const template = yaml.dump({
+        Resources: {
+          RecordSet: {
+            Type: 'AWS::Route53::RecordSet',
+            Properties: {}
+          }
+        }
       });
+      expect(lint(template)).toMatchObject(expected);
+    });
 
-      test('required property', () => {
-        const expected =  [
-          {
-            path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Name'],
-            message: expect.stringMatching(/required/)
-          },
-          {
-            path: ['Root', 'Resources', 'RecordSet', 'Properties', 'Type'],
-            message: expect.stringMatching(/required/)
+    test('invalid Type', () => {
+      const expected = [
+        {
+          path: ['Root', 'Resources', 'FooBar', 'Type'],
+          message: expect.stringMatching(/invalid/)
+        }
+      ];
+      const template = yaml.dump({
+        Resources: {
+          FooBar: {
+            Type: 'AWS::Foo::Bar',
+            Properties: {}
           }
-        ]
-        const template = yaml.dump({
-          Resources: {
-            RecordSet: {
-              Type: 'AWS::Route53::RecordSet',
-              Properties: {}
-            }
-          }
-        });
-        expect(lint(template)).toMatchObject(expected);
+        }
       });
+      expect(lint(template)).toMatchObject(expected);
+    });
 
-      test('invalid Type', () => {
-        const expected = [
-          {
-            path: ['Root', 'Resources', 'FooBar', 'Type'],
-            message: expect.stringMatching(/invalid/)
-          }
-        ];
-        const template = yaml.dump({
-          Resources: {
-            FooBar: {
-              Type: 'AWS::Foo::Bar',
-              Properties: {}
+    test('invalid resource property primitive type', () => {
+      const expected = [
+        {
+          path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'],
+          message: expect.stringMatching(/String/)
+        }
+      ];
+      const template = yaml.dump({
+        Resources: {
+          Bucket: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              BucketName: {}
             }
           }
-        });
-        expect(lint(template)).toMatchObject(expected);
+        }
       });
+      expect(lint(template)).toMatchObject(expected);
+    });
 
-      test('invalid resource property primitive type', () => {
-        const expected = [
-          {
-            path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'],
-            message: expect.stringMatching(/String/)
-          }
-        ];
-        const template = yaml.dump({
-          Resources: {
-            Bucket: {
-              Type: 'AWS::S3::Bucket',
-              Properties: {
-                BucketName: {}
-              }
+    test('invalid resource property type', () => {
+      const expected = [
+        {
+          path: ['Root', 'Resources', 'Bucket', 'Properties', 'Tags'],
+          message: expect.stringMatching(/List/)
+        }
+      ];
+      const template = yaml.dump({
+        Resources: {
+          Bucket: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              Tags: {}
             }
           }
-        });
-        expect(lint(template)).toMatchObject(expected);
+        }
       });
+      expect(lint(template)).toMatchObject(expected);
+    });
 
-      test('invalid resource property type', () => {
-        const expected = [
-          {
-            path: ['Root', 'Resources', 'Bucket', 'Properties', 'Tags'],
-            message: expect.stringMatching(/List/)
-          }
-        ];
-        const template = yaml.dump({
-          Resources: {
-            Bucket: {
-              Type: 'AWS::S3::Bucket',
-              Properties: {
-                Tags: {}
-              }
+    test('invalid resource property List type', () => {
+      const expected = [
+        {
+          path: ['Root', 'Resources', 'Bucket', 'Properties', 'Tags', '0'],
+          message: expect.stringMatching(/Object/)
+        }
+      ];
+      const template = yaml.dump({
+        Resources: {
+          Bucket: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              Tags: ['foo']
             }
           }
-        });
-        expect(lint(template)).toMatchObject(expected);
+        }
       });
+      expect(lint(template)).toMatchObject(expected);
+    });
 
-      test('invalid resource property List type', () => {
-        const expected = [
-          {
-            path: ['Root', 'Resources', 'Bucket', 'Properties', 'Tags', '0'],
-            message: expect.stringMatching(/Object/)
-          }
-        ];
-        const template = yaml.dump({
-          Resources: {
-            Bucket: {
-              Type: 'AWS::S3::Bucket',
-              Properties: {
-                Tags: ['foo']
-              }
-            }
-          }
-        });
-        expect(lint(template)).toMatchObject(expected);
-      });
+    describe('Sub', () => {
+      describe.each(['JSON', 'YAML'])('%s', (style) => {
+        test.each([
+          // !Sub String
+          ['valid resource', new yaml.Sub('${A}', style), []],
+          ['multiple resources', new yaml.Sub('a${A}b${B}c', style), []],
+          ['invalid resource', new yaml.Sub('${Blag}', style), [e('Blag', ['Sub'])]],
+          ['! is ignored', new yaml.Sub('${!Bar}', style), []],
+          ['multiple with invalid resource', new yaml.Sub('a${Bar}b${B}', style), [e('Bar', ['Sub'])]],
+          ['valid attribute', new yaml.Sub('${A.Arn}', style), []],
+          ['invalid attribute', new yaml.Sub('${A.Bar}', style), [e('Bar', ['Sub'])]],
 
-      describe('Ref', () => {
-        test('parameter', () => {
-          const template = yaml.dump({
-            Parameters: {
-              Foo: {
-                Type: 'String',
-              }
-            },
-            Resources: {
-              Bucket: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: {
-                    Ref: 'Foo'
-                  }
-                }
-              }
-            }
-          });
-          expect(lint(template)).toEqual([]);
-        });
-        test('resource', () => {
-          const template = yaml.dump({
-            Resources: {
-              A: {Type: 'AWS::S3::Bucket'},
-              B: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: {
-                    Ref: 'A'
-                  }
-                }
-              }
-            }
-          });
-          expect(lint(template)).toEqual([]);
-        });
-        test('pseudo parameter', () => {
-          const template = yaml.dump({
-            Resources: {
-              A: {Type: 'AWS::S3::Bucket'},
-              B: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: {
-                    Ref: 'AWS::Region'
-                  }
-                }
-              }
-            }
-          });
-          expect(lint(template)).toEqual([]);
-        });
-        test('invalid name', () => {
-          const expected = [
-            {
-              path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'],
-              message: expect.stringMatching(/Parameter or Resource/)
-            }
-          ];
-          const template = yaml.dump({
-            Resources: {
-              Bucket: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: {
-                    Ref: 'Baz'
-                  }
-                }
-              }
-            }
-          });
-          expect(lint(template)).toMatchObject(expected);
-        });
-        test('invalid value', () => {
-          const expected = [
-            {
-              path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName', 'Ref'],
-              message: expect.stringMatching(/String/)
-            }
-          ];
-          const template = yaml.dump({
-            Resources: {
-              Bucket: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: {
-                    Ref: ['Baz']
-                  }
-                }
-              }
-            }
-          });
-          expect(lint(template)).toMatchObject(expected);
-        });
-      });
+          // !Sub [String, Object]
+          ['valid resource', new yaml.Sub(['${A}', {}], style), []],
+          ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style), []],
 
-      describe('GetAtt', () => {
-        test('valid resource attribute', () => {
-          let expected: Error[] = [];
-          if(style === 'JSON') {
-            expected = [{
-              path: ['Root', 'Resources', 'B', 'Properties', 'BucketName', 'GetAtt'],
-              message: expect.stringMatching(/format/)
-            }];
-          };
-          const template = yaml.dump({
-            Resources: {
-              A: {Type: 'AWS::S3::Bucket'},
-              B: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: new yaml.GetAtt('A.Arn', style)
-                }
-              }
-            }
-          });
-          expect(lint(template)).toMatchObject(expected);
-        });
-        test('invalid resource attribute', () => {
-          let expected = [];
-          if(style === 'JSON') {
-            expected = [{
-              path: ['Root', 'Resources', 'B', 'Properties', 'BucketName', 'GetAtt'],
-              message: expect.stringMatching(/format/)
-            }];
-          } else {
-            expected = [{
-              path: ['Root', 'Resources', 'B', 'Properties', 'BucketName', 'GetAtt'],
-              message: expect.stringMatching(/attribute/)
-            }];
-          }
-          const template = yaml.dump({
-            Resources: {
-              A: {Type: 'AWS::S3::Bucket'},
-              B: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: new yaml.GetAtt('A.Foo', style)
-                }
-              }
-            }
-          });
-          expect(lint(template)).toMatchObject(expected);
-        });
-        test.skip('invalid name', () => {
-          const expected = [
-            {
-              path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName', 'GetAtt'],
-              message: expect.stringMatching(/Resource/)
-            }
-          ];
-          const template = yaml.dump({
-            Resources: {
-              Bucket: {
-                Type: 'AWS::S3::Bucket',
-                Properties: {
-                  BucketName: new yaml.GetAtt('Baz.Arn', style)
-                }
-              }
-            }
-          });
-          expect(lint(template)).toMatchObject(expected);
-        });
-        test('invalid value', () => {
-          const expected = [
-            {
-              path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName', 'GetAtt'],
-              message: expect.stringMatching(/Resource.Attribute/)
-            }
-          ];
-          const template = `
-Resources:
-  Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !GetAtt [AWS::Region]
-`
-          expect(lint(template)).toMatchObject(expected);
+          ['invalid type', new yaml.Sub(['${A}'], style), [e('or', ['Sub'])]],
+          ['invalid type', new yaml.Sub([{}, '${A}'], style), [e('String', ['Sub', '0']), e('Object', ['Sub', '1'])]],
+          ['invalid type', new yaml.Sub({}, style), [e('or', ['Sub'])]],
+        ])('%s %j', (s, bucketName, errors) => {
+          expect(lint(t(bucketName))).toMatchObject(errors);
         });
       });
     });
 
-  }
+    describe('GetAtt', () => {
+      test.each([
+        // !GetAtt String
+        ['valid resource YAML', new yaml.GetAtt('A.Arn', 'YAML'), []],
+        ['invalid resource YAML', new yaml.GetAtt('Blag.Arn', 'YAML'), [e('Blag', ['GetAtt'])]],
+        ['invalid attribute YAML', new yaml.GetAtt('A.Bar', 'YAML'), [e('Bar', ['GetAtt'])]],
+
+        // !GetAtt [String, String]
+        ['valid resource JSON', new yaml.GetAtt(['A', 'Arn'], 'JSON'), []],
+        ['invalid resource JSON', new yaml.GetAtt(['A', 'Cat'], 'JSON'), [e('Cat', ['GetAtt'])]],
+        ['valid resource YAML', new yaml.GetAtt(['A', 'Arn'], 'YAML'), []],
+        ['invalid resource YAML', new yaml.GetAtt(['A', 'Cat'], 'YAML'), [e('Cat', ['GetAtt'])]],
+
+        ['invalid type', new yaml.GetAtt(['${A}'], 'JSON'), [e('List', ['GetAtt'])]],
+        ['invalid type', new yaml.GetAtt([{}, '${A}'], 'JSON'), [e('List', ['GetAtt'])]],
+        ['invalid type', new yaml.GetAtt({}, 'JSON'), [e('String', ['GetAtt'])]],
+        ['invalid type', new yaml.GetAtt({}, 'YAML'), [e('or', ['GetAtt'])]],
+      ])('%s %j', (s, bucketName, errors) => {
+        expect(lint(t(bucketName))).toMatchObject(errors);
+      });
+    });
+
+    describe('Ref', () => {
+      describe.each(['JSON', 'YAML'])('%s', (style) => {
+        test.each([
+          ['valid resource', new yaml.Ref('A', style), []],
+          ['invalid resource', new yaml.Ref('Blag', style), [e('Blag', ['Ref'])]],
+          ['invalid type', new yaml.Ref(['A'], style), [e('String', ['Ref'])]],
+          ['invalid type', new yaml.Ref({ a: 'A' }, style), [e('String', ['Ref'])]],
+        ])('%s %s', (s, bucketName, errors) => {
+          expect(lint(t(bucketName))).toMatchObject(errors);
+        });
+      });
+    });
+  });
 
   describe('Parameters', () => {
     test('invalid type', () => {
