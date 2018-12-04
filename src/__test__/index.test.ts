@@ -34,25 +34,6 @@ function t(value: any) {
   ));
 }
 
-function e(message: string, path: string[] = []) {
-  return {
-    path: ['Root', 'Resources', 'Bucket', 'Properties', 'BucketName'].concat(path),
-    message: expect.stringMatching(new RegExp(message))
-  };
-}
-
-function c(cfnFnName: string, style: string) {
-  if (cfnFnName === 'Ref') {
-    return 'Ref';
-  } else {
-    if (style === 'YAMLTag') {
-      return cfnFnName;
-    } else {
-      return `Fn::${cfnFnName}`;
-    }
-  }
-}
-
 describe('lint', () => {
 
   test('valid template', () => {
@@ -249,35 +230,23 @@ describe('lint', () => {
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
           // !Sub String
-          ['valid resource', new yaml.Sub('${A}', style), []],
-          ['multiple resources', new yaml.Sub('a${A}b${B}c', style), []],
-          ['invalid resource',
-            new yaml.Sub('${Blag}', style),
-            [e('Blag', [c('Sub', style)])]],
+          ['valid resource', new yaml.Sub('${A}', style)],
+          ['multiple resources', new yaml.Sub('a${A}b${B}c', style)],
+          ['invalid resource', new yaml.Sub('${Blag}', style)],
           ['! is ignored', new yaml.Sub('${!Bar}', style), []],
-          ['multiple with invalid resource',
-            new yaml.Sub('a${Bar}b${B}', style),
-            [e('Bar', [c('Sub', style)])]],
-          ['valid attribute', new yaml.Sub('${A.Arn}', style), []],
-          ['invalid attribute',
-            new yaml.Sub('${A.Bar}', style),
-            [e('Bar', [c('Sub', style)])]],
+          ['multiple with invalid resource', new yaml.Sub('a${Bar}b${B}', style)],
+          ['valid attribute', new yaml.Sub('${A.Arn}', style)],
+          ['invalid attribute', new yaml.Sub('${A.Bar}', style)],
 
           // !Sub [String, Object]
-          ['valid resource', new yaml.Sub(['${A}', {}], style), []],
-          ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style), []],
+          ['valid resource', new yaml.Sub(['${A}', {}], style)],
+          ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style)],
 
-          ['invalid type',
-            new yaml.Sub(['${A}'], style),
-            [e('or', [c('Sub', style)])]],
-          ['invalid type',
-            new yaml.Sub([{}, '${A}'], style),
-            [e('String', [c('Sub', style), '0']), e('Object', [c('Sub', style), '1'])]],
-          ['invalid type',
-            new yaml.Sub({}, style),
-            [e('or', [c('Sub', style)])]],
-        ])('%s %j', (s, bucketName, errors) => {
-          expect(lint(t(bucketName))).toMatchObject(errors);
+          ['invalid type', new yaml.Sub(['${A}'], style)],
+          ['invalid type', new yaml.Sub([{}, '${A}'], style)],
+          ['invalid type', new yaml.Sub({}, style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toMatchSnapshot()
         });
       });
     });
@@ -285,34 +254,34 @@ describe('lint', () => {
     describe('GetAtt', () => {
       test.each([
         // !GetAtt String
-        ['valid resource YAMLTag', new yaml.GetAtt('A.Arn', 'YAMLTag'), []],
-        ['invalid resource YAMLTag', new yaml.GetAtt('Blag.Arn', 'YAMLTag'), [e('Blag', ['GetAtt'])]],
-        ['invalid attribute YAMLTag', new yaml.GetAtt('A.Bar', 'YAMLTag'), [e('Bar', ['GetAtt'])]],
+        ['valid resource YAMLTag', new yaml.GetAtt('A.Arn', 'YAMLTag')],
+        ['invalid resource YAMLTag', new yaml.GetAtt('Blag.Arn', 'YAMLTag')],
+        ['invalid attribute YAMLTag', new yaml.GetAtt('A.Bar', 'YAMLTag')],
 
         // !GetAtt [String, String]
-        ['valid resource Object', new yaml.GetAtt(['A', 'Arn'], 'Object'), []],
-        ['invalid resource Object', new yaml.GetAtt(['A', 'Cat'], 'Object'), [e('Cat', ['Fn::GetAtt'])]],
-        ['valid resource YAMLTag', new yaml.GetAtt(['A', 'Arn'], 'YAMLTag'), []],
-        ['invalid resource YAMLTag', new yaml.GetAtt(['A', 'Cat'], 'YAMLTag'), [e('Cat', ['GetAtt'])]],
+        ['valid resource Object', new yaml.GetAtt(['A', 'Arn'], 'Object')],
+        ['invalid resource Object', new yaml.GetAtt(['A', 'Cat'], 'Object')],
+        ['valid resource YAMLTag', new yaml.GetAtt(['A', 'Arn'], 'YAMLTag')],
+        ['invalid resource YAMLTag', new yaml.GetAtt(['A', 'Cat'], 'YAMLTag')],
 
-        ['invalid type', new yaml.GetAtt(['${A}'], 'Object'), [e('List', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt([{}, '${A}'], 'Object'), [e('List', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt({}, 'Object'), [e('String', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt({}, 'YAMLTag'), [e('or', ['GetAtt'])]],
-      ])('%s %j', (s, bucketName, errors) => {
-        expect(lint(t(bucketName))).toMatchObject(errors);
+        ['invalid type', new yaml.GetAtt(['${A}'], 'Object')],
+        ['invalid type', new yaml.GetAtt([{}, '${A}'], 'Object')],
+        ['invalid type', new yaml.GetAtt({}, 'Object')],
+        ['invalid type', new yaml.GetAtt({}, 'YAMLTag')],
+      ])('%s %j', (s, bucketName) => {
+        expect(lint(t(bucketName))).toMatchSnapshot();
       });
     });
 
     describe('Ref', () => {
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
-          ['valid resource', new yaml.Ref('A', style), []],
-          ['invalid resource', new yaml.Ref('Blag', style), [e('Blag', ['Ref'])]],
-          ['invalid type', new yaml.Ref(['A'], style), [e('String', ['Ref'])]],
+          ['valid resource', new yaml.Ref('A', style)],
+          ['invalid resource', new yaml.Ref('Blag', style)],
+          ['invalid type', new yaml.Ref(['A'], style)],
           // ['invalid type', new yaml.Ref({ a: 'A' }, style), [e('String', ['Ref'])]],
-        ])('%s %j', (s, bucketName, errors) => {
-          expect(lint(t(bucketName))).toMatchObject(errors);
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toMatchSnapshot();
         });
       });
     });
@@ -320,14 +289,12 @@ describe('lint', () => {
     describe('Base64', () => {
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
-          ['string', new yaml.Base64('abc', style), []],
-          ['Ref', new yaml.Base64(new yaml.Ref('A', style), style), []],
+          ['string', new yaml.Base64('abc', style)],
+          ['Ref', new yaml.Base64(new yaml.Ref('A', style), style)],
           // ['Sub', new yaml.Base64(new yaml.Sub('${A}', style), style), []],
-          ['Ref with invalid resource',
-            new yaml.Base64(new yaml.Ref('Nothing', style), style),
-            [e('Nothing', [c('Base64', style), 'Ref'])]],
-        ])('%s %j', (s, bucketName, errors) => {
-          expect(lint(t(bucketName))).toMatchObject(errors);
+          ['Ref with invalid resource', new yaml.Base64(new yaml.Ref('Nothing', style), style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toMatchSnapshot();
         });
       });
     });

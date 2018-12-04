@@ -239,3 +239,489 @@ Array [
 exports[`lint Conditions If YAMLTag Or multiple inputs {"Or":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
 
 exports[`lint Conditions If YAMLTag Or single input {"Or":[{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Resources Base64 Object Ref {"Fn::Base64":{"Ref":"A"}} 1`] = `Array []`;
+
+exports[`lint Resources Base64 Object Ref with invalid resource {"Fn::Base64":{"Ref":"Nothing"}} 1`] = `
+Array [
+  Object {
+    "message": "Nothing is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Base64",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Base64 Object string {"Fn::Base64":"abc"} 1`] = `Array []`;
+
+exports[`lint Resources Base64 YAMLTag Ref {"Base64":{"Ref":"A"}} 1`] = `Array []`;
+
+exports[`lint Resources Base64 YAMLTag Ref with invalid resource {"Base64":{"Ref":"Nothing"}} 1`] = `
+Array [
+  Object {
+    "message": "Nothing is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Base64",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Base64 YAMLTag string {"Base64":"abc"} 1`] = `Array []`;
+
+exports[`lint Resources GetAtt invalid attribute YAMLTag {"GetAtt":"A.Bar"} 1`] = `
+Array [
+  Object {
+    "message": "Bar is not a valid attribute of A",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid resource Object {"Fn::GetAtt":["A","Cat"]} 1`] = `
+Array [
+  Object {
+    "message": "Cat is not a valid attribute of A",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid resource YAMLTag {"GetAtt":"Blag.Arn"} 1`] = `
+Array [
+  Object {
+    "message": "Blag is not a valid Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid resource YAMLTag {"GetAtt":["A","Cat"]} 1`] = `
+Array [
+  Object {
+    "message": "Cat is not a valid attribute of A",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid type {"Fn::GetAtt":["\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List of two Strings",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid type {"Fn::GetAtt":[{},"\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List of two Strings",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid type {"Fn::GetAtt":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a List of two Strings",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt invalid type {"GetAtt":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String or a List of two Strings",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources GetAtt valid resource Object {"Fn::GetAtt":["A","Arn"]} 1`] = `Array []`;
+
+exports[`lint Resources GetAtt valid resource YAMLTag {"GetAtt":"A.Arn"} 1`] = `Array []`;
+
+exports[`lint Resources GetAtt valid resource YAMLTag {"GetAtt":["A","Arn"]} 1`] = `Array []`;
+
+exports[`lint Resources Ref Object invalid resource {"Ref":"Blag"} 1`] = `
+Array [
+  Object {
+    "message": "Blag is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Ref Object invalid type {"Ref":["A"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"A\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Ref Object valid resource {"Ref":"A"} 1`] = `Array []`;
+
+exports[`lint Resources Ref YAMLTag invalid resource {"Ref":"Blag"} 1`] = `
+Array [
+  Object {
+    "message": "Blag is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Ref YAMLTag invalid type {"Ref":["A"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"A\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Ref YAMLTag valid resource {"Ref":"A"} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object ! is ignored {"Fn::Sub":"\${!Bar}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object invalid attribute {"Fn::Sub":"\${A.Bar}"} 1`] = `
+Array [
+  Object {
+    "message": "Bar is not a valid Attribute of A",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object invalid resource {"Fn::Sub":"\${Blag}"} 1`] = `
+Array [
+  Object {
+    "message": "Blag not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object invalid type {"Fn::Sub":["\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String or List of Sting and Map",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object invalid type {"Fn::Sub":[{},"\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+      "0",
+    ],
+  },
+  Object {
+    "message": "must be an Object",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+      "1",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object invalid type {"Fn::Sub":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String or List of Sting and Map",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object local ref {"Fn::Sub":["\${Local}",{"Local":"a"}]} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object multiple resources {"Fn::Sub":"a\${A}b\${B}c"} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object multiple with invalid resource {"Fn::Sub":"a\${Bar}b\${B}"} 1`] = `
+Array [
+  Object {
+    "message": "Bar not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub Object valid attribute {"Fn::Sub":"\${A.Arn}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object valid resource {"Fn::Sub":"\${A}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub Object valid resource {"Fn::Sub":["\${A}",{}]} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag ! is ignored {"Sub":"\${!Bar}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag invalid attribute {"Sub":"\${A.Bar}"} 1`] = `
+Array [
+  Object {
+    "message": "Bar is not a valid Attribute of A",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag invalid resource {"Sub":"\${Blag}"} 1`] = `
+Array [
+  Object {
+    "message": "Blag not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag invalid type {"Sub":["\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String or List of Sting and Map",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag invalid type {"Sub":[{},"\${A}"]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+      "0",
+    ],
+  },
+  Object {
+    "message": "must be an Object",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+      "1",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag invalid type {"Sub":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String or List of Sting and Map",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag local ref {"Sub":["\${Local}",{"Local":"a"}]} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag multiple resources {"Sub":"a\${A}b\${B}c"} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag multiple with invalid resource {"Sub":"a\${Bar}b\${B}"} 1`] = `
+Array [
+  Object {
+    "message": "Bar not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Sub YAMLTag valid attribute {"Sub":"\${A.Arn}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag valid resource {"Sub":"\${A}"} 1`] = `Array []`;
+
+exports[`lint Resources Sub YAMLTag valid resource {"Sub":["\${A}",{}]} 1`] = `Array []`;
