@@ -203,7 +203,10 @@ export class Equals extends CfnFn {
 }
 export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
-  [supportedFns]: SupportedFns = [Base64, FindInMap, GetAtt, GetAZs, If, Join, Select, Sub, Ref, Condition];
+  [supportedFns]: SupportedFns = [
+    Base64, FindInMap, GetAtt, GetAZs, Join, Select, Sub, Ref,
+    Condition, And, Equals, If, Not, Or
+  ];
   [paramSpec] = (path: Path, errors: Error[]) => {
     if(validate.list(path, this.data, errors)) {
       if(this.data.length === 3) {
