@@ -7,7 +7,7 @@ import {Path, Error} from '../types';
 import {ResourceTypes, Attributes, PropertyValueType} from '../spec';
 import {cfnFnName} from '../util';
 
-export class CfnFnsValidator extends Validator {
+export default class CfnFnsValidator extends Validator {
   stack: yaml.CfnFn[] = [];
   resourceType: any;
 

@@ -5,6 +5,6 @@ import {toCfnFn} from '../util';
 
 describe('toCfnFn', () => {
   test('Ref', () => {
-    expect(toCfnFn({ Ref: 'abc'})).toMatchObject(new Ref('abc', 'JSON'))
+    expect(toCfnFn({ Ref: 'abc'})).toMatchObject(new Ref('abc', 'Object'))
   });
 });

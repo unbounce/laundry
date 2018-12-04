@@ -9,7 +9,7 @@ import {ResourceTypes, Attributes} from '../spec';
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
 };
-export class RefValidator extends Validator {
+export default class RefsValidator extends Validator {
 
   refs = [
     // From https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html

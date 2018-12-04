@@ -3,23 +3,23 @@ import {load, dump, Ref, CfnFn} from '../yaml';
 describe('load', () => {
   test('with ref', () => {
     const expected = {
-      foo: new Ref('bar', 'YAML')
+      foo: new Ref('bar', 'YAMLTag')
     };
     expect(load('foo: !Ref bar')).toEqual(expected);
   });
 });
 
 describe('dump', () => {
-  test('with YAML style', () => {
+  test('with YAMLTag style', () => {
     const input = {
-      foo: new Ref('bar', 'YAML')
+      foo: new Ref('bar', 'YAMLTag')
     };
     expect(dump(input)).toEqual('foo: !Ref bar\n');
   });
 
-  test('with JSON style', () => {
+  test('with Object style', () => {
     const input = {
-      foo: new Ref('bar', 'JSON')
+      foo: new Ref('bar', 'Object')
     };
     expect(dump(input)).toEqual('foo:\n  Ref: bar\n');
   });

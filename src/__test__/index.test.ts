@@ -42,10 +42,10 @@ function e(message: string, path: string[] = []) {
 }
 
 function c(cfnFnName: string, style: string) {
-  if(cfnFnName === 'Ref') {
+  if (cfnFnName === 'Ref') {
     return 'Ref';
   } else {
-    if(style === 'YAML') {
+    if (style === 'YAMLTag') {
       return cfnFnName;
     } else {
       return `Fn::${cfnFnName}`;
@@ -146,7 +146,7 @@ describe('lint', () => {
         message: expect.stringMatching(/required/)
       }];
       const template = yaml.dump({
-        Resources: {RecordSet: {Type: 'AWS::Route53::RecordSet', Properties: { Type: 'A' }}}
+        Resources: { RecordSet: { Type: 'AWS::Route53::RecordSet', Properties: { Type: 'A' } } }
       });
       expect(lint(template)).toMatchObject(expected);
     });
@@ -157,9 +157,12 @@ describe('lint', () => {
         message: expect.stringMatching(/required/)
       }];
       const template = yaml.dump({
-        Resources: {RecordSet: {
-          Type: 'AWS::Route53::RecordSet',
-          Properties: { Type: 'A', Name: new yaml.Ref('AWS::NoValue', 'YAML') }}}
+        Resources: {
+          RecordSet: {
+            Type: 'AWS::Route53::RecordSet',
+            Properties: { Type: 'A', Name: new yaml.Ref('AWS::NoValue', 'YAMLTag') }
+          }
+        }
       });
       expect(lint(template)).toMatchObject(expected);
     });
@@ -243,36 +246,36 @@ describe('lint', () => {
     });
 
     describe('Sub', () => {
-      describe.each(['JSON', 'YAML'])('%s', (style) => {
+      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
           // !Sub String
           ['valid resource', new yaml.Sub('${A}', style), []],
           ['multiple resources', new yaml.Sub('a${A}b${B}c', style), []],
           ['invalid resource',
-           new yaml.Sub('${Blag}', style),
-           [e('Blag', [c('Sub', style)])]],
+            new yaml.Sub('${Blag}', style),
+            [e('Blag', [c('Sub', style)])]],
           ['! is ignored', new yaml.Sub('${!Bar}', style), []],
           ['multiple with invalid resource',
-           new yaml.Sub('a${Bar}b${B}', style),
-           [e('Bar', [c('Sub', style)])]],
+            new yaml.Sub('a${Bar}b${B}', style),
+            [e('Bar', [c('Sub', style)])]],
           ['valid attribute', new yaml.Sub('${A.Arn}', style), []],
           ['invalid attribute',
-           new yaml.Sub('${A.Bar}', style),
-           [e('Bar', [c('Sub', style)])]],
+            new yaml.Sub('${A.Bar}', style),
+            [e('Bar', [c('Sub', style)])]],
 
           // !Sub [String, Object]
           ['valid resource', new yaml.Sub(['${A}', {}], style), []],
           ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style), []],
 
           ['invalid type',
-           new yaml.Sub(['${A}'], style),
-           [e('or', [c('Sub', style)])]],
+            new yaml.Sub(['${A}'], style),
+            [e('or', [c('Sub', style)])]],
           ['invalid type',
-           new yaml.Sub([{}, '${A}'], style),
-           [e('String', [c('Sub', style), '0']), e('Object', [c('Sub', style), '1'])]],
+            new yaml.Sub([{}, '${A}'], style),
+            [e('String', [c('Sub', style), '0']), e('Object', [c('Sub', style), '1'])]],
           ['invalid type',
-           new yaml.Sub({}, style),
-           [e('or', [c('Sub', style)])]],
+            new yaml.Sub({}, style),
+            [e('or', [c('Sub', style)])]],
         ])('%s %j', (s, bucketName, errors) => {
           expect(lint(t(bucketName))).toMatchObject(errors);
         });
@@ -282,49 +285,98 @@ describe('lint', () => {
     describe('GetAtt', () => {
       test.each([
         // !GetAtt String
-        ['valid resource YAML', new yaml.GetAtt('A.Arn', 'YAML'), []],
-        ['invalid resource YAML', new yaml.GetAtt('Blag.Arn', 'YAML'), [e('Blag', ['GetAtt'])]],
-        ['invalid attribute YAML', new yaml.GetAtt('A.Bar', 'YAML'), [e('Bar', ['GetAtt'])]],
+        ['valid resource YAMLTag', new yaml.GetAtt('A.Arn', 'YAMLTag'), []],
+        ['invalid resource YAMLTag', new yaml.GetAtt('Blag.Arn', 'YAMLTag'), [e('Blag', ['GetAtt'])]],
+        ['invalid attribute YAMLTag', new yaml.GetAtt('A.Bar', 'YAMLTag'), [e('Bar', ['GetAtt'])]],
 
         // !GetAtt [String, String]
-        ['valid resource JSON', new yaml.GetAtt(['A', 'Arn'], 'JSON'), []],
-        ['invalid resource JSON', new yaml.GetAtt(['A', 'Cat'], 'JSON'), [e('Cat', ['Fn::GetAtt'])]],
-        ['valid resource YAML', new yaml.GetAtt(['A', 'Arn'], 'YAML'), []],
-        ['invalid resource YAML', new yaml.GetAtt(['A', 'Cat'], 'YAML'), [e('Cat', ['GetAtt'])]],
+        ['valid resource Object', new yaml.GetAtt(['A', 'Arn'], 'Object'), []],
+        ['invalid resource Object', new yaml.GetAtt(['A', 'Cat'], 'Object'), [e('Cat', ['Fn::GetAtt'])]],
+        ['valid resource YAMLTag', new yaml.GetAtt(['A', 'Arn'], 'YAMLTag'), []],
+        ['invalid resource YAMLTag', new yaml.GetAtt(['A', 'Cat'], 'YAMLTag'), [e('Cat', ['GetAtt'])]],
 
-        ['invalid type', new yaml.GetAtt(['${A}'], 'JSON'), [e('List', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt([{}, '${A}'], 'JSON'), [e('List', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt({}, 'JSON'), [e('String', ['Fn::GetAtt'])]],
-        ['invalid type', new yaml.GetAtt({}, 'YAML'), [e('or', ['GetAtt'])]],
+        ['invalid type', new yaml.GetAtt(['${A}'], 'Object'), [e('List', ['Fn::GetAtt'])]],
+        ['invalid type', new yaml.GetAtt([{}, '${A}'], 'Object'), [e('List', ['Fn::GetAtt'])]],
+        ['invalid type', new yaml.GetAtt({}, 'Object'), [e('String', ['Fn::GetAtt'])]],
+        ['invalid type', new yaml.GetAtt({}, 'YAMLTag'), [e('or', ['GetAtt'])]],
       ])('%s %j', (s, bucketName, errors) => {
         expect(lint(t(bucketName))).toMatchObject(errors);
       });
     });
 
     describe('Ref', () => {
-      describe.each(['JSON', 'YAML'])('%s', (style) => {
+      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
           ['valid resource', new yaml.Ref('A', style), []],
           ['invalid resource', new yaml.Ref('Blag', style), [e('Blag', ['Ref'])]],
           ['invalid type', new yaml.Ref(['A'], style), [e('String', ['Ref'])]],
           // ['invalid type', new yaml.Ref({ a: 'A' }, style), [e('String', ['Ref'])]],
-        ])('%s %s', (s, bucketName, errors) => {
+        ])('%s %j', (s, bucketName, errors) => {
           expect(lint(t(bucketName))).toMatchObject(errors);
         });
       });
     });
 
     describe('Base64', () => {
-      describe.each(['JSON', 'YAML'])('%s', (style) => {
+      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
           ['string', new yaml.Base64('abc', style), []],
           ['Ref', new yaml.Base64(new yaml.Ref('A', style), style), []],
-          ['Sub', new yaml.Base64(new yaml.Sub('${A}', style), style), []],
+          // ['Sub', new yaml.Base64(new yaml.Sub('${A}', style), style), []],
           ['Ref with invalid resource',
-           new yaml.Base64(new yaml.Ref('Nothing', style), style),
-           [e('Nothing', [c('Base64', style), 'Ref'])]],
-        ])('%s %s', (s, bucketName, errors) => {
+            new yaml.Base64(new yaml.Ref('Nothing', style), style),
+            [e('Nothing', [c('Base64', style), 'Ref'])]],
+        ])('%s %j', (s, bucketName, errors) => {
           expect(lint(t(bucketName))).toMatchObject(errors);
+        });
+      });
+    });
+  });
+
+  describe('Conditions', () => {
+    describe('If', () => {
+      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+        describe('If', () => {
+          test.each([
+            ['valid input', new yaml.If([new yaml.Equals(['', ''], style), '', ''], style)],
+            ['invalid input', new yaml.If([new yaml.Equals(['', ''], style)], style)],
+            ['invalid ref', new yaml.If([new yaml.Equals([new yaml.Ref('foo', style), ''], style), '', ''], style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toMatchSnapshot();
+          });
+        });
+
+        describe('Not', () => {
+          test.each([
+            ['single input', new yaml.Not([new yaml.Equals(['', ''], style)], style)],
+            ['multiple inputs', new yaml.Not([new yaml.Equals(['', ''], style), new yaml.Equals(['', ''], style)], style)],
+            ['invalid array value', new yaml.Not([''], style)],
+            ['invalid value', new yaml.Not('', style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toMatchSnapshot();
+          });
+        });
+
+        describe('And', () => {
+          test.each([
+            ['single input', new yaml.And([new yaml.Equals(['', ''], style)], style)],
+            ['multiple inputs', new yaml.And([new yaml.Equals(['', ''], style), new yaml.Equals(['', ''], style)], style)],
+            ['invalid array value', new yaml.And([''], style)],
+            ['invalid value', new yaml.And('', style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toMatchSnapshot();
+          });
+        });
+
+        describe('Or', () => {
+          test.each([
+            ['single input', new yaml.Or([new yaml.Equals(['', ''], style)], style)],
+            ['multiple inputs', new yaml.Or([new yaml.Equals(['', ''], style), new yaml.Equals(['', ''], style)], style)],
+            ['invalid array value', new yaml.Or([''], style)],
+            ['invalid value', new yaml.Or('', style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toMatchSnapshot();
+          });
         });
       });
     });

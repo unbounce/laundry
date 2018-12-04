@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import * as validate from './validate';
-import {Validator} from './validate';
-import {Path, Error} from './types';
+import * as validate from '../validate';
+import {Validator} from '../validate';
+import {Path, Error} from '../types';
 
 // Based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html
 
@@ -148,7 +148,7 @@ const optional = {
   },
 };
 
-export class ParametersValidator extends Validator {
+export default class ParametersValidator extends Validator {
 
   Parameters(path: Path, parameters: any) {
     if(validate.optional(parameters) && validate.object(path, parameters, this.errors)) {

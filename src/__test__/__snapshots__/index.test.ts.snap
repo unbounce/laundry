@@ -1,0 +1,241 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`lint Conditions If Object And invalid array value {"Fn::And":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a Boolean",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::And",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object And invalid value {"Fn::And":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::And",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object And multiple inputs {"Fn::And":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object And single input {"Fn::And":[{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object If invalid input {"Fn::If":[{"Fn::Equals":["",""]}]} 1`] = `
+Array [
+  Object {
+    "message": "must have three elements",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::If",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object If invalid ref {"Fn::If":[{"Fn::Equals":[{"Ref":"foo"},""]},"",""]} 1`] = `
+Array [
+  Object {
+    "message": "foo is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::If",
+      "0",
+      "Fn::Equals",
+      "0",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object If valid input {"Fn::If":[{"Fn::Equals":["",""]},"",""]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object Not invalid array value {"Fn::Not":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List of one String",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::Not",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object Not invalid value {"Fn::Not":""} 1`] = `Array []`;
+
+exports[`lint Conditions If Object Not multiple inputs {"Fn::Not":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object Not single input {"Fn::Not":[{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object Or invalid array value {"Fn::Or":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a Boolean",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::Or",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object Or invalid value {"Fn::Or":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::Or",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object Or multiple inputs {"Fn::Or":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If Object Or single input {"Fn::Or":[{"Fn::Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag And invalid array value {"And":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a Boolean",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "And",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag And invalid value {"And":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "And",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag And multiple inputs {"And":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag And single input {"And":[{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag If invalid input {"If":[{"Equals":["",""]}]} 1`] = `
+Array [
+  Object {
+    "message": "must have three elements",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "If",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag If invalid ref {"If":[{"Equals":[{"Ref":"foo"},""]},"",""]} 1`] = `
+Array [
+  Object {
+    "message": "foo is not a valid Parameter or Resource",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "If",
+      "0",
+      "Equals",
+      "0",
+      "Ref",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag If valid input {"If":[{"Equals":["",""]},"",""]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag Not invalid array value {"Not":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List of one String",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Not",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag Not invalid value {"Not":""} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag Not multiple inputs {"Not":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag Not single input {"Not":[{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag Or invalid array value {"Or":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a Boolean",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Or",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag Or invalid value {"Or":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Or",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag Or multiple inputs {"Or":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
+
+exports[`lint Conditions If YAMLTag Or single input {"Or":[{"Equals":["",""]}]} 1`] = `Array []`;

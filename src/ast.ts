@@ -103,6 +103,13 @@ export class Walker {
   Conditions(conditions: any): void {
     const path = this.pushPath('Conditions');
     _.forEach(this.visitors, (v) => v.Conditions(path, conditions));
+    if(_.isPlainObject(conditions)) {
+      _.forEach(conditions, (condition, name) => {
+        const path = this.pushPath(name);
+        this.recursivelyVisitCfnFn(path, condition);
+        this.popPath();
+      });
+    }
     this.popPath();
   }
 
@@ -113,18 +120,18 @@ export class Walker {
   }
 
   Resources(resources: any): void {
-    let path = this.pushPath('Resources');
+    const path = this.pushPath('Resources');
     _.forEach(this.visitors, (v) => v.Resources(path, resources));
 
      if(_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
-        path = this.pushPath(name);
+        const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Resource(path, resource));
         const properties = _.get(resource, 'Properties');
         if(_.isObject(properties)) {
-          path = this.pushPath('Properties');
+          const path = this.pushPath('Properties');
           _.forEach(properties, (value, key) => {
-            path = this.pushPath(key);
+            const path = this.pushPath(key);
             _.forEach(this.visitors, (v) => v.ResourceProperty(path, key, value));
             this.recursivelyVisitCfnFn(path, value);
             this.popPath();
@@ -138,6 +145,11 @@ export class Walker {
     this.popPath();
   }
 
+  // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
+  //
+  // You can use intrinsic functions only in specific parts of a template.
+  // Currently, you can use intrinsic functions in resource properties, outputs,
+  // metadata attributes, and update policy attributes.
   private recursivelyVisitCfnFn(path: Path, value: any) {
     if(value instanceof CfnFn) {
       path = this.pushPath(cfnFnName(value));

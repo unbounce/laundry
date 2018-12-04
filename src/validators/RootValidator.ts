@@ -4,7 +4,7 @@ import * as validate from '../validate';
 import {Validator} from '../validate';
 import {Path, Error} from '../types';
 
-export class RootValidator extends Validator {
+export default class RootValidator extends Validator {
   Root(path: Path, root: any) {
     validate.object(path, root, this.errors);
   }
@@ -33,9 +33,9 @@ export class RootValidator extends Validator {
   //   validate.optional(mappings) && validate.object(path, mappings, this.errors);
   // }
 
-  // Conditions(path: Path, conditions: any) {
-  //   validate.optional(conditions) && validate.object(path, conditions, this.errors);
-  // }
+  Conditions(path: Path, conditions: any) {
+    validate.optional(conditions) && validate.object(path, conditions, this.errors);
+  }
 
   // Transform(path: Path, transform: any) {
   //   validate.optional(transform) && validate.object(path, transform, this.errors);

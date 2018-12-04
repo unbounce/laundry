@@ -32,46 +32,46 @@ export function toCfnFn(o: any): yaml.CfnFn|undefined {
       const value = o[name];
       switch (name) {
         case 'Ref':
-          return new yaml.Ref(value, 'JSON');
+          return new yaml.Ref(value, 'Object');
           break;
         case 'Fn::Base64':
-          return new yaml.Base64(value, 'JSON');
+          return new yaml.Base64(value, 'Object');
           break;
         case 'Fn::FindInMap':
-          return new yaml.FindInMap(value, 'JSON');
+          return new yaml.FindInMap(value, 'Object');
           break;
         case 'Fn::GetAtt':
-          return new yaml.GetAtt(value, 'JSON');
+          return new yaml.GetAtt(value, 'Object');
           break;
         case 'Fn::ImportValue':
-          return new yaml.ImportValue(value, 'JSON');
+          return new yaml.ImportValue(value, 'Object');
           break;
         case 'Fn::Join':
-          return new yaml.Join(value, 'JSON');
+          return new yaml.Join(value, 'Object');
           break;
         case 'Fn::Split':
-          return new yaml.Split(value, 'JSON');
+          return new yaml.Split(value, 'Object');
           break;
         case 'Fn::Select':
-          return new yaml.Select(value, 'JSON');
+          return new yaml.Select(value, 'Object');
           break;
         case 'Fn::Sub':
-          return new yaml.Sub(value, 'JSON');
+          return new yaml.Sub(value, 'Object');
           break;
         case 'Fn::And':
-          return new yaml.And(value, 'JSON');
+          return new yaml.And(value, 'Object');
           break;
         case 'Fn::Equals':
-          return new yaml.Equals(value, 'JSON');
+          return new yaml.Equals(value, 'Object');
           break;
         case 'Fn::If':
-          return new yaml.If(value, 'JSON');
+          return new yaml.If(value, 'Object');
           break;
         case 'Fn::Not':
-          return new yaml.Not(value, 'JSON');
+          return new yaml.Not(value, 'Object');
           break;
         case 'Fn::Or':
-          return new yaml.Or(value, 'JSON');
+          return new yaml.Or(value, 'Object');
           break;
       }
     }
@@ -80,7 +80,7 @@ export function toCfnFn(o: any): yaml.CfnFn|undefined {
 
 export function cfnFnName(cfnFn: yaml.CfnFn) {
   const name = cfnFn.constructor.name;
-  if(cfnFn.isYAML()) {
+  if(cfnFn.isYamlTag()) {
     return name;
   } else {
     if(name === 'Ref') {

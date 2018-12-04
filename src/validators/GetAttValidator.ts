@@ -27,7 +27,7 @@ export default class GetAttValidator extends Validator {
   CfnFn(path: Path, value: yaml.CfnFn) {
     if(value instanceof yaml.GetAtt) {
       let resource, attribute, parts;
-      if(value.isYAML() && _.isString(value.data)) {
+      if(value.isYamlTag() && _.isString(value.data)) {
         // !GetAtt A.Att
         [resource, ...parts] = value.data.split('.');
       } else if(_.isArray(value.data) && value.data.length === 2 && _.isString(value.data[0])){

@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import {ParametersValidator} from './parameters';
-import {RootValidator} from './validators/root';
-import {RefValidator} from './validators/ref';
-import {CfnFnsValidator} from './validators/cfnfns';
+import ParametersValidator from './validators/ParametersValidator';
+import RootValidator from './validators/RootValidator';
+import RefsValidator from './validators/RefsValidator';
+import CfnFnsValidator from './validators/CfnFnsValidator';
 import GetAttValidator from './validators/GetAttValidator';
 import SubValidator from './validators/SubValidator';
 import {
@@ -48,7 +48,7 @@ export function lint(template: string) {
     new ResourceTypeValidator(errors),
     new RequriedResourcePropertyValidator(errors),
     new ResourcePropertyValidator(errors),
-    new RefValidator(errors),
+    new RefsValidator(errors),
     new CfnFnsValidator(errors),
     new GetAttValidator(errors),
     new SubValidator(errors),
