@@ -31,7 +31,7 @@
     "watchPathIgnorePatterns": [
       ".*flycheck.*"
     ],
-    "setupTestFrameworkScriptFile": "<rootDir>/src/__test__/setup.js",
+    "setupTestFrameworkScriptFile": "<rootDir>/src/__tests__/setup.js",
     "moduleFileExtensions": [
       "ts",
       "tsx",
