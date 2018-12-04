@@ -21,7 +21,7 @@ export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   return _.isEqual(spec, returnSpec);
 }
 
-export function optional(o: any): boolean {
+export function optional(path: Path, o: any, errors: Error[]): boolean {
   // Used to short-circuit validation checks
   return !_.isUndefined(o);
 }
@@ -35,11 +35,22 @@ export function required(path: Path, o: any, errors: Error[]): boolean {
   }
 }
 
-export function object(path: Path, o: any, errors: Error[]): boolean {
+interface ValidationFn {
+  (path: Path, o: any, errors: Error[]): boolean
+}
+
+export function object(path: Path,
+                       o: any,
+                       errors: Error[],
+                       properties: {[key: string]: ValidationFn[]} = {}): boolean {
   if(!_.isPlainObject(o)) {
     errors.push({path, message: 'must be an Object'});
     return false;
   } else {
+    _.forEach(properties, (fns, key) => {
+      const p = path.concat(key);
+      _.find(fns, (fn) => !fn(p, _.get(o, key), errors));
+    });
     return true;
   }
 }

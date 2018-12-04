@@ -72,7 +72,7 @@ const optional = {
     validate.string(path, allowedValues, errors);
   },
   Default: (path: Path, parameter: object, value: any, errors: Error[]) => {
-    validate.optional(value);
+    validate.optional(path, value, errors);
     const type = _.get(parameter, 'Type')
     if(type === 'Number') {
       if(!validate.number(path, value, [])){
@@ -151,7 +151,8 @@ const optional = {
 export default class ParametersValidator extends Validator {
 
   Parameters(path: Path, parameters: any) {
-    if(validate.optional(parameters) && validate.object(path, parameters, this.errors)) {
+    if(validate.optional(path, parameters, this.errors)
+       && validate.object(path, parameters, this.errors)) {
       this.forEachWithPath(path, parameters, (path, parameter, name) => {
         if(validate.object(path, parameter, this.errors)) {
           _.forEach(parameter, (value, key) => {

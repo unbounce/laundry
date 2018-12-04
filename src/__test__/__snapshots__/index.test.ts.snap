@@ -240,6 +240,116 @@ exports[`lint Conditions If YAMLTag Or multiple inputs {"Or":[{"Equals":["",""]}
 
 exports[`lint Conditions If YAMLTag Or single input {"Or":[{"Equals":["",""]}]} 1`] = `Array []`;
 
+exports[`lint Mappings empty 1`] = `Array []`;
+
+exports[`lint Mappings empty object {} 1`] = `Array []`;
+
+exports[`lint Mappings invalid type {"a":{"b":[]}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Mappings",
+      "a",
+      "b",
+    ],
+  },
+]
+`;
+
+exports[`lint Mappings invalid type 1`] = `
+Array [
+  Object {
+    "message": "must be an Object",
+    "path": Array [
+      "Root",
+      "Mappings",
+    ],
+  },
+]
+`;
+
+exports[`lint Mappings object {"a":{"b":"c"}} 1`] = `Array []`;
+
+exports[`lint Outputs description {"Value":"v","Description":"d"} 1`] = `Array []`;
+
+exports[`lint Outputs empty 1`] = `Array []`;
+
+exports[`lint Outputs export {"Value":"v","Export":{"Name":"n"}} 1`] = `Array []`;
+
+exports[`lint Outputs invalid type 1`] = `
+Array [
+  Object {
+    "message": "must be an Object",
+    "path": Array [
+      "Root",
+      "Outputs",
+    ],
+  },
+]
+`;
+
+exports[`lint Outputs invalid type description {"Value":"v","Description":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Outputs",
+      "O",
+      "Description",
+    ],
+  },
+]
+`;
+
+exports[`lint Outputs invalid type export {"Value":"v","Export":{"Name":{}}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Outputs",
+      "O",
+      "Export",
+      "Name",
+    ],
+  },
+]
+`;
+
+exports[`lint Outputs invalid type value {"Value":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Outputs",
+      "O",
+      "Value",
+    ],
+  },
+]
+`;
+
+exports[`lint Outputs missing export name {"Value":"v","Export":{}} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Outputs",
+      "O",
+      "Export",
+      "Name",
+    ],
+  },
+]
+`;
+
+exports[`lint Outputs value {"Value":"v"} 1`] = `Array []`;
+
 exports[`lint Resources Base64 Object Ref {"Fn::Base64":{"Ref":"A"}} 1`] = `Array []`;
 
 exports[`lint Resources Base64 Object Ref with invalid resource {"Fn::Base64":{"Ref":"Nothing"}} 1`] = `

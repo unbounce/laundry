@@ -753,4 +753,40 @@ describe('lint', () => {
     });
   });
 
+  describe('Outputs', () => {
+    test('invalid type', () => {
+      expect(lintWithProperty('Outputs', '')).toMatchSnapshot();
+    });
+    test('empty', () => {
+      expect(lintWithProperty('Outputs', {})).toMatchSnapshot();
+    });
+    test.each([
+      ['value', { Value: 'v' }],
+      ['description', { Value: 'v', Description: 'd' }],
+      ['export', { Value: 'v', Export: { Name: 'n' } }],
+      ['invalid type value', { Value: {} }],
+      ['invalid type description', { Value: 'v', Description: {} }],
+      ['invalid type export', { Value: 'v', Export: { Name: {} } }],
+      ['missing export name', { Value: 'v', Export: {} }],
+    ])('%s %j', (s, output) => {
+      expect(lintWithProperty('Outputs.O', output)).toMatchSnapshot();
+    });
+  });
+
+  describe('Mappings', () => {
+    test('invalid type', () => {
+      expect(lintWithProperty('Mappings', '')).toMatchSnapshot();
+    });
+    test('empty', () => {
+      expect(lintWithProperty('Mappings', {})).toMatchSnapshot();
+    });
+    test.each([
+      ['empty object', {}],
+      ['object', { 'a': { 'b': 'c'}}],
+      ['invalid type', { 'a': { 'b': []}}],
+    ])('%s %j', (s, mapping) => {
+      expect(lintWithProperty('Mappings', mapping)).toMatchSnapshot();
+    });
+  });
+
 });

@@ -97,6 +97,13 @@ export class Walker {
   Mappings(mappings: any): void {
     const path = this.pushPath('Mappings');
     _.forEach(this.visitors, (v) => v.Mappings(path, mappings));
+    if(_.isObject(mappings)) {
+      _.forEach(mappings, (mapping, name) => {
+        const path = this.pushPath(name);
+        _.forEach(this.visitors, (v) => v.Mapping(path, mapping));
+        this.popPath();
+      });
+    }
     this.popPath();
   }
 
@@ -168,6 +175,13 @@ export class Walker {
   Outputs(outputs: any): void {
     const path = this.pushPath('Outputs');
     _.forEach(this.visitors, (v) => v.Outputs(path, outputs));
+    if(_.isObject(outputs)) {
+      _.forEach(outputs, (output, name) => {
+        const path = this.pushPath(name);
+        _.forEach(this.visitors, (v) => v.Output(path, output));
+        this.popPath();
+      });
+    }
     this.popPath();
   }
 }
