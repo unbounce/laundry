@@ -208,11 +208,11 @@ export class If extends CfnFn {
     Condition, And, Equals, If, Not, Or
   ];
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if(validate.list(path, this.data, errors)) {
-      if(this.data.length === 3) {
+    if (validate.list(path, this.data, errors)) {
+      if (this.data.length === 3) {
         validate.boolean(path.concat('0'), this.data[0], errors);
       } else {
-        errors.push({ path, message: 'must have three elements'});
+        errors.push({ path, message: 'must have three elements' });
       }
     }
   };
@@ -292,6 +292,7 @@ const types = _.concat(
   tag(Split),
   tag(Select),
   // tag(GetParam),
+  tag(Condition),
   tag(And),
   tag(Equals),
   tag(If),

@@ -5,6 +5,7 @@ import { lint } from '../index';
 import * as yaml from '../yaml';
 
 const testTemplate = {
+  Conditions: { C: true },
   Resources: {
     A: {
       Type: 'AWS::S3::Bucket',
@@ -226,6 +227,27 @@ describe('lint', () => {
       expect(lint(template)).toMatchObject(expected);
     });
 
+    describe('Condition', () => {
+      test('valid condition', () => {
+        const template = yaml.dump({
+          Conditions: { C: true },
+          Resources: { Bucket: { Condition: 'C', Type: 'AWS::S3::Bucket' } }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('invalid condition', () => {
+        const expected = [{
+          path: ['Root', 'Resources', 'Bucket', 'Condition'],
+          message: expect.stringMatching(/Foo/)
+        }];
+        const template = yaml.dump({
+          Conditions: { C: true },
+          Resources: { Bucket: { Condition: 'Foo', Type: 'AWS::S3::Bucket' } }
+        });
+        expect(lint(template)).toMatchObject(expected);
+      });
+    });
+
     describe('Sub', () => {
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
@@ -306,6 +328,7 @@ describe('lint', () => {
         describe('If', () => {
           test.each([
             ['valid input', new yaml.If([new yaml.Equals(['', ''], style), '', ''], style)],
+            ['valid condition', new yaml.If([new yaml.Condition('C', style), '', ''], style)],
             ['invalid input', new yaml.If([new yaml.Equals(['', ''], style)], style)],
             ['invalid ref', new yaml.If([new yaml.Equals([new yaml.Ref('foo', style), ''], style), '', ''], style)],
           ])('%s %j', (s, i) => {
@@ -782,8 +805,8 @@ describe('lint', () => {
     });
     test.each([
       ['empty object', {}],
-      ['object', { 'a': { 'b': 'c'}}],
-      ['invalid type', { 'a': { 'b': []}}],
+      ['object', { 'a': { 'b': 'c' } }],
+      ['invalid type', { 'a': { 'b': [] } }],
     ])('%s %j', (s, mapping) => {
       expect(lintWithProperty('Mappings', mapping)).toMatchSnapshot();
     });

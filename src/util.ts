@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 
-import {Path} from './types';
+import { Path } from './types';
 import * as yaml from './yaml';
 
 export function forEachWithPath<T>(
   path: Path,
   as: Array<T>,
-  fn: (path: Path, a: T, i: number|string) => void)
-: void {
+  fn: (path: Path, a: T, i: number | string) => void)
+  : void {
   _.forEach(as, (a, i) => {
     fn(path.concat(i.toString()), a, i);
   });
@@ -21,13 +21,13 @@ export function isCfnFn(o: any): o is yaml.CfnFn {
   return o instanceof yaml.CfnFn;
 }
 
-export function toCfnFn(o: any): yaml.CfnFn|undefined {
-  if(_.isObject(o)) {
-    if(o instanceof yaml.CfnFn) {
+export function toCfnFn(o: any): yaml.CfnFn | undefined {
+  if (_.isObject(o)) {
+    if (o instanceof yaml.CfnFn) {
       return o;
     }
     const keys = _.keys(o);
-    if(keys.length === 1) {
+    if (keys.length === 1) {
       const name = keys[0];
       const value = o[name];
       switch (name) {
@@ -73,6 +73,9 @@ export function toCfnFn(o: any): yaml.CfnFn|undefined {
         case 'Fn::Or':
           return new yaml.Or(value, 'Object');
           break;
+        case 'Fn::Condition':
+          return new yaml.Condition(value, 'Object');
+          break;
       }
     }
   }
@@ -80,10 +83,10 @@ export function toCfnFn(o: any): yaml.CfnFn|undefined {
 
 export function cfnFnName(cfnFn: yaml.CfnFn) {
   const name = cfnFn.constructor.name;
-  if(cfnFn.isYamlTag()) {
+  if (cfnFn.isYamlTag()) {
     return name;
   } else {
-    if(name === 'Ref') {
+    if (name === 'Ref') {
       return name;
     } else {
       return `Fn::${name}`;

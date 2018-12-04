@@ -113,6 +113,7 @@ export class Walker {
     if(_.isPlainObject(conditions)) {
       _.forEach(conditions, (condition, name) => {
         const path = this.pushPath(name);
+        _.forEach(this.visitors, (v) => v.Condition(path, condition));
         this.recursivelyVisitCfnFn(path, condition);
         this.popPath();
       });

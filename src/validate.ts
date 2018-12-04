@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
-import {Visitor} from './ast';
-import {Path, Error, ResourceSpecificationError} from './types';
+import { Visitor } from './ast';
+import { Path, Error, ResourceSpecificationError } from './types';
 import {
   PropertyTypes,
   PropertyValueType,
@@ -9,11 +9,32 @@ import {
   Type
 } from './spec';
 import * as yaml from './yaml';
-import {forEachWithPath, isNoValue} from './util';
+import { forEachWithPath, isNoValue } from './util';
+
+// Validation functions
+//
+// These are designed to be chained so that only one error message is created
+// for each element. For example:
+//
+//   validate.required(value) && validate.string(value);
+//
+// This will create only check if `value` is a string if it is considered to be
+// present by the `requried` validation function. The functions return `false`
+// when a violation is found. They can be used within a conditional to perform
+// more complex validations, for example:
+//
+//   if (validate.required(value) && validate.string(value)) {
+//     if(_.includes([...], value)) ...
+//   }
+//
+
+interface ValidationFn {
+  (path: Path, o: any, errors: Error[]): boolean
+}
 
 export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   let returnSpec;
-  if(_.isFunction(cfnFn.returnSpec)) {
+  if (_.isFunction(cfnFn.returnSpec)) {
     returnSpec = cfnFn.returnSpec();
   } else {
     returnSpec = cfnFn.returnSpec;
@@ -21,43 +42,53 @@ export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   return _.isEqual(spec, returnSpec);
 }
 
+// Used to short-circuit validation checks. For example:
+//
+//  validate.optional(value) && validate.string(value);
+//
 export function optional(path: Path, o: any, errors: Error[]): boolean {
-  // Used to short-circuit validation checks
+
   return !_.isUndefined(o);
 }
 
 export function required(path: Path, o: any, errors: Error[]): boolean {
-  if(_.isNil(o) || isNoValue(o)) {
-    errors.push({path, message: 'is required'});
+  if (_.isNil(o) || isNoValue(o)) {
+    errors.push({ path, message: 'is required' });
     return false;
   } else {
     return true;
   }
 }
 
-interface ValidationFn {
-  (path: Path, o: any, errors: Error[]): boolean
-}
-
+// Validate an object
+//
+// Optionally validate the object's properties. For example:
+//
+//   validate.object(path, value, errors, {
+//     Name: [validate.required, validate.string],
+//     Age: [validate.optional, validate.number]
+//   });
+//
 export function object(path: Path,
-                       o: any,
-                       errors: Error[],
-                       properties: {[key: string]: ValidationFn[]} = {}): boolean {
-  if(!_.isPlainObject(o)) {
-    errors.push({path, message: 'must be an Object'});
-    return false;
-  } else {
+  o: any,
+  errors: Error[],
+  properties: { [key: string]: ValidationFn[] } = {}): boolean {
+  if (_.isPlainObject(o)) {
+    // Validate the objects properties
     _.forEach(properties, (fns, key) => {
       const p = path.concat(key);
       _.find(fns, (fn) => !fn(p, _.get(o, key), errors));
     });
     return true;
+  } else {
+    errors.push({ path, message: 'must be an Object' });
+    return false;
   }
 }
 
 export function list(path: Path, o: any, errors: Error[]): boolean {
-   if(!_.isArray(o)) {
-    errors.push({path, message: 'must be a List'});
+  if (!_.isArray(o)) {
+    errors.push({ path, message: 'must be a List' });
     return false;
   } else {
     return true;
@@ -65,44 +96,40 @@ export function list(path: Path, o: any, errors: Error[]): boolean {
 }
 
 export function string(path: Path, o: any, errors: Error[]): boolean {
-  if(o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'String' })) {
+  if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'String' })) {
     return true;
   } else if (_.isString(o)) {
     return true;
   } else if (_.isNumber(o)) { // YAML interprets number only
     return true;
   } else {
-    errors.push({path, message: `must be a String, got ${JSON.stringify(o)}`});
+    errors.push({ path, message: `must be a String, got ${JSON.stringify(o)}` });
     return false;
   }
 }
 
 export function number(path: Path, o: any, errors: Error[]): boolean {
-  if(_.isNumber(o)) {
+  if (_.isNumber(o)) {
     return true;
-  } else if(_.isString(o) && _.isFinite(_.parseInt(o))) {
+  } else if (_.isString(o) && _.isFinite(_.parseInt(o))) {
     return true;
   } else {
-    errors.push({path, message: 'must be a Number'});
+    errors.push({ path, message: 'must be a Number' });
     return false;
   }
 }
 
 export function boolean(path: Path, o: any, errors: Error[]): boolean {
-  if(o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Boolean' })) {
+  if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Boolean' })) {
     return true;
-  } else if(_.isBoolean(o)) {
+  } else if (_.isBoolean(o)) {
     return true;
-  } else if(_.isString(o) && o.match(/^(true|false)$/i)) {
+  } else if (_.isString(o) && o.match(/^(true|false)$/i)) {
     return true;
   } else {
-    errors.push({path, message: 'must be a Boolean'});
+    errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
     return false;
   }
-}
-
-export function error(path: Path, message: string, errors: Error[]): void {
-  errors.push({path, message});
 }
 
 export class Validator extends Visitor {
@@ -113,15 +140,11 @@ export class Validator extends Visitor {
     this.errors = errors;
   }
 
-  public error(path: Path, message: string) {
-    this.errors.push({ path, message, source: this.constructor.name });
-  }
-
   protected forEachWithPath<T>(
     path: Path,
     as: Array<T>,
-    fn: (path: Path, a: T, i: number|string) => void)
-  : void {
+    fn: (path: Path, a: T, i: number | string) => void)
+    : void {
     _.forEach(as, (a, i) => {
       fn(path.concat(i.toString()), a, i);
     });
@@ -131,7 +154,7 @@ export class Validator extends Visitor {
 
 function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, errors: Error[]) {
   let validator: (path: Path, o: any, errors: Error[]) => boolean;
-  switch(primitiveType) {
+  switch (primitiveType) {
     case 'Boolean':
       validator = boolean;
       break;
@@ -161,34 +184,34 @@ function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, 
 function complexType(path: Path, resourceType: string, type: Type, properties: any, errors: Error[]) {
   // TODO check that resourceType is valid
   const propertyType = _.get(PropertyTypes, `${resourceType}.${type}`) || _.get(PropertyTypes, type);
-   if(propertyType) {
-     if(object(path, properties, errors)) {
-       forEachWithPath(path, properties, (path, property, name) => {
-         const s = _.get(propertyType.Properties, name);
-         if(s) {
-           if(s.PrimitiveType) {
-             primitiveType(path, s.PrimitiveType, property, errors);
-           } else if(s.Type === 'Map') {
-             object(path, property, errors);
-           } else if(s.Type === 'List') {
-             if(_.isArray(property)) {
-               forEachWithPath(path, property, (path, v, k) => {
-                 if(s.PrimitiveItemType) {
-                   primitiveType(path, s.PrimitiveItemType, v, errors);
-                 } else if(s.ItemType) {
-                   complexType(path, resourceType, s.ItemType, v, errors);
-                 } else {
-                   throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
-                 }
-               });
-             } else {
-               errors.push({path, message: 'must be a List'});
-             }
-           }
-         } else {
-           errors.push({path, message: 'invalid property'});
-         }
-       });
+  if (propertyType) {
+    if (object(path, properties, errors)) {
+      forEachWithPath(path, properties, (path, property, name) => {
+        const s = _.get(propertyType.Properties, name);
+        if (s) {
+          if (s.PrimitiveType) {
+            primitiveType(path, s.PrimitiveType, property, errors);
+          } else if (s.Type === 'Map') {
+            object(path, property, errors);
+          } else if (s.Type === 'List') {
+            if (_.isArray(property)) {
+              forEachWithPath(path, property, (path, v, k) => {
+                if (s.PrimitiveItemType) {
+                  primitiveType(path, s.PrimitiveItemType, v, errors);
+                } else if (s.ItemType) {
+                  complexType(path, resourceType, s.ItemType, v, errors);
+                } else {
+                  throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
+                }
+              });
+            } else {
+              errors.push({ path, message: 'must be a List' });
+            }
+          }
+        } else {
+          errors.push({ path, message: 'invalid property' });
+        }
+      });
     }
   } else {
     throw new ResourceSpecificationError(`Unknown Type '${propertyType}'`, path);
@@ -196,25 +219,25 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
 }
 
 export function spec(path: Path, resourceType: string, propertyType: PropertyValueType, property: any, errors: Error[]) {
-  if(propertyType.PrimitiveType) {
+  if (propertyType.PrimitiveType) {
     primitiveType(path, propertyType.PrimitiveType, property, errors);
-  } else if(propertyType.Type === 'Map') {
+  } else if (propertyType.Type === 'Map') {
     object(path, property, errors);
-  } else if(propertyType.Type === 'List') {
-    if(_.isArray(property)) {
+  } else if (propertyType.Type === 'List') {
+    if (_.isArray(property)) {
       forEachWithPath(path, property, (path, v, i) => {
-        if(propertyType.PrimitiveItemType) {
+        if (propertyType.PrimitiveItemType) {
           primitiveType(path, propertyType.PrimitiveItemType, v, errors);
-        } else if(propertyType.ItemType) {
+        } else if (propertyType.ItemType) {
           complexType(path, resourceType, propertyType.ItemType, v, errors);
         } else {
           throw new ResourceSpecificationError('No property type', path);
         }
       });
     } else {
-      errors.push({ path, message: 'must be a List'});
+      errors.push({ path, message: 'must be a List' });
     }
-  } else if(propertyType.Type) {
+  } else if (propertyType.Type) {
     complexType(path, resourceType, propertyType.Type, property, errors);
   } else {
     throw new ResourceSpecificationError('No property type', path);
