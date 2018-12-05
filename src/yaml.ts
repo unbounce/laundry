@@ -303,7 +303,7 @@ const types = _.concat(
 const schema = yaml.Schema.create(yaml.JSON_SCHEMA, types);
 
 export function load(contents: string) {
-  return yaml.load(contents, { schema });
+  return yaml.load(contents, { schema, json: true });
 }
 
 export function dump(obj: object) {
