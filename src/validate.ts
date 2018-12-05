@@ -13,8 +13,8 @@ import { forEachWithPath, isNoValue } from './util';
 
 // Validation functions
 //
-// These are designed to be chained so that only one error message is created
-// for each element. For example:
+// These functions are designed to be chained so that only one error message is
+// created for each element. For example:
 //
 //   validate.required(value) && validate.string(value);
 //

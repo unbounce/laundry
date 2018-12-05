@@ -1,27 +1,26 @@
 import * as _ from 'lodash';
 
-import {Path} from './types';
-import {CfnFn} from './yaml';
-import {cfnFnName} from './util';
+import { Path } from './types';
+import { CfnFn } from './yaml';
+import { cfnFnName } from './util';
 
 export class Visitor {
-  Root(path: Path, root: any): void {}
-  AWSTemplateFormatVersion(path: Path, version: any): void {}
-  Description(path: Path, description: any): void {}
-  Metadata(path: Path, metadata: any): void {}
-  Parameters(path: Path, parameters: any): void {}
-  Mappings(path: Path, mappings: any): void {}
-  Conditions(path: Path, conditions: any): void {}
-  Transform(path: Path, transform: any): void {}
-  Resources(path: Path, resources: any): void {}
-  Outputs(path: Path, outputs: any): void {}
-  Parameter(path: Path, parameter: any): void {}
-  Mapping(path: Path, mapping: any): void {}
-  Condition(path: Path, condition: any): void {}
-  Resource(path: Path, resource: any): void {}
-  ResourceProperty(path: Path, name: string, value: any): void {}
-  CfnFn(path: Path, value: CfnFn): void {}
-  Output(path: Path, output: any): void {}
+  Root(path: Path, root: any): void { }
+  AWSTemplateFormatVersion(path: Path, version: any): void { }
+  Description(path: Path, description: any): void { }
+  Metadata(path: Path, metadata: any): void { }
+  Parameters(path: Path, parameters: any): void { }
+  Mappings(path: Path, mappings: any): void { }
+  Conditions(path: Path, conditions: any): void { }
+  Transform(path: Path, transform: any): void { }
+  Resources(path: Path, resources: any): void { }
+  Outputs(path: Path, outputs: any): void { }
+  Parameter(path: Path, parameter: any): void { }
+  Mapping(path: Path, mapping: any): void { }
+  Condition(path: Path, condition: any): void { }
+  Resource(path: Path, resource: any): void { }
+  CfnFn(path: Path, value: CfnFn): void { }
+  Output(path: Path, output: any): void { }
 }
 
 export class Walker {
@@ -84,7 +83,7 @@ export class Walker {
     const path = this.pushPath('Parameters');
     _.forEach(this.visitors, (v) => v.Parameters(path, parameters));
 
-     if(_.isObject(parameters)) {
+    if (_.isObject(parameters)) {
       _.forEach(parameters, (parameter, name) => {
         this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Parameter(path, parameter));
@@ -97,7 +96,7 @@ export class Walker {
   Mappings(mappings: any): void {
     const path = this.pushPath('Mappings');
     _.forEach(this.visitors, (v) => v.Mappings(path, mappings));
-    if(_.isObject(mappings)) {
+    if (_.isObject(mappings)) {
       _.forEach(mappings, (mapping, name) => {
         const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Mapping(path, mapping));
@@ -110,7 +109,7 @@ export class Walker {
   Conditions(conditions: any): void {
     const path = this.pushPath('Conditions');
     _.forEach(this.visitors, (v) => v.Conditions(path, conditions));
-    if(_.isPlainObject(conditions)) {
+    if (_.isPlainObject(conditions)) {
       _.forEach(conditions, (condition, name) => {
         const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Condition(path, condition));
@@ -131,16 +130,15 @@ export class Walker {
     const path = this.pushPath('Resources');
     _.forEach(this.visitors, (v) => v.Resources(path, resources));
 
-     if(_.isObject(resources)) {
+    if (_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
         const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Resource(path, resource));
         const properties = _.get(resource, 'Properties');
-        if(_.isObject(properties)) {
+        if (_.isObject(properties)) {
           const path = this.pushPath('Properties');
           _.forEach(properties, (value, key) => {
             const path = this.pushPath(key);
-            _.forEach(this.visitors, (v) => v.ResourceProperty(path, key, value));
             this.recursivelyVisitCfnFn(path, value);
             this.popPath();
           });
@@ -159,12 +157,12 @@ export class Walker {
   // Currently, you can use intrinsic functions in resource properties, outputs,
   // metadata attributes, and update policy attributes.
   private recursivelyVisitCfnFn(path: Path, value: any) {
-    if(value instanceof CfnFn) {
+    if (value instanceof CfnFn) {
       path = this.pushPath(cfnFnName(value));
       _.forEach(this.visitors, (v) => v.CfnFn(path, value));
       this.recursivelyVisitCfnFn(path, value.data);
       this.popPath();
-    } else if(_.isObject(value)) {
+    } else if (_.isObject(value)) {
       _.forEach(value, (v, i) => {
         path = this.pushPath(i.toString());
         this.recursivelyVisitCfnFn(path, v);
@@ -176,7 +174,7 @@ export class Walker {
   Outputs(outputs: any): void {
     const path = this.pushPath('Outputs');
     _.forEach(this.visitors, (v) => v.Outputs(path, outputs));
-    if(_.isObject(outputs)) {
+    if (_.isObject(outputs)) {
       _.forEach(outputs, (output, name) => {
         const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Output(path, output));
