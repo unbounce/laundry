@@ -228,6 +228,17 @@ export class If extends CfnFn {
     }
     return {};
   };
+
+  constructor(d: any, s: Style) {
+    super(d, s);
+    // Replace string representation of Condition with Condition object, for
+    // example: !If [SomeCondition, 1, 2]. This is not ideal as error messages
+    // will not read perfectly, but this is the cleanest way to validate these
+    // values properly.
+    if (_.isArray(d) && _.isString(d[0])) {
+      d[0] = new Condition(d[0], s);
+    }
+  }
 }
 function paramToReturnSpec(o: any): PropertyValueType {
   if (_.isString(o)) {
