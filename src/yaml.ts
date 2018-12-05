@@ -105,9 +105,10 @@ export class FindInMap extends CfnFn {
   [returnSpec] = { PrimitiveType: 'String' };
   [supportedFns]: SupportedFns = [FindInMap, Ref];
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (!(_.isArray(this.data) && this.data.length === 3
-      && _.every(this.data, _.isString))) {
-      errors.push({ path, message: 'must be a List of three Strings' });
+    if (_.isArray(this.data) && this.data.length === 3) {
+      _.forEach(this.data, (value, i) => {
+        validate.string(path.concat(i.toString()), value, errors);
+      })
     }
   };
 }
