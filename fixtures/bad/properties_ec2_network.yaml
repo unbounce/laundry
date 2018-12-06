@@ -1,0 +1,38 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  AWS EC2 Good Template
+Parameters:
+  cidrBlock:
+    Type: Number
+  vpcTenancy:
+    Type: String
+    AllowedValues:
+      - default
+      - dedicated
+  myAz:
+    Type: Number
+Resources:
+  myVpc1:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref cidrBlock
+      InstanceTenancy: bad
+  myVpc2:
+    Type: AWS::EC2::VPC
+    Properties:
+      InstanceTenancy: !Ref vpcTenancy
+      CidrBlock: 10.0.0.3
+  mySubnet2-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/64
+  mySubnet2-2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-3a
+      CidrBlock: !Ref cidrBlock
+  mySubnet3-1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref myAz

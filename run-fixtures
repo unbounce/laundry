@@ -1,0 +1,25 @@
+#!/bin/bash
+
+for file in fixtures/bad/*{.json,.yaml}; do
+    output=$(bin/laundry lint "$file")
+    if [[ "$?" == "0" ]]; then
+        echo "FAILED did not produce error for ${file}"
+        echo "$output"
+    fi
+done
+
+for file in fixtures/good/*{.json,.yaml}; do
+    output=$(bin/laundry lint "$file")
+    if [[ "$?" != "0" ]]; then
+        echo "FAILED produced error for ${file}"
+        echo "$output"
+    fi
+done
+
+for file in fixtures/quickstart/*{.json,.yaml}; do
+  output=$(bin/laundry lint "$file")
+  if [[ "$?" != "0" ]]; then
+      echo "FAILED produced error for ${file}"
+      echo "$output"
+  fi
+done
