@@ -39,7 +39,10 @@ export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
   } else {
     returnSpec = cfnFn.returnSpec;
   }
-  return _.isEqual(spec, returnSpec);
+  // Test the returnSpec is a superset of spec. This it to support testing
+  // { Type: 'List' } without checking the ItemType.
+  // I can't explain why this works, but https://stackoverflow.com/a/26127030
+  return _.some([returnSpec], spec);
 }
 
 // Used to short-circuit validation checks. For example:
@@ -47,7 +50,6 @@ export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
 //  validate.optional(value) && validate.string(value);
 //
 export function optional(path: Path, o: any, errors: Error[]): boolean {
-
   return !_.isUndefined(o);
 }
 
@@ -86,21 +88,26 @@ export function object(path: Path,
   }
 }
 
-export function list(path: Path, o: any, errors: Error[]): boolean {
-  if (!_.isArray(o)) {
-    errors.push({ path, message: 'must be a List' });
-    return false;
-  } else {
+export function list(path: Path, o: any, errors: Error[]): o is Array<any> {
+  if (o instanceof yaml.CfnFn && cfnFn(o, { Type: 'List' })) {
+    return true
+  } else if (_.isArray(o)) {
     return true;
+  } else {
+    errors.push({ path, message: `must be a List, got ${JSON.stringify(o)}` });
+    return false;
   }
 }
 
 export function string(path: Path, o: any, errors: Error[]): boolean {
-  if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'String' })) {
+  if (o instanceof yaml.CfnFn
+    && (cfnFn(o, { PrimitiveType: 'String' }) || cfnFn(o, { PrimitiveType: 'Number' }))) {
     return true;
   } else if (_.isString(o)) {
     return true;
-  } else if (_.isNumber(o)) { // YAML interprets number only
+  } else if (_.isBoolean(o)) { // TODO better support 'true'/'false' in string values
+    return true;
+  } else if (_.isNumber(o)) { // YAML interprets number only strings as numbers
     return true;
   } else {
     errors.push({ path, message: `must be a String, got ${JSON.stringify(o)}` });
@@ -194,7 +201,7 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
           } else if (s.Type === 'Map') {
             object(path, property, errors);
           } else if (s.Type === 'List') {
-            if (_.isArray(property)) {
+            if (list(path, property, errors)) {
               forEachWithPath(path, property, (path, v, k) => {
                 if (s.PrimitiveItemType) {
                   primitiveType(path, s.PrimitiveItemType, v, errors);
@@ -204,8 +211,6 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
                   throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
                 }
               });
-            } else {
-              errors.push({ path, message: 'must be a List' });
             }
           }
         } else {
@@ -224,7 +229,7 @@ export function spec(path: Path, resourceType: string, propertyType: PropertyVal
   } else if (propertyType.Type === 'Map') {
     object(path, property, errors);
   } else if (propertyType.Type === 'List') {
-    if (_.isArray(property)) {
+    if (list(path, property, errors)) {
       forEachWithPath(path, property, (path, v, i) => {
         if (propertyType.PrimitiveItemType) {
           primitiveType(path, propertyType.PrimitiveItemType, v, errors);
@@ -234,8 +239,6 @@ export function spec(path: Path, resourceType: string, propertyType: PropertyVal
           throw new ResourceSpecificationError('No property type', path);
         }
       });
-    } else {
-      errors.push({ path, message: 'must be a List' });
     }
   } else if (propertyType.Type) {
     complexType(path, resourceType, propertyType.Type, property, errors);

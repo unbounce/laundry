@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 
 import * as validate from '../validate';
 import * as yaml from '../yaml';
-import {Validator} from '../validate';
-import {Path, Error} from '../types';
-import {ResourceTypes, Attributes} from '../spec';
+import { Validator } from '../validate';
+import { Path, Error } from '../types';
+import { ResourceTypes, Attributes } from '../spec';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -18,11 +18,12 @@ export default class RefsValidator extends Validator {
     'AWS::StackId',
     'AWS::StackName',
     'AWS::URLSuffix',
-    'AWS::NoValue'
+    'AWS::NoValue',
+    'AWS::AccountId'
   ];
 
   Parameters(path: Path, parameters: any) {
-    if(_.isObject(parameters)) {
+    if (_.isObject(parameters)) {
       _.forEach(parameters, (parameter, name) => {
         this.refs.push(name);
       });
@@ -30,7 +31,7 @@ export default class RefsValidator extends Validator {
   }
 
   Resources(path: Path, resources: any) {
-    if(_.isObject(resources)) {
+    if (_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
         this.refs.push(name);
       });
@@ -38,8 +39,8 @@ export default class RefsValidator extends Validator {
   }
 
   CfnFn(path: Path, value: yaml.CfnFn) {
-    if(value instanceof yaml.Ref && _.isString(value.data)) {
-      if(!_.includes(this.refs, value.data)) {
+    if (value instanceof yaml.Ref && _.isString(value.data)) {
+      if (!_.includes(this.refs, value.data)) {
         this.errors.push({
           path,
           message: `${value.data} is not a valid Parameter or Resource`

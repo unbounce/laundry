@@ -65,7 +65,7 @@ Array [
 ]
 `;
 
-exports[`lint Conditions If Object If valid condition {"Fn::If":[{"Fn::Condition":"C"},"",""]} 1`] = `Array []`;
+exports[`lint Conditions If Object If valid condition {"Fn::If":[{"Condition":"C"},"",""]} 1`] = `Array []`;
 
 exports[`lint Conditions If Object If valid input {"Fn::If":[{"Fn::Equals":["",""]},"",""]} 1`] = `Array []`;
 
@@ -248,7 +248,7 @@ exports[`lint Mappings empty 1`] = `Array []`;
 
 exports[`lint Mappings empty object {} 1`] = `Array []`;
 
-exports[`lint Mappings invalid type {"a":{"b":[]}} 1`] = `
+exports[`lint Mappings invalid type {"a":{"b":{"d":[]}}} 1`] = `
 Array [
   Object {
     "message": "must be a String, got []",
@@ -257,6 +257,7 @@ Array [
       "Mappings",
       "a",
       "b",
+      "d",
     ],
   },
 ]
@@ -274,7 +275,21 @@ Array [
 ]
 `;
 
-exports[`lint Mappings object {"a":{"b":"c"}} 1`] = `Array []`;
+exports[`lint Mappings object {"a":{"b":""}} 1`] = `
+Array [
+  Object {
+    "message": "must be an Object",
+    "path": Array [
+      "Root",
+      "Mappings",
+      "a",
+      "b",
+    ],
+  },
+]
+`;
+
+exports[`lint Mappings object {"a":{"b":{"c":"d"}}} 1`] = `Array []`;
 
 exports[`lint Outputs description {"Value":"v","Description":"d"} 1`] = `Array []`;
 

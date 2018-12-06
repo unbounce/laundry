@@ -293,6 +293,30 @@ describe('lint', () => {
       ])('%s %j', (s, bucketName) => {
         expect(lint(t(bucketName))).toMatchSnapshot();
       });
+
+      describe('CloudFormation Stack Outputs', () => {
+        describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+          test('Outputs', () => {
+            const template = yaml.dump({
+              Resources: {
+                Stack: {
+                  Type: 'AWS::CloudFormation::Stack',
+                  Properties: { TemplateURL: '' }
+                }
+              },
+              Outputs: {
+                O: {
+                  Value: new yaml.GetAtt('Stack.Outputs', style)
+                },
+                A: {
+                  Value: new yaml.GetAtt('Stack.Outputs.A', style)
+                }
+              }
+            });
+            expect(lint(template)).toEqual([]);
+          });
+        });
+      });
     });
 
     describe('Ref', () => {
@@ -805,8 +829,9 @@ describe('lint', () => {
     });
     test.each([
       ['empty object', {}],
-      ['object', { 'a': { 'b': 'c' } }],
-      ['invalid type', { 'a': { 'b': [] } }],
+      ['object', { 'a': { 'b': { 'c': 'd' } } }],
+      ['invalid type', { 'a': { 'b': { 'd': [] } } }],
+      ['object', { 'a': { 'b': '' } }],
     ])('%s %j', (s, mapping) => {
       expect(lintWithProperty('Mappings', mapping)).toMatchSnapshot();
     });

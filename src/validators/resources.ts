@@ -17,7 +17,9 @@ export class ResourceTypeValidator extends Validator {
     if (_.isObject(resource)) {
       const resourceType = _.get(resource, 'Type');
       if (validate.required(path, resourceType, this.errors)) {
-        if (!_.startsWith(resourceType, 'Custom::')) {
+        // TODO Support AWS::Serverless::*
+        if (!(_.startsWith(resourceType, 'Custom::')
+          || _.startsWith(resourceType, 'AWS::Serverless'))) {
           const s: ResourceType = _.get(ResourceTypes, resourceType);
           if (!s) {
             this.errors.push({

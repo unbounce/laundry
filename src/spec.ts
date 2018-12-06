@@ -1,5 +1,20 @@
-import {Path, Error} from './types';
+import * as _ from 'lodash';
+import { Path, Error } from './types';
 import spec from './CloudFormationResourceSpecification.json';
+
+const overrides = {
+  ResourceTypes: {
+    "AWS::CloudFormation::Stack": {
+      Attributes: {
+        Outputs: {
+          PrimitiveType: 'Json'
+        }
+      }
+    }
+  }
+};
+
+_.merge(spec, overrides);
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';

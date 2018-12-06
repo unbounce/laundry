@@ -1,8 +1,10 @@
 import * as _ from 'lodash';
+import CfnFnPreparer from './CfnFnPreparer';
 import ParametersValidator from './validators/ParametersValidator';
 import RootValidator from './validators/RootValidator';
 import RefsValidator from './validators/RefsValidator';
-import CfnFnsValidator from './validators/CfnFnsValidator';
+import CfnFnsSupportedFnsValidator from './validators/CfnFnsSupportedFnsValidator';
+import CfnFnsInputsValidator from './validators/CfnFnsInputsValidator';
 import GetAttValidator from './validators/GetAttValidator';
 import SubValidator from './validators/SubValidator';
 import {
@@ -42,6 +44,12 @@ function convertCfnFns(o: any): any {
 }
 
 export function lint(template: string) {
+  const input = convertCfnFns(yaml.load(template));
+
+  const prewalk = new Walker([new CfnFnPreparer([])]);
+  // Mutates input
+  prewalk.Root(input);
+
   const errors: Error[] = [];
   const validators = [
     new RootValidator(errors),
@@ -51,12 +59,12 @@ export function lint(template: string) {
     new ResourcePropertyValidator(errors),
     new ResourceConditionValidator(errors),
     new RefsValidator(errors),
-    new CfnFnsValidator(errors),
+    new CfnFnsSupportedFnsValidator(errors),
+    new CfnFnsInputsValidator(errors),
     new GetAttValidator(errors),
     new SubValidator(errors),
   ];
-  const walker = new Walker(validators);
-  const input = convertCfnFns(yaml.load(template));
-  walker.Root(input);
+  const validate = new Walker(validators);
+  validate.Root(input);
   return errors;
 }

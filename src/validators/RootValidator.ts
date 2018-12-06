@@ -40,7 +40,11 @@ export default class RootValidator extends Validator {
       _.forEach(mapping, (m, name) => {
         if (validate.object(path.concat(name), mapping, this.errors)) {
           _.forEach(mapping, (value, key) => {
-            validate.string(path.concat(key), value, this.errors);
+            if (validate.object(path.concat(key), value, this.errors)) {
+              _.forEach(value, (v, k) => {
+                validate.string(path.concat([key, k]), v, this.errors);
+              });
+            }
           });
         }
       });

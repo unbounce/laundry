@@ -43,6 +43,9 @@ export function toCfnFn(o: any): yaml.CfnFn | undefined {
         case 'Fn::GetAtt':
           return new yaml.GetAtt(value, 'Object');
           break;
+        case 'Fn::GetAZs':
+          return new yaml.GetAZs(value, 'Object');
+          break;
         case 'Fn::ImportValue':
           return new yaml.ImportValue(value, 'Object');
           break;
@@ -73,7 +76,7 @@ export function toCfnFn(o: any): yaml.CfnFn | undefined {
         case 'Fn::Or':
           return new yaml.Or(value, 'Object');
           break;
-        case 'Fn::Condition':
+        case 'Condition':
           return new yaml.Condition(value, 'Object');
           break;
       }
@@ -86,7 +89,7 @@ export function cfnFnName(cfnFn: yaml.CfnFn) {
   if (cfnFn.isYamlTag()) {
     return name;
   } else {
-    if (name === 'Ref') {
+    if (name === 'Ref' || name === 'Condition') {
       return name;
     } else {
       return `Fn::${name}`;
