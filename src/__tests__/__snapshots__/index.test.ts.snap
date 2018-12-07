@@ -18,7 +18,7 @@ Array [
 exports[`lint Conditions If Object And invalid value {"Fn::And":""} 1`] = `
 Array [
   Object {
-    "message": "must be a List",
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",
@@ -107,7 +107,7 @@ Array [
 exports[`lint Conditions If Object Or invalid value {"Fn::Or":""} 1`] = `
 Array [
   Object {
-    "message": "must be a List",
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",
@@ -140,7 +140,7 @@ Array [
 exports[`lint Conditions If YAMLTag And invalid value {"And":""} 1`] = `
 Array [
   Object {
-    "message": "must be a List",
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",
@@ -229,7 +229,7 @@ Array [
 exports[`lint Conditions If YAMLTag Or invalid value {"Or":""} 1`] = `
 Array [
   Object {
-    "message": "must be a List",
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",

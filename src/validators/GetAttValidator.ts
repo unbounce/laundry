@@ -45,12 +45,19 @@ export default class GetAttValidator extends Validator {
       }
 
       attribute = parts[0];
+      const fullAttribute = parts.join('.');
 
       if (_.includes(_.keys(this.resources), resource)) {
+        // Some resources, like `AWS::ElasticLoadBalancing::LoadBalancer` have
+        // Attributes with a dot in them, like `SourceSecurityGroup.GroupName`
+        if (_.has(this.resources, [resource, fullAttribute])) {
+          return;
+        }
+
         if (_.has(this.resources, [resource, attribute])) {
           // Only `Json` type attributes can have a nested attribute
           if (parts.length > 1 && _.get(this.resources, [resource, attribute, 'PrimitiveType']) !== 'Json') {
-            this.errors.push({ path, message: `${parts.join('.')} is not a valid attribute of ${resource}` });
+            this.errors.push({ path, message: `${fullAttribute} is not a valid attribute of ${resource}` });
           }
         } else {
           this.errors.push({ path, message: `${attribute} is not a valid attribute of ${resource}` });
