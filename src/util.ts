@@ -3,16 +3,6 @@ import * as _ from 'lodash';
 import { Path } from './types';
 import * as yaml from './yaml';
 
-export function forEachWithPath<T>(
-  path: Path,
-  as: Array<T>,
-  fn: (path: Path, a: T, i: number | string) => void)
-  : void {
-  _.forEach(as, (a, i) => {
-    fn(path.concat(i.toString()), a, i);
-  });
-}
-
 export function isNoValue(o: any) {
   return o instanceof yaml.Ref && o.data === 'AWS::NoValue';
 }

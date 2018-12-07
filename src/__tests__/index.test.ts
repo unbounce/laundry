@@ -347,6 +347,26 @@ describe('lint', () => {
           expect(lint(t(bucketName))).toMatchSnapshot();
         });
       });
+
+      test('Non string type', () => {
+        const template = yaml.dump({
+          Parameters: { ExpirationInDays: { Type: 'Number' } },
+          Resources: {
+            A: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                LifecycleConfiguration: {
+                  Rules: [{
+                    Status: 'Enabled',
+                    ExpirationInDays: new yaml.Ref('ExpirationInDays', 'Object')
+                  }]
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
     });
 
     describe('Base64', () => {
@@ -369,6 +389,32 @@ describe('lint', () => {
 
   describe('Conditions', () => {
     describe('If', () => {
+      test('AWS::NoValue', () => {
+        const template = yaml.dump({
+          Conditions: { ShouldReplicate: true },
+          Resources: {
+            A: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                ReplicationConfiguration: {
+                  'Fn::If': [
+                    'ShouldReplicate',
+                    {
+                      Role: '',
+                      Rules: [
+                        { Destination: { Bucket: '', Prefix: '', Status: 'Enabled' } }
+                      ]
+                    },
+                    { 'Ref': 'AWS::NoValue' }
+                  ]
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         describe('If', () => {
           test.each([
