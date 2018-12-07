@@ -70,7 +70,7 @@ export default class SubValidator extends Validator {
       let match;
       while (match = r.exec(template)) {
         let resource, attribute;
-        [resource, attribute] = match[1].split('.', 2);
+        [resource, attribute] = _.trim(match[1]).split('.', 2);
         if (attribute) {
           if (_.includes(_.keys(this.resources), resource)) {
             if (!_.includes(_.get(this.resources, resource), attribute)) {
