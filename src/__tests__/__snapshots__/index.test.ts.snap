@@ -64,7 +64,22 @@ Array [
 exports[`lint Conditions If Object Not invalid array value {"Fn::Not":[""]} 1`] = `
 Array [
   Object {
-    "message": "must be a List of one String",
+    "message": "must be a Boolean, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::Not",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If Object Not invalid value {"Fn::Not":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",
@@ -74,8 +89,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If Object Not invalid value {"Fn::Not":""} 1`] = `Array []`;
 
 exports[`lint Conditions If Object Not multiple inputs {"Fn::Not":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
 
@@ -174,7 +187,22 @@ Array [
 exports[`lint Conditions If YAMLTag Not invalid array value {"Not":[""]} 1`] = `
 Array [
   Object {
-    "message": "must be a List of one String",
+    "message": "must be a Boolean, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Not",
+      "0",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag Not invalid value {"Not":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List, got \\"\\"",
     "path": Array [
       "Root",
       "Conditions",
@@ -184,8 +212,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If YAMLTag Not invalid value {"Not":""} 1`] = `Array []`;
 
 exports[`lint Conditions If YAMLTag Not multiple inputs {"Not":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
 
@@ -242,7 +268,7 @@ Array [
 exports[`lint Mappings invalid type 1`] = `
 Array [
   Object {
-    "message": "must be an Object",
+    "message": "must be an Object, got \\"\\"",
     "path": Array [
       "Root",
       "Mappings",
@@ -254,7 +280,7 @@ Array [
 exports[`lint Mappings object {"a":{"b":""}} 1`] = `
 Array [
   Object {
-    "message": "must be an Object",
+    "message": "must be an Object, got \\"\\"",
     "path": Array [
       "Root",
       "Mappings",
@@ -276,7 +302,7 @@ exports[`lint Outputs export {"Value":"v","Export":{"Name":"n"}} 1`] = `Array []
 exports[`lint Outputs invalid type 1`] = `
 Array [
   Object {
-    "message": "must be an Object",
+    "message": "must be an Object, got \\"\\"",
     "path": Array [
       "Root",
       "Outputs",
@@ -634,7 +660,7 @@ Array [
     ],
   },
   Object {
-    "message": "must be an Object",
+    "message": "must be an Object, got \\"\${A}\\"",
     "path": Array [
       "Root",
       "Resources",
@@ -743,7 +769,7 @@ Array [
     ],
   },
   Object {
-    "message": "must be an Object",
+    "message": "must be an Object, got \\"\${A}\\"",
     "path": Array [
       "Root",
       "Resources",

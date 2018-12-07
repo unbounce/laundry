@@ -14,6 +14,14 @@ type ParamSpecFn = (path: Path, errors: Error[]) => void;
 // YAMLTag => !Ref Resource
 export type Style = 'Object' | 'YAMLTag';
 
+function isList(o: any) {
+  return validate.list([], o, []);
+}
+
+function isString(o: any) {
+  return validate.string([], o, []);
+}
+
 // Symbols are used to hide properties from yaml.dump when style = 'Object'
 const foo = Symbol('foo');
 const style = Symbol('style');
@@ -94,16 +102,17 @@ export class Condition extends CfnFn {
 export class Sub extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html';
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (_.isArray(this.data) && this.data.length === 2) {
+    // _.isString(this.data) || validate.list(path, this.data, errors, [validate.string, validate.object]);
+    if (isList(this.data) && this.data.length === 2) {
       validate.string(path.concat('0'), this.data[0], errors);
       validate.object(path.concat('1'), this.data[1], errors);
-    } else if (!_.isString(this.data)) {
+    } else if (!isString(this.data)) {
       errors.push({ path, message: 'must be a String or List of Sting and Map' });
     }
   };
   [returnSpec] = { PrimitiveType: 'String' };
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref, Condition
+    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref, Condition, Sub
   ];
 }
 
@@ -112,23 +121,19 @@ export class FindInMap extends CfnFn {
   [returnSpec] = { PrimitiveType: 'String' };
   [supportedFns]: SupportedFns = [FindInMap, Ref];
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (_.isArray(this.data) && this.data.length === 3) {
-      _.forEach(this.data, (value, i) => {
-        validate.string(path.concat(i.toString()), value, errors);
-      })
-    }
+    validate.list(path, this.data, errors, Array(3).fill(validate.string));
   };
 }
 
 export class GetAtt extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html';
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (this.isYamlTag() && _.isString(this.data)) {
+    if (this.isYamlTag() && isString(this.data)) {
       if (!_.includes(this.data, '.')) {
         errors.push({ path, message: 'must be a String that contains a `.`' });
       }
-    } else if (!(_.isArray(this.data) && this.data.length === 2
-      && _.every(this.data, _.isString))) {
+    } else if (!(isList(this.data) && this.data.length === 2
+      && _.every(this.data, isString))) {
       if (this.isYamlTag()) {
         errors.push({ path, message: 'must be a String or a List of two Strings' });
       } else {
@@ -148,7 +153,7 @@ export class ImportValue extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html';
   [returnSpec] = { PrimitiveType: 'String' };
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, If, Join, Select, Split, Sub, Ref
+    Base64, FindInMap, If, Join, Select, Split, Sub, Ref, Condition
   ];
 }
 
@@ -191,9 +196,17 @@ export class Join extends CfnFn {
 }
 export class Split extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-split.html';
+  [paramSpec] = (path: Path, errors: Error[]) => {
+    if (validate.list(path, this.data, errors) && this.data.length === 2) {
+      validate.string(path, path.concat('0'), errors);
+      validate.list(path, path.concat('1'), errors);
+    } else {
+      errors.push({ path, message: 'must be a List of length 2' });
+    }
+  };
   [returnSpec] = { Type: 'List', PrimitiveItemType: 'String' };
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref
+    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref, Condition
   ];
 }
 export class Select extends CfnFn {
@@ -214,7 +227,7 @@ export class And extends CfnFn {
 export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (!(_.isArray(this.data) && this.data.length === 2)) {
+    if (!(isList(this.data) && this.data.length === 2)) {
       errors.push({ path, message: 'must be a List of length 2' });
     }
   };
@@ -225,7 +238,7 @@ export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, Join, Select, Sub, Ref,
-    Condition, And, Equals, If, Not, Or
+    Condition, And, Equals, If, Not, Or, ImportValue
   ];
   [paramSpec] = (path: Path, errors: Error[]) => {
     if (validate.list(path, this.data, errors)) {
@@ -238,7 +251,7 @@ export class If extends CfnFn {
   };
   [returnSpec] = () => {
     const value = this.data;
-    if (_.isArray(value) && value.length === 3) {
+    if (isList(value) && value.length === 3) {
       const a = paramToReturnSpec(value[1]);
       const b = paramToReturnSpec(value[2]);
       if (a === null && b !== null) {
@@ -270,6 +283,8 @@ function paramToReturnSpec(o: any): PropertyValueType | null {
     return { PrimitiveType: 'Number' };
   } else if (_.isBoolean(o)) {
     return { PrimitiveType: 'Boolean' };
+  } else if (_.isArray(o)) {
+    return { Type: 'List' };
   } else if (o instanceof CfnFn) {
     if (o instanceof Ref && o.data === 'AWS::NoValue') {
       return null;
@@ -290,11 +305,7 @@ export class Not extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-not';
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
   [paramSpec] = (path: Path, errors: Error[]) => {
-    if (_.isArray(this.data)
-      && this.data.length === 1
-      && _.isString(this.data[0])) {
-      errors.push({ path, message: 'must be a List of one String' });
-    }
+    validate.list(path, this.data, errors, validate.boolean)
   };
   [returnSpec] = { PrimitiveType: 'Boolean' };
 }
