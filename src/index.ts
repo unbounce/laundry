@@ -46,7 +46,7 @@ function convertCfnFns(o: any): any {
 export function lint(template: string) {
   const input = convertCfnFns(yaml.load(template));
 
-  const prewalk = new Walker([new CfnFnPreparer([])]);
+  const prewalk = new Walker([new CfnFnPreparer()]);
   // Mutates input
   prewalk.Root(input);
 

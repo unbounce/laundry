@@ -1,8 +1,6 @@
 import * as _ from 'lodash';
 
-// This should be `Visitor from './ast'`, but that causes a circular import issue.
-// These modules need restructuring. This works as Validator extends Visitor.
-import { Validator } from './validate';
+import { Visitor } from './ast';
 import { Path } from './types';
 import { PrimitiveType, PropertyValueType } from './spec';
 import * as yaml from './yaml';
@@ -32,7 +30,7 @@ function parameterTypeToPrimitiveType(type: string): PrimitiveType | undefined {
   }
 }
 
-export default class CfnFnPreparer extends Validator {
+export default class CfnFnPreparer extends Visitor {
   parameterTypes: { [key: string]: PropertyValueType } = {};
 
   Parameters(path: Path, o: any) {
