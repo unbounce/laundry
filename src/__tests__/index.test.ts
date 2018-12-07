@@ -254,15 +254,22 @@ describe('lint', () => {
           // !Sub String
           ['valid resource', new yaml.Sub('${A}', style)],
           ['multiple resources', new yaml.Sub('a${A}b${B}c', style)],
-          ['invalid resource', new yaml.Sub('${Blag}', style)],
           ['! is ignored', new yaml.Sub('${!Bar}', style), []],
-          ['multiple with invalid resource', new yaml.Sub('a${Bar}b${B}', style)],
           ['valid attribute', new yaml.Sub('${A.Arn}', style)],
-          ['invalid attribute', new yaml.Sub('${A.Bar}', style)],
 
           // !Sub [String, Object]
           ['valid resource', new yaml.Sub(['${A}', {}], style)],
           ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toEqual([]);
+        });
+        test.each([
+          // !Sub String
+          ['invalid resource', new yaml.Sub('${Blag}', style)],
+          ['multiple with invalid resource', new yaml.Sub('a${Bar}b${B}', style)],
+
+          // !Sub [String, Object]
+          ['invalid attribute', new yaml.Sub('${A.Bar}', style)],
 
           ['invalid type', new yaml.Sub(['${A}'], style)],
           ['invalid type', new yaml.Sub([{}, '${A}'], style)],
@@ -277,13 +284,19 @@ describe('lint', () => {
       test.each([
         // !GetAtt String
         ['valid resource YAMLTag', new yaml.GetAtt('A.Arn', 'YAMLTag')],
+        // !GetAtt [String, String]
+        ['valid resource Object', new yaml.GetAtt(['A', 'Arn'], 'Object')],
+        ['valid resource YAMLTag', new yaml.GetAtt(['A', 'Arn'], 'YAMLTag')],
+      ])('%s %j', (s, bucketName) => {
+        expect(lint(t(bucketName))).toEqual([]);
+      });
+      test.each([
+        // !GetAtt String
         ['invalid resource YAMLTag', new yaml.GetAtt('Blag.Arn', 'YAMLTag')],
         ['invalid attribute YAMLTag', new yaml.GetAtt('A.Bar', 'YAMLTag')],
 
         // !GetAtt [String, String]
-        ['valid resource Object', new yaml.GetAtt(['A', 'Arn'], 'Object')],
         ['invalid resource Object', new yaml.GetAtt(['A', 'Cat'], 'Object')],
-        ['valid resource YAMLTag', new yaml.GetAtt(['A', 'Arn'], 'YAMLTag')],
         ['invalid resource YAMLTag', new yaml.GetAtt(['A', 'Cat'], 'YAMLTag')],
 
         ['invalid type', new yaml.GetAtt(['${A}'], 'Object')],
@@ -323,6 +336,10 @@ describe('lint', () => {
       describe.each(['Object', 'YAMLTag'])('%s', (style) => {
         test.each([
           ['valid resource', new yaml.Ref('A', style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toEqual([]);
+        });
+        test.each([
           ['invalid resource', new yaml.Ref('Blag', style)],
           ['invalid type', new yaml.Ref(['A'], style)],
           // ['invalid type', new yaml.Ref({ a: 'A' }, style), [e('String', ['Ref'])]],
@@ -337,6 +354,10 @@ describe('lint', () => {
         test.each([
           ['string', new yaml.Base64('abc', style)],
           ['Ref', new yaml.Base64(new yaml.Ref('A', style), style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toEqual([]);
+        });
+        test.each([
           // ['Sub', new yaml.Base64(new yaml.Sub('${A}', style), style), []],
           ['Ref with invalid resource', new yaml.Base64(new yaml.Ref('Nothing', style), style)],
         ])('%s %j', (s, bucketName) => {
@@ -353,6 +374,12 @@ describe('lint', () => {
           test.each([
             ['valid input', new yaml.If([new yaml.Equals(['', ''], style), '', ''], style)],
             ['valid condition', new yaml.If([new yaml.Condition('C', style), '', ''], style)],
+            ['NoValue first', new yaml.If([new yaml.Equals([new yaml.Ref('AWS::NoValue', style), ''], style), '', ''], style)],
+            ['NoValue second', new yaml.If([new yaml.Equals(['', new yaml.Ref('AWS::NoValue', style)], style), '', ''], style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toEqual([]);
+          });
+          test.each([
             ['invalid input', new yaml.If([new yaml.Equals(['', ''], style)], style)],
             ['invalid ref', new yaml.If([new yaml.Equals([new yaml.Ref('foo', style), ''], style), '', ''], style)],
           ])('%s %j', (s, i) => {
@@ -375,6 +402,10 @@ describe('lint', () => {
           test.each([
             ['single input', new yaml.And([new yaml.Equals(['', ''], style)], style)],
             ['multiple inputs', new yaml.And([new yaml.Equals(['', ''], style), new yaml.Equals(['', ''], style)], style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toEqual([]);
+          });
+          test.each([
             ['invalid array value', new yaml.And([''], style)],
             ['invalid value', new yaml.And('', style)],
           ])('%s %j', (s, i) => {
@@ -386,6 +417,10 @@ describe('lint', () => {
           test.each([
             ['single input', new yaml.Or([new yaml.Equals(['', ''], style)], style)],
             ['multiple inputs', new yaml.Or([new yaml.Equals(['', ''], style), new yaml.Equals(['', ''], style)], style)],
+          ])('%s %j', (s, i) => {
+            expect(lintWithProperty('Conditions.C', i)).toEqual([]);
+          });
+          test.each([
             ['invalid array value', new yaml.Or([''], style)],
             ['invalid value', new yaml.Or('', style)],
           ])('%s %j', (s, i) => {

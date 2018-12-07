@@ -29,10 +29,6 @@ Array [
 ]
 `;
 
-exports[`lint Conditions If Object And multiple inputs {"Fn::And":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
-
-exports[`lint Conditions If Object And single input {"Fn::And":[{"Fn::Equals":["",""]}]} 1`] = `Array []`;
-
 exports[`lint Conditions If Object If invalid input {"Fn::If":[{"Fn::Equals":["",""]}]} 1`] = `
 Array [
   Object {
@@ -64,10 +60,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If Object If valid condition {"Fn::If":[{"Condition":"C"},"",""]} 1`] = `Array []`;
-
-exports[`lint Conditions If Object If valid input {"Fn::If":[{"Fn::Equals":["",""]},"",""]} 1`] = `Array []`;
 
 exports[`lint Conditions If Object Not invalid array value {"Fn::Not":[""]} 1`] = `
 Array [
@@ -118,10 +110,6 @@ Array [
 ]
 `;
 
-exports[`lint Conditions If Object Or multiple inputs {"Fn::Or":[{"Fn::Equals":["",""]},{"Fn::Equals":["",""]}]} 1`] = `Array []`;
-
-exports[`lint Conditions If Object Or single input {"Fn::Or":[{"Fn::Equals":["",""]}]} 1`] = `Array []`;
-
 exports[`lint Conditions If YAMLTag And invalid array value {"And":[""]} 1`] = `
 Array [
   Object {
@@ -150,10 +138,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If YAMLTag And multiple inputs {"And":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
-
-exports[`lint Conditions If YAMLTag And single input {"And":[{"Equals":["",""]}]} 1`] = `Array []`;
 
 exports[`lint Conditions If YAMLTag If invalid input {"If":[{"Equals":["",""]}]} 1`] = `
 Array [
@@ -186,10 +170,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If YAMLTag If valid condition {"If":[{"Condition":"C"},"",""]} 1`] = `Array []`;
-
-exports[`lint Conditions If YAMLTag If valid input {"If":[{"Equals":["",""]},"",""]} 1`] = `Array []`;
 
 exports[`lint Conditions If YAMLTag Not invalid array value {"Not":[""]} 1`] = `
 Array [
@@ -239,10 +219,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Conditions If YAMLTag Or multiple inputs {"Or":[{"Equals":["",""]},{"Equals":["",""]}]} 1`] = `Array []`;
-
-exports[`lint Conditions If YAMLTag Or single input {"Or":[{"Equals":["",""]}]} 1`] = `Array []`;
 
 exports[`lint Mappings empty 1`] = `Array []`;
 
@@ -369,8 +345,6 @@ Array [
 
 exports[`lint Outputs value {"Value":"v"} 1`] = `Array []`;
 
-exports[`lint Resources Base64 Object Ref {"Fn::Base64":{"Ref":"A"}} 1`] = `Array []`;
-
 exports[`lint Resources Base64 Object Ref with invalid resource {"Fn::Base64":{"Ref":"Nothing"}} 1`] = `
 Array [
   Object {
@@ -388,10 +362,6 @@ Array [
 ]
 `;
 
-exports[`lint Resources Base64 Object string {"Fn::Base64":"abc"} 1`] = `Array []`;
-
-exports[`lint Resources Base64 YAMLTag Ref {"Base64":{"Ref":"A"}} 1`] = `Array []`;
-
 exports[`lint Resources Base64 YAMLTag Ref with invalid resource {"Base64":{"Ref":"Nothing"}} 1`] = `
 Array [
   Object {
@@ -408,8 +378,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Resources Base64 YAMLTag string {"Base64":"abc"} 1`] = `Array []`;
 
 exports[`lint Resources GetAtt invalid attribute YAMLTag {"GetAtt":"A.Bar"} 1`] = `
 Array [
@@ -539,12 +507,6 @@ Array [
 ]
 `;
 
-exports[`lint Resources GetAtt valid resource Object {"Fn::GetAtt":["A","Arn"]} 1`] = `Array []`;
-
-exports[`lint Resources GetAtt valid resource YAMLTag {"GetAtt":"A.Arn"} 1`] = `Array []`;
-
-exports[`lint Resources GetAtt valid resource YAMLTag {"GetAtt":["A","Arn"]} 1`] = `Array []`;
-
 exports[`lint Resources Ref Object invalid resource {"Ref":"Blag"} 1`] = `
 Array [
   Object {
@@ -577,8 +539,6 @@ Array [
 ]
 `;
 
-exports[`lint Resources Ref Object valid resource {"Ref":"A"} 1`] = `Array []`;
-
 exports[`lint Resources Ref YAMLTag invalid resource {"Ref":"Blag"} 1`] = `
 Array [
   Object {
@@ -610,10 +570,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Resources Ref YAMLTag valid resource {"Ref":"A"} 1`] = `Array []`;
-
-exports[`lint Resources Sub Object ! is ignored {"Fn::Sub":"\${!Bar}"} 1`] = `Array []`;
 
 exports[`lint Resources Sub Object invalid attribute {"Fn::Sub":"\${A.Bar}"} 1`] = `
 Array [
@@ -708,10 +664,6 @@ Array [
 ]
 `;
 
-exports[`lint Resources Sub Object local ref {"Fn::Sub":["\${Local}",{"Local":"a"}]} 1`] = `Array []`;
-
-exports[`lint Resources Sub Object multiple resources {"Fn::Sub":"a\${A}b\${B}c"} 1`] = `Array []`;
-
 exports[`lint Resources Sub Object multiple with invalid resource {"Fn::Sub":"a\${Bar}b\${B}"} 1`] = `
 Array [
   Object {
@@ -727,14 +679,6 @@ Array [
   },
 ]
 `;
-
-exports[`lint Resources Sub Object valid attribute {"Fn::Sub":"\${A.Arn}"} 1`] = `Array []`;
-
-exports[`lint Resources Sub Object valid resource {"Fn::Sub":"\${A}"} 1`] = `Array []`;
-
-exports[`lint Resources Sub Object valid resource {"Fn::Sub":["\${A}",{}]} 1`] = `Array []`;
-
-exports[`lint Resources Sub YAMLTag ! is ignored {"Sub":"\${!Bar}"} 1`] = `Array []`;
 
 exports[`lint Resources Sub YAMLTag invalid attribute {"Sub":"\${A.Bar}"} 1`] = `
 Array [
@@ -829,10 +773,6 @@ Array [
 ]
 `;
 
-exports[`lint Resources Sub YAMLTag local ref {"Sub":["\${Local}",{"Local":"a"}]} 1`] = `Array []`;
-
-exports[`lint Resources Sub YAMLTag multiple resources {"Sub":"a\${A}b\${B}c"} 1`] = `Array []`;
-
 exports[`lint Resources Sub YAMLTag multiple with invalid resource {"Sub":"a\${Bar}b\${B}"} 1`] = `
 Array [
   Object {
@@ -848,9 +788,3 @@ Array [
   },
 ]
 `;
-
-exports[`lint Resources Sub YAMLTag valid attribute {"Sub":"\${A.Arn}"} 1`] = `Array []`;
-
-exports[`lint Resources Sub YAMLTag valid resource {"Sub":"\${A}"} 1`] = `Array []`;
-
-exports[`lint Resources Sub YAMLTag valid resource {"Sub":["\${A}",{}]} 1`] = `Array []`;
