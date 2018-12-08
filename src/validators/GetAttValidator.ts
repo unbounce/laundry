@@ -14,12 +14,17 @@ type Parameters = {
 // Validates that !GetAtts reference a valid resource or parameter
 export default class GetAttValidator extends Validator {
   private resources: { [name: string]: string[] } = {}
+  private customResources: string[] = [];
 
   Resources(path: Path, resources: any) {
     if (_.isObject(resources)) {
       _.forEach(resources, (resource, name) => {
         const type = _.get(resource, 'Type');
-        this.resources[name] = _.get(ResourceTypes, [type, 'Attributes'], {});
+        if (_.startsWith(type, 'Custom::')) {
+          this.customResources.push(name);
+        } else {
+          this.resources[name] = _.get(ResourceTypes, [type, 'Attributes'], {});
+        }
       });
     }
   }
@@ -46,6 +51,11 @@ export default class GetAttValidator extends Validator {
 
       attribute = parts[0];
       const fullAttribute = parts.join('.');
+
+      if (_.includes(this.customResources, resource)) {
+        // TODO check Attributes of custom resources
+        return;
+      }
 
       if (_.includes(_.keys(this.resources), resource)) {
         // Some resources, like `AWS::ElasticLoadBalancing::LoadBalancer` have
