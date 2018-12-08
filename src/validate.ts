@@ -9,7 +9,7 @@ import {
   Type
 } from './spec';
 import * as yaml from './yaml';
-import { isNoValue, cfnFnName } from './util';
+import { isNoValue, isStringNumber, cfnFnName } from './util';
 
 // `_.forEach` which tracks the `Path` and understands how to step into `CfnFn`s
 export function forEach<T>(
@@ -178,6 +178,8 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isNumber(o)) {
     return true;
+  } else if (isStringNumber(o)) {
+    return true;
   } else {
     errors.push({ path, message: `must be a Number, got ${o}` });
     return false;
@@ -186,6 +188,8 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
 
 export function boolean(path: Path, o: any, errors: Error[]): boolean {
   if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Boolean' })) {
+    return true;
+  } else if (_.isString(o) && o.match(/true|false/i)) {
     return true;
   } else if (_.isBoolean(o)) {
     return true;
