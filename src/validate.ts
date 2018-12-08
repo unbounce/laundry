@@ -178,8 +178,6 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isNumber(o)) {
     return true;
-    // } else if (_.isString(o) && _.isFinite(_.parseInt(o))) {
-    //   return true;
   } else {
     errors.push({ path, message: 'must be a Number' });
     return false;
@@ -191,8 +189,6 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isBoolean(o)) {
     return true;
-    // } else if (_.isString(o) && o.match(/^(true|false)$/i)) {
-    //   return true;
   } else {
     errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
     return false;

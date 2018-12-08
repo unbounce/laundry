@@ -40,7 +40,8 @@ function parameterToPrimitiveTypes(parameter: object): PrimitiveType[] | undefin
         return ['String', 'Number', 'Boolean'];
       }
     case 'Number':
-      return ['Number'];
+      // A `Number` parameter may be valid for a `String` property
+      return ['Number', 'String'];
     default:
       return undefined;
   }
@@ -57,25 +58,24 @@ export default class CfnFnPreparer extends Visitor {
         if (_.isString(type)) {
           let isList = false;
           // Extract basic type out of List or Parameter
-          let match = type.match(/List<(.+)>/);
-          if (match) {
+
+          if (_.includes(type, 'CommaDelimitedList')) {
             isList = true;
-            type = match[1];
           } else {
-            if (_.includes(type, 'CommaDelimitedList')) {
-              isList = true;
-            } else {
-              match = type.match(/AWS::SSM::Parameter::Value<List<(.+)>>/);
-              if (match) {
-                isList = true;
-                type = match[1];
-              } else {
-                match = type.match(/AWS::SSM::Parameter::Value<(.+)>/);
+            _.find(
+              [/List<(.+)>/,
+                /AWS::SSM::Parameter::Value<List<(.+)>>/,
+                /AWS::SSM::Parameter::Value<(.+)>/],
+              (re) => {
+                const match = type.match(re);
                 if (match) {
+                  isList = true;
                   type = match[1];
+                  return true;
+                } else {
+                  return false;
                 }
-              }
-            }
+              });
           }
           const primitiveTypes = parameterToPrimitiveTypes(parameter);
           this.parameterTypes[name] = _.reduce(primitiveTypes, (acc, primitiveType) => {
