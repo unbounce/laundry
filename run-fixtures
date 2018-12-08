@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt -s nullglob
+
 for file in fixtures/bad/*{.json,.yaml}; do
     output=$(bin/laundry lint "$file")
     if [[ "$?" == "0" ]]; then
