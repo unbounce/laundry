@@ -55,16 +55,19 @@ interface ValidationFn {
 }
 
 export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
-  let returnSpec;
+  let returnSpec: PropertyValueType[];
   if (_.isFunction(cfnFn.returnSpec)) {
     returnSpec = cfnFn.returnSpec();
   } else {
     returnSpec = cfnFn.returnSpec;
   }
-  // Test the returnSpec is a superset of spec. This it to support testing
-  // { Type: 'List' } without checking the ItemType.
-  // I can't explain why this works, but https://stackoverflow.com/a/26127030
-  return _.some([returnSpec], spec);
+  // Test if any of the `returnSpec`'s match
+  return _.some(returnSpec, (rs) => {
+    // Test if `rs` is a superset of spec. This it to support testing
+    // { Type: 'List' } without checking the ItemType.
+    // I can't explain why this works, but https://stackoverflow.com/a/26127030
+    return _.some([rs], spec);
+  });
 }
 
 // Used to short-circuit validation checks. For example:
@@ -175,8 +178,8 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isNumber(o)) {
     return true;
-  } else if (_.isString(o) && _.isFinite(_.parseInt(o))) {
-    return true;
+    // } else if (_.isString(o) && _.isFinite(_.parseInt(o))) {
+    //   return true;
   } else {
     errors.push({ path, message: 'must be a Number' });
     return false;
@@ -188,8 +191,8 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
     return true;
   } else if (_.isBoolean(o)) {
     return true;
-  } else if (_.isString(o) && o.match(/^(true|false)$/i)) {
-    return true;
+    // } else if (_.isString(o) && o.match(/^(true|false)$/i)) {
+    //   return true;
   } else {
     errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
     return false;

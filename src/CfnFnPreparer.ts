@@ -5,8 +5,8 @@ import { Path } from './types';
 import { PrimitiveType, PropertyValueType } from './spec';
 import * as yaml from './yaml';
 
-function parameterTypeToPrimitiveType(type: string): PrimitiveType | undefined {
-  switch (type) {
+function parameterToPrimitiveTypes(parameter: object): PrimitiveType[] | undefined {
+  switch (_.get(parameter, 'Type')) {
     case 'String':
     case 'AWS::SSM::Parameter::Name':
     case 'AWS::SSM::Parameter::Value<String>':
@@ -20,18 +20,34 @@ function parameterTypeToPrimitiveType(type: string): PrimitiveType | undefined {
     case 'AWS::EC2::Volume::Id':
     case 'AWS::EC2::VPC::Id':
     case 'AWS::Route53::HostedZone::Id':
-      return 'String';
-    case 'Number':
-      return 'Number';
     case 'CommaDelimitedList':
     case 'AWS::SSM::Parameter::Value<CommaDelimitedList>':
+      // Try to infer other types from Default value
+      const defaultValue = _.get(parameter, 'Default');
+      if (_.isString(defaultValue)) {
+        const types = ['String'];
+        if (defaultValue.match(/^(true|false)$/i)) {
+          types.push('Boolean');
+        }
+        if (_.isFinite(_.parseInt(defaultValue))) {
+          types.push('Number');
+        }
+        return types;
+      } else {
+        // Without any other information, we can't tell if a String parameter will
+        // be rejected for properties that accept a Number or Boolean, so we must
+        // assume that this parameter is valid for those properties.
+        return ['String', 'Number', 'Boolean'];
+      }
+    case 'Number':
+      return ['Number'];
     default:
       return undefined;
   }
 }
 
 export default class CfnFnPreparer extends Visitor {
-  parameterTypes: { [key: string]: PropertyValueType } = {};
+  parameterTypes: { [key: string]: PropertyValueType[] } = {};
 
   Parameters(path: Path, o: any) {
     if (_.isObject(o)) {
@@ -46,30 +62,37 @@ export default class CfnFnPreparer extends Visitor {
             isList = true;
             type = match[1];
           } else {
-            match = type.match(/AWS::SSM::Parameter::Value<List<(.+)>>/);
-            if (match) {
+            if (_.includes(type, 'CommaDelimitedList')) {
               isList = true;
-              type = match[1];
             } else {
-              match = type.match(/AWS::SSM::Parameter::Value<(.+)>/);
+              match = type.match(/AWS::SSM::Parameter::Value<List<(.+)>>/);
               if (match) {
+                isList = true;
                 type = match[1];
+              } else {
+                match = type.match(/AWS::SSM::Parameter::Value<(.+)>/);
+                if (match) {
+                  type = match[1];
+                }
               }
             }
           }
-          const primitiveType = parameterTypeToPrimitiveType(type);
-          let spec: PropertyValueType;
-          if (isList) {
-            spec = {
-              Type: 'List',
-              PrimitiveItemType: primitiveType
-            };
-          } else {
-            spec = {
-              PrimitiveType: primitiveType
-            };
-          }
-          this.parameterTypes[name] = spec;
+          const primitiveTypes = parameterToPrimitiveTypes(parameter);
+          this.parameterTypes[name] = _.reduce(primitiveTypes, (acc, primitiveType) => {
+            let spec: PropertyValueType;
+            if (isList) {
+              spec = {
+                Type: 'List',
+                PrimitiveItemType: primitiveType
+              };
+            } else {
+              spec = {
+                PrimitiveType: primitiveType
+              };
+            }
+            acc.push(spec);
+            return acc;
+          }, [] as PropertyValueType[]);
         }
       });
     }

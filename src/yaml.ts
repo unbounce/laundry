@@ -5,7 +5,7 @@ import { PropertyValueType } from './spec';
 import { cfnFnName } from './util';
 
 type SupportedFns = Array<typeof CfnFn>;
-type PropertyValueTypeFn = () => PropertyValueType;
+type PropertyValueTypeFn = () => PropertyValueType[];
 
 // Function styles:
 // Object => { "Ref": "Resource" }
@@ -24,7 +24,7 @@ export class CfnFn {
   public [data]: any;
   public [supportedFns]: SupportedFns = [];
   public [doc]: string = 'http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html';
-  public [returnSpec]: PropertyValueType | PropertyValueTypeFn = {};
+  public [returnSpec]: PropertyValueType[] | PropertyValueTypeFn = [];
   public [style]: Style;
 
   constructor(d: any, s: Style) {
@@ -47,11 +47,11 @@ export class CfnFn {
     return this[data];
   }
 
-  get returnSpec(): PropertyValueType | PropertyValueTypeFn {
+  get returnSpec(): PropertyValueType[] | PropertyValueTypeFn {
     return this[returnSpec];
   }
 
-  set returnSpec(p: PropertyValueType | PropertyValueTypeFn) {
+  set returnSpec(p: PropertyValueType[] | PropertyValueTypeFn) {
     this[returnSpec] = p;
   }
 
@@ -71,19 +71,19 @@ export class CfnFn {
 export class Ref extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html';
   // TODO Ref can return non-strings
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [];
 }
 
 export class Condition extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html';
-  [returnSpec] = { PrimitiveType: 'Boolean' };
+  [returnSpec] = [{ PrimitiveType: 'Boolean' }];
   [supportedFns]: SupportedFns = [];
 }
 
 export class Sub extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref, Condition, Sub
   ];
@@ -91,7 +91,7 @@ export class Sub extends CfnFn {
 
 export class FindInMap extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-findinmap.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [FindInMap, Ref];
 }
 
@@ -101,13 +101,13 @@ export class GetAtt extends CfnFn {
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-directoryservice-microsoftad.html#w2ab1c21c10c90c13c11
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iot1click-device.html#aws-resource-iot1click-device-returnvalues
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html#w2ab1c21c10c51c42c19
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [Ref]; // Only for attribute name
 }
 
 export class ImportValue extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, If, Join, Select, Split, Sub, Ref, Condition
   ];
@@ -115,7 +115,7 @@ export class ImportValue extends CfnFn {
 
 export class Base64 extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-base64.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Ref, Sub, FindInMap, GetAtt, ImportValue, Base64, Cidr,
     GetAZs, Join, Split, Select, And, Equals, If, Not, Or, Condition
@@ -124,17 +124,17 @@ export class Base64 extends CfnFn {
 
 export class Cidr extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-cidr.html';
-  [returnSpec] = { Type: 'List', PrimitiveItemType: 'String' };
+  [returnSpec] = [{ Type: 'List', PrimitiveItemType: 'String' }];
   [supportedFns]: SupportedFns = [Select, Ref, GetAtt];
 }
 
 export class GetAZs extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getavailabilityzones.html';
-  [returnSpec] = { Type: 'List', PrimitiveItemType: 'String' };
+  [returnSpec] = [{ Type: 'List', PrimitiveItemType: 'String' }];
 }
 export class Join extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, If, ImportValue,
     Join, Split, Select, Sub, Ref, Condition
@@ -142,14 +142,14 @@ export class Join extends CfnFn {
 }
 export class Split extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-split.html';
-  [returnSpec] = { Type: 'List', PrimitiveItemType: 'String' };
+  [returnSpec] = [{ Type: 'List', PrimitiveItemType: 'String' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref, Condition
   ];
 }
 export class Select extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-select.html';
-  [returnSpec] = { PrimitiveType: 'String' };
+  [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [FindInMap, GetAtt, GetAZs, If, Split, Ref, Cidr, Select];
 }
 // export class GetParam extends CfnFn {
@@ -158,12 +158,12 @@ export class Select extends CfnFn {
 //
 export class And extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-and';
-  [returnSpec] = { PrimitiveType: 'Boolean' };
+  [returnSpec] = [{ PrimitiveType: 'Boolean' }];
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
 }
 export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
-  [returnSpec] = { PrimitiveType: 'Boolean' };
+  [returnSpec] = [{ PrimitiveType: 'Boolean' }];
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
 }
 export class If extends CfnFn {
@@ -185,7 +185,7 @@ export class If extends CfnFn {
         return a;
       }
     }
-    return {};
+    return [];
   };
 
   constructor(d: any, s: Style) {
@@ -199,15 +199,15 @@ export class If extends CfnFn {
     }
   }
 }
-function paramToReturnSpec(o: any): PropertyValueType | null {
+function paramToReturnSpec(o: any): PropertyValueType[] | null {
   if (_.isString(o)) {
-    return { PrimitiveType: 'String' };
+    return [{ PrimitiveType: 'String' }];
   } else if (_.isNumber(o)) {
-    return { PrimitiveType: 'Number' };
+    return [{ PrimitiveType: 'Number' }];
   } else if (_.isBoolean(o)) {
-    return { PrimitiveType: 'Boolean' };
+    return [{ PrimitiveType: 'Boolean' }];
   } else if (_.isArray(o)) {
-    return { Type: 'List' };
+    return [{ Type: 'List' }];
   } else if (o instanceof CfnFn) {
     if (o instanceof Ref && o.data === 'AWS::NoValue') {
       return null;
@@ -219,20 +219,20 @@ function paramToReturnSpec(o: any): PropertyValueType | null {
       }
     }
   } else if (_.isPlainObject(o)) {
-    return { PrimitiveType: 'Json' };
+    return [{ PrimitiveType: 'Json' }];
   } else {
-    return {};
+    return [];
   }
 }
 export class Not extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-not';
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
-  [returnSpec] = { PrimitiveType: 'Boolean' };
+  [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 export class Or extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or';
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
-  [returnSpec] = { PrimitiveType: 'Boolean' };
+  [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 
 function tag(cls: any) {
