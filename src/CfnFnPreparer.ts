@@ -9,9 +9,9 @@ import * as yaml from './yaml';
 function parameterToPrimitiveTypes(
   name: string,
   parameter: object,
+  type: string,
   parameters: object): PrimitiveType[] {
-  switch (_.get(parameter, 'Type')) {
-    case 'String':
+  switch (type) {
     case 'AWS::SSM::Parameter::Name':
     case 'AWS::SSM::Parameter::Value<String>':
     case 'AWS::EC2::AvailabilityZone::Name':
@@ -26,6 +26,8 @@ function parameterToPrimitiveTypes(
     case 'AWS::Route53::HostedZone::Id':
     case 'CommaDelimitedList':
     case 'AWS::SSM::Parameter::Value<CommaDelimitedList>':
+      return ['String'];
+    case 'String':
       const defaultSpecs = ['String', 'Number', 'Boolean'];
       // Try to infer other types from Default value
       const value = _.get(parameters, name);
@@ -99,7 +101,7 @@ export default class CfnFnPreparer extends Visitor {
               }
             });
           }
-          const primitiveTypes = parameterToPrimitiveTypes(name, parameter, this.parameters);
+          const primitiveTypes = parameterToPrimitiveTypes(name, parameter, type, this.parameters);
           this.parameterTypes[name] = _.reduce(primitiveTypes, (acc, primitiveType) => {
             let spec: PropertyValueType;
             if (isList) {
