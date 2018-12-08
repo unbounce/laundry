@@ -1,7 +1,7 @@
 import * as yargs from 'yargs';
 import * as fs from 'fs';
 
-import {lint} from './index';
+import { lint } from './index';
 
 export function main() {
   const args = yargs
@@ -19,18 +19,16 @@ export function main() {
         let template;
         try {
           template = fs.readFileSync(argv.template).toString();
+          const errors = lint(template);
+          for (const error of errors) {
+            console.log(`${error.path.join('.')}: ${error.message}`);
+          }
+          if (errors.length > 0) {
+            process.exit(1);
+          }
         } catch (e) {
           console.log(e.message);
           process.exit(1);
-        }
-        if(template) {
-          const errors = lint(template);
-          for(const error of errors) {
-            console.log(`${error.path.join('.')}: ${error.message}`);
-          }
-          if(errors.length > 0) {
-            process.exit(1);
-          }
         }
       })
     .help('help')
