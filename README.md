@@ -34,7 +34,7 @@ lint('{}');
 Better validation can be done if parameter values are provided:
 
 ```javascript
-lint('...', { ParamA: 1, ParamB: 'two});
+lint('...', { ParamA: 1, ParamB: 'two'});
 ```
 
 ## Development
