@@ -179,7 +179,7 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
   } else if (_.isNumber(o)) {
     return true;
   } else {
-    errors.push({ path, message: 'must be a Number' });
+    errors.push({ path, message: `must be a Number, got ${o}` });
     return false;
   }
 }

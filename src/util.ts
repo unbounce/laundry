@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 
+import { PropertyValueType } from './spec';
 import { Path } from './types';
 import * as yaml from './yaml';
 
@@ -84,5 +85,38 @@ export function cfnFnName(cfnFn: yaml.CfnFn) {
     } else {
       return `Fn::${name}`;
     }
+  }
+}
+
+export function isStringNumber(o: any): boolean {
+  return _.isFinite(_.parseInt(o));
+}
+export function valueToSpecs(o: any): PropertyValueType[] | null {
+  if (_.isString(o)) {
+    const types = [{ PrimitiveType: 'String' }];
+    if (isStringNumber(o)) {
+      types.push({ PrimitiveType: 'Number' });
+    }
+    return types;
+  } else if (_.isNumber(o)) {
+    return [{ PrimitiveType: 'Number' }];
+  } else if (_.isBoolean(o)) {
+    return [{ PrimitiveType: 'Boolean' }];
+  } else if (_.isArray(o)) {
+    return [{ Type: 'List' }];
+  } else if (o instanceof yaml.CfnFn) {
+    if (o instanceof yaml.Ref && o.data === 'AWS::NoValue') {
+      return null;
+    } else {
+      if (_.isFunction(o.returnSpec)) {
+        return o.returnSpec();
+      } else {
+        return o.returnSpec;
+      }
+    }
+  } else if (_.isPlainObject(o)) {
+    return [{ PrimitiveType: 'Json' }];
+  } else {
+    return [];
   }
 }

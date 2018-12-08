@@ -814,3 +814,39 @@ Array [
   },
 ]
 `;
+
+exports[`lint with parameters string values invalid default 1`] = `
+Array [
+  Object {
+    "message": "must be a Number, got Ref ExpirationInDays",
+    "path": Array [
+      "Root",
+      "Resources",
+      "A",
+      "Properties",
+      "LifecycleConfiguration",
+      "Rules",
+      "0",
+      "ExpirationInDays",
+    ],
+  },
+]
+`;
+
+exports[`lint with parameters string values invalid value 1`] = `
+Array [
+  Object {
+    "message": "must be a Number, got Ref ExpirationInDays",
+    "path": Array [
+      "Root",
+      "Resources",
+      "A",
+      "Properties",
+      "LifecycleConfiguration",
+      "Rules",
+      "0",
+      "ExpirationInDays",
+    ],
+  },
+]
+`;

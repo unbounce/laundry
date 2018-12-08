@@ -22,16 +22,19 @@ const testTemplate = {
   }
 }
 
+function set(key: string | string[], value: any, o: object) {
+  return _.set(_.cloneDeep(o), key, value);
+}
 function lintWithProperty(key: string, value: any) {
-  const template = _.set(_.cloneDeep(testTemplate), key, value);
+  const template = set(key, value, testTemplate);
   return lint(yaml.dump(template))
 }
 
 function t(value: any) {
-  return yaml.dump(_.set(
-    _.cloneDeep(testTemplate),
+  return yaml.dump(set(
     ['Resources', 'Bucket', 'Properties', 'BucketName'],
-    value
+    value,
+    testTemplate
   ));
 }
 
@@ -367,6 +370,7 @@ describe('lint', () => {
         });
         expect(lint(template)).toEqual([]);
       });
+
     });
 
     describe('Base64', () => {
@@ -918,4 +922,42 @@ describe('lint', () => {
     });
   });
 
+  describe('with parameters', () => {
+    describe('string values', () => {
+      const template = {
+        Parameters: { ExpirationInDays: { Type: 'String' } },
+        Resources: {
+          A: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              LifecycleConfiguration: {
+                Rules: [{
+                  Status: 'Enabled',
+                  ExpirationInDays: new yaml.Ref('ExpirationInDays', 'Object')
+                }]
+              }
+            }
+          }
+        }
+      };
+      test('valid default', () => {
+        const t = yaml.dump(set('Parameters.ExpirationInDays.Default', '1', template));
+        expect(lint(t)).toEqual([]);
+      });
+      test('invalid default', () => {
+        const t = yaml.dump(set('Parameters.ExpirationInDays.Default', 'foo', template));
+        expect(lint(t)).toMatchSnapshot();
+      });
+      test('valid value', () => {
+        const t = yaml.dump(template);
+        const parameters = { ExpirationInDays: '1' };
+        expect(lint(t, parameters)).toEqual([]);
+      });
+      test('invalid value', () => {
+        const t = yaml.dump(template);
+        const parameters = { ExpirationInDays: 'foo' };
+        expect(lint(t, parameters)).toMatchSnapshot();
+      });
+    });
+  })
 });

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
 import { Path, Error } from './types';
 import { PropertyValueType } from './spec';
-import { cfnFnName } from './util';
+import { valueToSpecs, cfnFnName } from './util';
 
 type SupportedFns = Array<typeof CfnFn>;
 type PropertyValueTypeFn = () => PropertyValueType[];
@@ -175,8 +175,8 @@ export class If extends CfnFn {
   [returnSpec] = () => {
     const value = this.data;
     if (_.isArray(value) && value.length === 3) {
-      const a = paramToReturnSpec(value[1]);
-      const b = paramToReturnSpec(value[2]);
+      const a = valueToSpecs(value[1]);
+      const b = valueToSpecs(value[2]);
       if (a === null && b !== null) {
         return b;
       } else if (a !== null && b === null) {
@@ -197,31 +197,6 @@ export class If extends CfnFn {
     if (_.isArray(d) && _.isString(d[0])) {
       d[0] = new Condition(d[0], s);
     }
-  }
-}
-function paramToReturnSpec(o: any): PropertyValueType[] | null {
-  if (_.isString(o)) {
-    return [{ PrimitiveType: 'String' }];
-  } else if (_.isNumber(o)) {
-    return [{ PrimitiveType: 'Number' }];
-  } else if (_.isBoolean(o)) {
-    return [{ PrimitiveType: 'Boolean' }];
-  } else if (_.isArray(o)) {
-    return [{ Type: 'List' }];
-  } else if (o instanceof CfnFn) {
-    if (o instanceof Ref && o.data === 'AWS::NoValue') {
-      return null;
-    } else {
-      if (_.isFunction(o.returnSpec)) {
-        return o.returnSpec();
-      } else {
-        return o.returnSpec;
-      }
-    }
-  } else if (_.isPlainObject(o)) {
-    return [{ PrimitiveType: 'Json' }];
-  } else {
-    return [];
   }
 }
 export class Not extends CfnFn {

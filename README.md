@@ -25,10 +25,16 @@ import { lint } from 'laundry';
 //     message: string;
 //     source?: string;
 // };
-// function lint(template: string): Error[]
+// function lint(template: string, parameters?: object): Error[]
 
 lint('{}');
 // => [{ path: ['Root', 'Resources'], message: 'is required'}]
+```
+
+Better validation can be done if parameter values are provided:
+
+```
+lint('...', { ParamA: 1, ParamB: 'two});
 ```
 
 ## Development
