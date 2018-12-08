@@ -33,7 +33,7 @@ lint('{}');
 
 Better validation can be done if parameter values are provided:
 
-```
+```javascript
 lint('...', { ParamA: 1, ParamB: 'two});
 ```
 
@@ -74,9 +74,9 @@ class SomethingValidator extends Validator {
 }
 ```
 
-Existing validators can be seen in [`validators/`]('./src/validators').
+Existing validators can be seen in [`validators/`](./src/validators).
 
-Validation functions are available in the [`validate`]('./src/validate') module
+Validation functions are available in the [`validate`](./src/validate) module
 for common validation needs. These functions are designed to be chained so that
 only one error message is created for each element. For example:
 
@@ -95,7 +95,7 @@ if (validate.required(value) && validate.string(value)) {
 }
 ```
 
-See [`validate`]('./src/validate') for the full list of validation functions.
+See [`validate`](./src/validate) for the full list of validation functions.
 
 ## Goals
 
