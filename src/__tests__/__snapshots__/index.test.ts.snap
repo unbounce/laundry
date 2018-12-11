@@ -250,21 +250,6 @@ exports[`lint Mappings empty 1`] = `Array []`;
 
 exports[`lint Mappings empty object {} 1`] = `Array []`;
 
-exports[`lint Mappings invalid type {"a":{"b":{"d":[]}}} 1`] = `
-Array [
-  Object {
-    "message": "must be a String, got []",
-    "path": Array [
-      "Root",
-      "Mappings",
-      "a",
-      "b",
-      "d",
-    ],
-  },
-]
-`;
-
 exports[`lint Mappings invalid type 1`] = `
 Array [
   Object {

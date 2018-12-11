@@ -915,7 +915,6 @@ describe('lint', () => {
     test.each([
       ['empty object', {}],
       ['object', { 'a': { 'b': { 'c': 'd' } } }],
-      ['invalid type', { 'a': { 'b': { 'd': [] } } }],
       ['object', { 'a': { 'b': '' } }],
     ])('%s %j', (s, mapping) => {
       expect(lintWithProperty('Mappings', mapping)).toMatchSnapshot();
