@@ -203,8 +203,8 @@ export class If extends CfnFn {
         return b;
       } else if (a !== null && b === null) {
         return a;
-      } else if (_.isEqual(a, b) && a !== null) {
-        return a;
+      } else {
+        return _.unionWith(a, b, _.isEqual);
       }
     }
     return [];
