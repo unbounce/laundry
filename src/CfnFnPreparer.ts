@@ -89,7 +89,6 @@ export default class CfnFnPreparer extends Visitor {
             _.find([
               /List<(.+)>/,
               /AWS::SSM::Parameter::Value<List<(.+)>>/,
-              /AWS::SSM::Parameter::Value<(.+)>/
             ], (re) => {
               const match = type.match(re);
               if (match) {
