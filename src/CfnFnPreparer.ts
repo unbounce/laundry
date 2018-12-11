@@ -87,8 +87,8 @@ export default class CfnFnPreparer extends Visitor {
             isList = true;
           } else {
             _.find([
+              /AWS::SSM::Parameter::Value<List<(.+)>>/, // AWS::SSM::Parameter::Value<List<AWS::EC2::AvailabilityZone::Name>>
               /List<(.+)>/,
-              /AWS::SSM::Parameter::Value<List<(.+)>>/,
             ], (re) => {
               const match = type.match(re);
               if (match) {
