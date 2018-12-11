@@ -300,7 +300,7 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
             }
           }
         } else {
-          errors.push({ path, message: `invalid property for ${name}` });
+          errors.push({ path, message: `invalid property for ${type}` });
         }
       });
     }
