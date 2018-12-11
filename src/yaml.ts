@@ -85,6 +85,23 @@ export class Condition extends CfnFn {
   [supportedFns]: SupportedFns = [];
 }
 
+// Used to wrap Conditions in If so that they're rendered properly using `JSON.stringify`. For example:
+//
+//   !If [MyCondition, Then, Else]
+//
+// rather than
+//
+//   !If [{ Condition: MyCondition }, Then, Else]
+//
+// See `If`'s constructor.
+//
+class ImplicitCondition extends Condition {
+  [supportedFns]: SupportedFns = [CfnFn];
+  toJSON() {
+    return this[data];
+  }
+}
+
 export class Sub extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html';
   [returnSpec] = [{ PrimitiveType: 'String' }];
@@ -113,7 +130,7 @@ export class ImportValue extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html';
   [returnSpec] = [{ PrimitiveType: 'String' }, { PrimitiveType: 'Number' }, { PrimitiveType: 'Boolean' }];
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, If, Join, Select, Split, Sub, Ref, Condition
+    Base64, FindInMap, If, Join, Select, Split, Sub, Ref, Condition, ImplicitCondition
   ];
 }
 
@@ -122,7 +139,7 @@ export class Base64 extends CfnFn {
   [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Ref, Sub, FindInMap, GetAtt, ImportValue, Base64, Cidr,
-    GetAZs, Join, Split, Select, And, Equals, If, Not, Or, Condition
+    GetAZs, Join, Split, Select, And, Equals, If, Not, Or, Condition, ImplicitCondition
   ];
 }
 
@@ -142,14 +159,14 @@ export class Join extends CfnFn {
   [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, If, ImportValue,
-    Join, Split, Select, Sub, Ref, Condition
+    Join, Split, Select, Sub, Ref, Condition, ImplicitCondition
   ];
 }
 export class Split extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-split.html';
   [returnSpec] = [{ Type: 'List', PrimitiveItemType: 'String' }];
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref, Condition
+    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Sub, Ref, Condition, ImplicitCondition
   ];
 }
 export class Select extends CfnFn {
@@ -164,18 +181,18 @@ export class Select extends CfnFn {
 export class And extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-and';
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
 }
 export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
 }
 export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, GetAtt, GetAZs, Join, Select, Sub, Ref,
-    Condition, And, Equals, If, Not, Or, ImportValue
+    Condition, ImplicitCondition, And, Equals, If, Not, Or, ImportValue
   ];
   [returnSpec] = () => {
     const value = this.data;
@@ -200,18 +217,18 @@ export class If extends CfnFn {
     // will not read perfectly, but this is the cleanest way to validate these
     // values properly.
     if (_.isArray(d) && _.isString(d[0])) {
-      d[0] = new Condition(d[0], s);
+      d[0] = new ImplicitCondition(d[0], s);
     }
   }
 }
 export class Not extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-not';
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 export class Or extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or';
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 
