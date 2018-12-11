@@ -1,0 +1,142 @@
+{
+  "ResourceTypes": {
+    "AWS::Serverless::Function": {
+      "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+      "Attributes": {
+        "Arn": {
+          "PrimitiveType": "String"
+        }
+      },
+      "Properties": {
+        "Handler": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": true,
+          "UpdateType": ""
+        },
+        "Runtime": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": true,
+          "UpdateType": ""
+        },
+        "CodeUri": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "InlineCode": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "FunctionName": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Description": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "MemorySize": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Integer",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Timeout": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Integer",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Role": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Policies": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Environment": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "VpcConfig": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Events": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Tags": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "Type": "Map",
+          "PrimitiveItemType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Tracing": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "KmsKeyArn": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "DeadLetterQueue": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "DeploymentPreference": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "Layers": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "Type": "List",
+          "PrimitiveItemType": "Json",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "AutoPublishAlias": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "String",
+          "Required": false,
+          "UpdateType": ""
+        },
+        "ReservedConcurrentExecutions": {
+          "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
+          "PrimitiveType": "Integer",
+          "Required": false,
+          "UpdateType": ""
+        }
+      }
+    }
+  }
+}

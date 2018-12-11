@@ -1,0 +1,11 @@
+{
+  "ResourceTypes": {
+    "AWS::CloudFormation::Stack": {
+      "Attributes": {
+        "Outputs": {
+          "PrimitiveType": "Json"
+        }
+      }
+    }
+  }
+}

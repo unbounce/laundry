@@ -1,20 +1,8 @@
 import * as _ from 'lodash';
 import { Path, Error } from './types';
-import spec from './CloudFormationResourceSpecification.json';
-
-const overrides = {
-  ResourceTypes: {
-    "AWS::CloudFormation::Stack": {
-      Attributes: {
-        Outputs: {
-          PrimitiveType: 'Json'
-        }
-      }
-    }
-  }
-};
-
-_.merge(spec, overrides);
+import CloudFormationResourceSpecification from './specs/CloudFormationResourceSpecification.json';
+import ServerlessResourceSpecification from './specs/ServerlessResourceSpecification.json';
+import CloudFormationResourceSpecificationOverrides from './specs/CloudFormationResourceSpecificationOverrides.json';
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
@@ -49,5 +37,14 @@ export type PropertyType = {
     } & PropertyValueType
   }
 }
+
+
+const spec = _.merge(
+  {},
+  CloudFormationResourceSpecification,
+  ServerlessResourceSpecification,
+  CloudFormationResourceSpecificationOverrides
+);
+
 export const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTypes;
 export const PropertyTypes: { [propertyType: string]: PropertyType } = spec.PropertyTypes;
