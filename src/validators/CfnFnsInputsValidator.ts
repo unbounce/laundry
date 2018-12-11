@@ -61,12 +61,7 @@ function cfnFnParamSpec(cfnFn: yaml.CfnFn): PropertyValueType | ParamSpecFn | un
       }
     }
     case yaml.Split: return (path: Path, cfnFn: yaml.CfnFn, errors: Error[]) => {
-      if (validate.list(path, cfnFn.data, errors) && cfnFn.data.length === 2) {
-        validate.string(path, path.concat('0'), errors);
-        validate.list(path, path.concat('1'), errors);
-      } else {
-        errors.push({ path, message: 'must be a List of length 2' });
-      }
+      validate.list(path, cfnFn.data, errors, [validate.string, validate.string]);
     };
     case yaml.And: return { Type: 'List', PrimitiveItemType: 'Boolean' };
     case yaml.Equals: return (path: Path, cfnFn: yaml.CfnFn, errors: Error[]) => {
