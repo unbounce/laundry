@@ -32,7 +32,7 @@ function parameterToPrimitiveTypes(
       const value = _.get(parameters, name);
       const defaultValue = _.get(parameter, 'Default');
       if (value) {
-        const valueSpecs = valueToSpecs(value)
+        const valueSpecs = valueToSpecs(value);
         if (valueSpecs) {
           return _.reduce(valueSpecs, (acc, spec) => {
             if (spec.PrimitiveType) {
@@ -71,6 +71,14 @@ function parameterToPrimitiveTypes(
 export default class CfnFnPreparer extends Visitor {
   parameterTypes: { [key: string]: PropertyValueType[] } = {};
   parameters: object;
+
+  mappings: {
+    [key1: string]: {
+      [key2: string]: {
+        [key3: string]: PropertyValueType[]
+      }
+    }
+  } = {};
 
   constructor(p: object) {
     super();
@@ -124,9 +132,29 @@ export default class CfnFnPreparer extends Visitor {
     }
   }
 
+  Mappings(path: Path, o: any) {
+    if (_.isObject(o)) {
+      _.forEach(o, (o1, k1) => {
+        if (_.isObject(o1)) {
+          _.forEach(o1, (o2, k2) => {
+            if (_.isObject(o2)) {
+              _.forEach(o2, (o3, k3) => {
+                // Yay, we're here
+                const specs = valueToSpecs(o3);
+                if (specs && !_.isEmpty(specs)) {
+                  _.set(this.mappings, [k1, k2, k3], specs);
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+
   CfnFn(path: Path, cfnFn: yaml.CfnFn) {
-    // Update Ref returnSpec based on parameter Type
     if (cfnFn instanceof yaml.Ref) {
+      // Update Ref returnSpec based on parameter Type
       const parameterType = _.get(this.parameterTypes, cfnFn.data);
       if (parameterType) {
         cfnFn.returnSpec = parameterType;
@@ -143,6 +171,30 @@ export default class CfnFnPreparer extends Visitor {
           cfnFn.returnSpec = parameterType;
         }
       }
+    } else if (cfnFn instanceof yaml.FindInMap) {
+      if (_.isArray(cfnFn.data) && cfnFn.data.length === 3) {
+        const specs = _.reduce(filterMappings(cfnFn.data[0], this.mappings), (acc1, m1) => {
+          return _.reduce(filterMappings(cfnFn.data[1], m1), (acc2, m2) => {
+            const mappings = filterMappings(cfnFn.data[2], m2);
+            return _.concat(acc2, _.flatten(_.values(mappings)));
+          }, acc1);
+        }, []);
+        if (!_.isEmpty(specs)) {
+          cfnFn.returnSpec = _.uniqWith(specs, _.isEqual);
+        }
+      }
     }
   }
+}
+
+function filterMappings(key: string | yaml.CfnFn, o: object) {
+  return _.pickBy(o, (v, k) => {
+    // If any segment of the `FindInMap` path is a dynamic value, accept all
+    // values at that level
+    if (key instanceof yaml.CfnFn) {
+      return true;
+    } else {
+      return key == k;
+    }
+  })
 }

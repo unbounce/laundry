@@ -108,7 +108,23 @@ export function valueToSpecs(o: any): PropertyValueType[] | null {
   } else if (_.isBoolean(o)) {
     return [{ PrimitiveType: 'Boolean' }];
   } else if (_.isArray(o)) {
-    return [{ Type: 'List' }];
+    const childSpecs = _.reduce(o, (acc, child) => {
+      const specs = _.reduce(valueToSpecs(child), (acc, s) => {
+        if (s.PrimitiveType) {
+          acc.push({ Type: 'List', PrimitiveItemType: s.PrimitiveType });
+        } else if (s.ItemType) {
+          acc.push({ Type: 'List', ItemType: s.Type });
+        }
+        return acc;
+      }, [] as PropertyValueType[]);
+
+      if (specs && !_.isEmpty(specs)) {
+        return _.concat(acc, _.uniqWith(specs, _.isEqual));
+      } else {
+        return acc;
+      }
+    }, [] as PropertyValueType[]);
+    return [{ Type: 'List', PrimitiveItemType: 'String' }];
   } else if (o instanceof yaml.CfnFn) {
     if (o instanceof yaml.Ref && o.data === 'AWS::NoValue') {
       return null;
