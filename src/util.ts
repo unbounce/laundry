@@ -91,6 +91,11 @@ export function cfnFnName(cfnFn: yaml.CfnFn) {
 export function isStringNumber(o: any): boolean {
   return _.isFinite(_.parseInt(o));
 }
+
+export function isStringBoolean(o: any): boolean {
+  return Boolean(_.isString(o) && o.match(/true|false|yes|no/i));
+}
+
 export function valueToSpecs(o: any): PropertyValueType[] | null {
   if (_.isString(o)) {
     const types = [{ PrimitiveType: 'String' }];

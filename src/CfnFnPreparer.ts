@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Visitor } from './ast';
 import { Path } from './types';
 import { PrimitiveType, PropertyValueType } from './spec';
-import { valueToSpecs, isStringNumber } from './util';
+import { valueToSpecs, isStringBoolean, isStringNumber } from './util';
 import * as yaml from './yaml';
 
 function parameterToPrimitiveTypes(
@@ -44,7 +44,7 @@ function parameterToPrimitiveTypes(
         }
       } else if (_.isString(defaultValue)) {
         const types = ['String'];
-        if (defaultValue.match(/^(true|false)$/i)) {
+        if (isStringBoolean(defaultValue)) {
           types.push('Boolean');
         }
         if (isStringNumber(defaultValue)) {
