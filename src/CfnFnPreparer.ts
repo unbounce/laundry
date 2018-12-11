@@ -25,7 +25,6 @@ function parameterToPrimitiveTypes(
     case 'AWS::EC2::VPC::Id':
     case 'AWS::Route53::HostedZone::Id':
     case 'CommaDelimitedList':
-    case 'AWS::SSM::Parameter::Value<CommaDelimitedList>':
       return ['String'];
     case 'String':
       const defaultSpecs = ['String', 'Number', 'Boolean'];
@@ -61,7 +60,11 @@ function parameterToPrimitiveTypes(
       // A `Number` parameter may be valid for a `String` property
       return ['Number', 'String'];
     default:
-      return [];
+      if (type.match(/AWS::SSM::Parameter::Value<[^<]+>/)) {
+        return ['String', 'Number', 'Boolean'];
+      } else {
+        return [];
+      }
   }
 }
 
