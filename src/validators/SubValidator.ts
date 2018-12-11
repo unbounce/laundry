@@ -5,7 +5,7 @@ import * as yaml from '../yaml';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
 import { ResourceTypes, Attributes } from '../spec';
-import { toCfnFn } from '../util';
+import { toCfnFn, subVariables } from '../util';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -56,21 +56,14 @@ export default class SubValidator extends Validator {
     // point (!) after the open curly brace, such as ${!Literal}. AWS
     // CloudFormation resolves this text as ${Literal}.
     if (value instanceof yaml.Sub) {
-      let template;
       let localRefs: string[] = [];
-      if (_.isString(value.data)) {
-        template = value.data;
-      } else if (_.isArray(value.data) && _.isString(value.data[0]) && _.isArray(value.data[1])) {
-        template = value.data[0];
+      let variables = subVariables(value);
+      if (_.isArray(value.data) && _.isString(value.data[0]) && _.isArray(value.data[1])) {
         localRefs = _.keys(value.data[1]);
-      } else {
-        return;
       }
-      const r = /\$\{([^!][^}]*)\}/g
-      let match;
-      while (match = r.exec(template)) {
+      _.forEach(variables, (variable) => {
         let resource, attribute;
-        [resource, attribute] = _.trim(match[1]).split('.', 2);
+        [resource, attribute] = variable.split('.', 2);
         if (attribute) {
           if (_.includes(_.keys(this.resources), resource)) {
             if (!_.includes(_.get(this.resources, resource), attribute)) {
@@ -84,7 +77,7 @@ export default class SubValidator extends Validator {
             this.errors.push({ path, message: `${resource} not a valid Parameter or Resource` });
           }
         }
-      }
+      });
     }
   }
 }

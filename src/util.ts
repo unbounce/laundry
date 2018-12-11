@@ -125,3 +125,19 @@ export function valueToSpecs(o: any): PropertyValueType[] | null {
     return [];
   }
 }
+
+export function subVariables(sub: yaml.Sub) {
+  let template;
+  if (_.isString(sub.data)) {
+    template = sub.data;
+  } else if (_.isArray(sub.data) && _.isString(sub.data[0]) && _.isArray(sub.data[1])) {
+    template = sub.data[0];
+  }
+  const variables = [];
+  const r = /\$\{([^!][^}]*)\}/g
+  let match;
+  while (match = r.exec(template)) {
+    variables.push(_.trim(match[1]));
+  }
+  return variables;
+}

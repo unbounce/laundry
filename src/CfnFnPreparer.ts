@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Visitor } from './ast';
 import { Path } from './types';
 import { PrimitiveType, PropertyValueType } from './spec';
-import { valueToSpecs, isStringBoolean, isStringNumber } from './util';
+import { valueToSpecs, isStringBoolean, isStringNumber, subVariables } from './util';
 import * as yaml from './yaml';
 
 function parameterToPrimitiveTypes(
@@ -127,6 +127,18 @@ export default class CfnFnPreparer extends Visitor {
       const parameterType = _.get(this.parameterTypes, cfnFn.data);
       if (parameterType) {
         cfnFn.returnSpec = parameterType;
+      }
+    } else if (cfnFn instanceof yaml.Sub) {
+      const variables = subVariables(cfnFn);
+      // If there is only one variable in the Sub , and it contains no other
+      // non-whitespace characters, it is effectively a Ref, so
+      // treat it the same
+      const variable = variables[0];
+      if (variables.length === 1 && _.trim(cfnFn.data) === `\${${variable}}`) {
+        const parameterType = _.get(this.parameterTypes, variable);
+        if (parameterType) {
+          cfnFn.returnSpec = parameterType;
+        }
       }
     }
   }
