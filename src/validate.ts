@@ -12,10 +12,10 @@ import * as yaml from './yaml';
 import { isNoValue, isStringNumber, cfnFnName } from './util';
 
 // `_.forEach` which tracks the `Path` and understands how to step into `CfnFn`s
-export function forEach<T>(
+export function forEach(
   path: Path,
-  as: Array<T>,
-  fn: (path: Path, a: T, i: number | string) => void)
+  as: Array<any>,
+  fn: (path: Path, a: any, i: number | string) => void)
   : void {
   if (as instanceof yaml.If) {
     if (_.isArray(as.data) && as.data.length === 3) {
@@ -26,6 +26,32 @@ export function forEach<T>(
         }
       });
     }
+  } else if (as instanceof yaml.CfnFn) {
+    // Pull the *ItemType off of the CfnFn (if it has it) and create a
+    // `CfnFnData` that represents the structure of this CfnFn's items This
+    // allows us to validate things like `Fn::Split` which return a list of
+    // strings and be able to step into the `Fn::Split` rather than cutting off
+    // validation at the list level.
+    let returnSpecs: PropertyValueType[];
+
+    if (_.isFunction(as.returnSpec)) {
+      returnSpecs = as.returnSpec();
+    } else {
+      returnSpecs = as.returnSpec;
+    }
+
+    const dataReturnSpecs = _.reduce(returnSpecs, (acc, spec) => {
+      if (spec.PrimitiveItemType) {
+        acc.push({ PrimitiveType: spec.PrimitiveItemType })
+      } else if (spec.ItemType) {
+        acc.push({ Type: spec.ItemType })
+      }
+      return acc;
+    }, [] as PropertyValueType[]);
+
+    const data = new yaml.CfnFnData(as.data, as.style, dataReturnSpecs);
+
+    fn(path, data, cfnFnName(as));
   } else {
     _.forEach(as, (a, i) => {
       fn(path.concat(i.toString()), a, i);
@@ -288,25 +314,25 @@ export function spec(path: Path, resourceType: string, propertyType: PropertyVal
     primitiveType(path, propertyType.PrimitiveType, property, errors);
   } else if (propertyType.Type === 'Map') {
     if (object(path, property, errors)) {
-      forEach(path, property, (path, v, i) => {
+      forEach(path, property, (p, v, i) => {
         if (propertyType.PrimitiveItemType) {
-          primitiveType(path, propertyType.PrimitiveItemType, v, errors);
+          primitiveType(p, propertyType.PrimitiveItemType, v, errors);
         } else if (propertyType.ItemType) {
-          complexType(path, resourceType, propertyType.ItemType, v, errors);
+          complexType(p, resourceType, propertyType.ItemType, v, errors);
         } else {
-          throw new ResourceSpecificationError('No property type', path);
+          throw new ResourceSpecificationError('No property type', p);
         }
       });
     }
   } else if (propertyType.Type === 'List') {
     if (list(path, property, errors)) {
-      forEach(path, property, (path, v, i) => {
+      forEach(path, property, (p, v, i) => {
         if (propertyType.PrimitiveItemType) {
-          primitiveType(path, propertyType.PrimitiveItemType, v, errors);
+          primitiveType(p, propertyType.PrimitiveItemType, v, errors);
         } else if (propertyType.ItemType) {
-          complexType(path, resourceType, propertyType.ItemType, v, errors);
+          complexType(p, resourceType, propertyType.ItemType, v, errors);
         } else {
-          throw new ResourceSpecificationError('No property type', path);
+          throw new ResourceSpecificationError('No property type', p);
         }
       });
     }

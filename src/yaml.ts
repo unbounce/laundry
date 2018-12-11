@@ -63,6 +63,10 @@ export class CfnFn {
     return this[style] === 'YAMLTag';
   }
 
+  get style(): Style {
+    return this[style]
+  }
+
   toString() {
     return `${this.constructor.name} ${this[data]}`
   }
@@ -208,6 +212,21 @@ export class Or extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or';
   [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition];
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
+}
+
+// Placeholder to use when stepping into a CfnFn for validation.
+// See forEach in validate.ts
+export class CfnFnData extends CfnFn {
+  [supportedFns]: SupportedFns = [CfnFn];
+
+  constructor(d: any, s: Style, rs: PropertyValueType[]) {
+    super(d, s);
+    this.returnSpec = rs;
+  }
+
+  toJSON() {
+    return this[data];
+  }
 }
 
 function tag(cls: any) {
