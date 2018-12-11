@@ -246,6 +246,238 @@ Array [
 ]
 `;
 
+exports[`lint GetAZs Object extra input {"Fn::GetAZs":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs Object invalid type {"Fn::GetAZs":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs Object invalid type {"Fn::GetAZs":{"a":""}} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs Object missing input {"Fn::GetAZs":[""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs YAMLTag extra input {"GetAZs":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs YAMLTag invalid type {"GetAZs":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs YAMLTag invalid type {"GetAZs":{"a":""}} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint GetAZs YAMLTag missing input {"GetAZs":[""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue Object extra input {"Fn::ImportValue":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"\\",[\\"\\"],\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue Object invalid type {"Fn::ImportValue":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [[],\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue Object invalid type {"Fn::ImportValue":{"a":""}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {\\"a\\":\\"\\"}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue Object missing input {"Fn::ImportValue":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue YAMLTag extra input {"ImportValue":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"\\",[\\"\\"],\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue YAMLTag invalid type {"ImportValue":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [[],\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue YAMLTag invalid type {"ImportValue":{"a":""}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {\\"a\\":\\"\\"}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "ImportValue",
+    ],
+  },
+]
+`;
+
+exports[`lint ImportValue YAMLTag missing input {"ImportValue":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [\\"\\"]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "ImportValue",
+    ],
+  },
+]
+`;
+
 exports[`lint Mappings empty 1`] = `Array []`;
 
 exports[`lint Mappings empty object {} 1`] = `Array []`;
@@ -513,6 +745,160 @@ Array [
       "Properties",
       "BucketName",
       "GetAtt",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join Object extra input {"Fn::Join":["","",""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List with 2 items",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Join",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join Object invalid type {"Fn::Join":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Join",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join Object invalid type {"Fn::Join":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Join",
+      "0",
+    ],
+  },
+  Object {
+    "message": "must be a List, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Join",
+      "1",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join Object missing input {"Fn::Join":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List with 2 items",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Fn::Join",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join YAMLTag extra input {"Join":["","",""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List with 2 items",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Join",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join YAMLTag invalid type {"Join":""} 1`] = `
+Array [
+  Object {
+    "message": "must be a List, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Join",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join YAMLTag invalid type {"Join":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Join",
+      "0",
+    ],
+  },
+  Object {
+    "message": "must be a List, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Join",
+      "1",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources Join YAMLTag missing input {"Join":[""]} 1`] = `
+Array [
+  Object {
+    "message": "must be a List with 2 items",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "BucketName",
+      "Join",
     ],
   },
 ]
@@ -795,6 +1181,110 @@ Array [
       "Properties",
       "BucketName",
       "Sub",
+    ],
+  },
+]
+`;
+
+exports[`lint Split Object extra input {"Fn::Split":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split Object invalid type {"Fn::Split":""} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split Object invalid type {"Fn::Split":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split Object missing input {"Fn::Split":[""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split YAMLTag extra input {"Split":["",[""],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split YAMLTag invalid type {"Split":""} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split YAMLTag invalid type {"Split":[[],""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
+    ],
+  },
+]
+`;
+
+exports[`lint Split YAMLTag missing input {"Split":[""]} 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Certificate",
     ],
   },
 ]

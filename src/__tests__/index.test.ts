@@ -389,6 +389,120 @@ describe('lint', () => {
         });
       });
     });
+
+    describe('Join', () => {
+      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+        test.each([
+          ['', new yaml.Join([',', ['a']], style)],
+          ['Split', new yaml.Join([',', new yaml.Split([',', 'a'], style)], style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toEqual([]);
+        });
+        test.each([
+          ['invalid type', new yaml.Join('', style)],
+          ['invalid type', new yaml.Join([[], ''], style)],
+          ['missing input', new yaml.Join([''], style)],
+          ['extra input', new yaml.Join(['', '', ''], style)],
+        ])('%s %j', (s, bucketName) => {
+          expect(lint(t(bucketName))).toMatchSnapshot();
+        });
+      });
+    });
+  });
+
+  describe('Split', () => {
+    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      test.each([
+        ['', new yaml.Split([',', 'a'], style)],
+        ['Join', new yaml.Split([',', new yaml.Join([',', ['a']], style)], style)],
+      ])('%s %j', (s, san) => {
+        const template = yaml.dump({
+          Resources: {
+            Certificate: {
+              Type: 'AWS::CertificateManager::Certificate',
+              Properties: {
+                DomainName: 'example.com',
+                SubjectAlternativeNames: san
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test.each([
+        ['invalid type', new yaml.Split('', style)],
+        ['invalid type', new yaml.Split([[], ''], style)],
+        ['missing input', new yaml.Split([''], style)],
+        ['extra input', new yaml.Split(['', [''], ''], style)],
+      ])('%s %j', (s, san) => {
+        const template = yaml.dump({
+          Resources: {
+            Certificate: {
+              DomainName: 'example.com',
+              SubjectAlternativeNames: san
+            }
+          }
+        });
+        expect(lint(template)).toMatchSnapshot();
+      });
+    });
+  });
+
+  describe('GetAZs', () => {
+    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      test.each([
+        ['', new yaml.GetAZs('', style)],
+        ['Ref', new yaml.GetAZs(new yaml.Ref('AWS::Region', style), style)],
+      ])('%s %j', (s, san) => {
+        const template = yaml.dump({
+          Resources: {
+            Certificate: {
+              Type: 'AWS::CertificateManager::Certificate',
+              Properties: {
+                DomainName: 'example.com',
+                SubjectAlternativeNames: san
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test.each([
+        ['invalid type', new yaml.GetAZs({ a: '' }, style)],
+        ['invalid type', new yaml.GetAZs([[], ''], style)],
+        ['missing input', new yaml.GetAZs([''], style)],
+        ['extra input', new yaml.GetAZs(['', [''], ''], style)],
+      ])('%s %j', (s, san) => {
+        const template = yaml.dump({
+          Resources: {
+            Certificate: {
+              DomainName: 'example.com',
+              SubjectAlternativeNames: san
+            }
+          }
+        });
+        expect(lint(template)).toMatchSnapshot();
+      });
+    });
+  });
+
+  describe('ImportValue', () => {
+    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      test.each([
+        ['', new yaml.ImportValue('', style)],
+        ['Ref', new yaml.ImportValue(new yaml.Ref('AWS::Region', style), style)],
+      ])('%s %j', (s, bucketName) => {
+        expect(lint(t(bucketName))).toEqual([]);
+      });
+      test.each([
+        ['invalid type', new yaml.ImportValue({ a: '' }, style)],
+        ['invalid type', new yaml.ImportValue([[], ''], style)],
+        ['missing input', new yaml.ImportValue([''], style)],
+        ['extra input', new yaml.ImportValue(['', [''], ''], style)],
+      ])('%s %j', (s, bucketName) => {
+        expect(lint(t(bucketName))).toMatchSnapshot();
+      });
+    });
   });
 
   describe('Conditions', () => {

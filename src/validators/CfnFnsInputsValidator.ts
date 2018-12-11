@@ -18,10 +18,22 @@ function isString(o: any) {
 
 function cfnFnParamSpec(cfnFn: yaml.CfnFn): PropertyValueType | ParamSpecFn | undefined {
   switch (cfnFn.constructor) {
-    // case yaml.ImportValue: return {};
-    // case yaml.GetAZs: return {};
-    // case yaml.Join: return {};
-    // case yaml.Select: return {};
+    case yaml.ImportValue: return { PrimitiveType: 'String' };
+    case yaml.GetAZs: return { PrimitiveType: 'String' };
+    case yaml.Join: return (path: Path, cfnFn: yaml.CfnFn, errors: Error[]) => {
+      validate.list(
+        path,
+        cfnFn.data,
+        errors,
+        [
+          validate.string,
+          (path: Path, o: any, errors: Error[]) => validate.list(path, o, errors, validate.string)
+        ]
+      );
+    };
+    case yaml.Select: return (path: Path, cfnFn: yaml.CfnFn, errors: Error[]) => {
+      validate.list(path, cfnFn.data, errors, [validate.number, validate.list]);
+    };
     case yaml.Ref: return { PrimitiveType: 'String' };
     case yaml.Condition: return { PrimitiveType: 'String' };
     case yaml.Sub: return (path: Path, cfnFn: yaml.CfnFn, errors: Error[]) => {

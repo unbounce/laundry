@@ -111,7 +111,7 @@ export class GetAtt extends CfnFn {
 
 export class ImportValue extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html';
-  [returnSpec] = [{ PrimitiveType: 'String' }];
+  [returnSpec] = [{ PrimitiveType: 'String' }, { PrimitiveType: 'Number' }, { PrimitiveType: 'Boolean' }];
   [supportedFns]: SupportedFns = [
     Base64, FindInMap, If, Join, Select, Split, Sub, Ref, Condition
   ];
@@ -135,6 +135,7 @@ export class Cidr extends CfnFn {
 export class GetAZs extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getavailabilityzones.html';
   [returnSpec] = [{ Type: 'List', PrimitiveItemType: 'String' }];
+  [supportedFns]: SupportedFns = [Ref];
 }
 export class Join extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html';
