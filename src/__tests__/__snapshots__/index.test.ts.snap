@@ -1227,6 +1227,19 @@ Array [
 ]
 `;
 
+exports[`lint Resources at least one of missing 1`] = `
+Array [
+  Object {
+    "message": "one of Ipv6CidrBlock, CidrBlock must be provided",
+    "path": Array [
+      "Root",
+      "Resources",
+      "NACL",
+    ],
+  },
+]
+`;
+
 exports[`lint Split Object extra input {"Fn::Split":["",[""],""]} 1`] = `
 Array [
   Object {

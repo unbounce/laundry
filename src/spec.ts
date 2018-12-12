@@ -3,6 +3,7 @@ import { Path, Error } from './types';
 import CloudFormationResourceSpecification from './specs/CloudFormationResourceSpecification.json';
 import ServerlessResourceSpecification from './specs/ServerlessResourceSpecification.json';
 import CloudFormationResourceSpecificationOverrides from './specs/CloudFormationResourceSpecificationOverrides.json';
+import AtLeastOneSpec from './specs/AtLeastOne.json';
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
@@ -37,7 +38,12 @@ export type PropertyType = {
     } & PropertyValueType
   }
 }
-
+export type AtLeastOne = {
+  PropertyTypes: {},
+  ResourceTypes: {
+    [key: string]: string[][]
+  }
+}
 
 const spec = _.merge(
   {},
@@ -48,3 +54,4 @@ const spec = _.merge(
 
 export const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTypes;
 export const PropertyTypes: { [propertyType: string]: PropertyType } = spec.PropertyTypes;
+export const AtLeastOne: AtLeastOne = AtLeastOneSpec;

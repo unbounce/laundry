@@ -6,6 +6,13 @@
           "PrimitiveType": "Json"
         }
       }
+    },
+    "AWS::EC2::NetworkAclEntry": {
+      "Properties": {
+        "CidrBlock": {
+          "Required": false
+        }
+      }
     }
   }
 }

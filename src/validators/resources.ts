@@ -9,7 +9,8 @@ import {
   ResourceType,
   PropertyType,
   ResourceTypes,
-  PropertyTypes
+  PropertyTypes,
+  AtLeastOne
 } from '../spec';
 
 export class ResourceTypeValidator extends Validator {
@@ -66,6 +67,27 @@ export class ResourcePropertyValidator extends Validator {
       }
     }
   }
+}
+
+export class ResourceAtLeastOnePropertyValidator extends Validator {
+
+  Resources(path: Path, resources: any) {
+    if (_.isObject(resources)) {
+      this.forEachWithPath(path, resources, (path, resource) => {
+        const resourceType = _.get(resource, 'Type');
+        const spec = _.get(AtLeastOne.ResourceTypes, resourceType);
+        if (spec) {
+          _.forEach(spec, (properties) => {
+            // If none of the properties are set, thats an error
+            if (!_.some(properties, (property) => _.has(resource, property))) {
+              this.errors.push({ path, message: `one of ${properties.join(', ')} must be provided` });
+            }
+          });
+        }
+      });
+    }
+  }
+
 }
 
 export class ResourceConditionValidator extends Validator {

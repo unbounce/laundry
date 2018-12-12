@@ -416,6 +416,26 @@ describe('lint', () => {
         expect(lintWithProperty('Resources.A.DependsOn', 'Foo')).toMatchSnapshot();
       });
     });
+    describe('at least one of', () => {
+      test('missing', () => {
+        const template = yaml.dump({
+          Resources: {
+            NACL: {
+              Type: 'AWS::EC2::NetworkAclEntry',
+              Properties: {
+                NetworkAclId: 'abc-122',
+                Protocol: '-1',
+                RuleAction: 'allow',
+                RuleNumber: 100,
+              }
+            }
+          }
+
+        });
+        expect(lint(template)).toMatchSnapshot();
+      })
+
+    });
   });
 
   describe('Split', () => {
