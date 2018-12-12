@@ -20,8 +20,8 @@ export function forEach(
   if (as instanceof yaml.If) {
     if (_.isArray(as.data) && as.data.length === 3) {
       _.forEach(as.data.slice(1, 3), (value, i) => {
-        const p = path.concat([cfnFnName(as), (i + 1).toString()]);
         if (_.isObject(value) && !isNoValue(value)) {
+          const p = path.concat([cfnFnName(as), (i + 1).toString()]);
           forEach(p, value, fn);
         }
       });

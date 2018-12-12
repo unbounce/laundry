@@ -540,12 +540,16 @@ describe('lint', () => {
             ['valid condition', new yaml.If([new yaml.Condition('C', style), '', ''], style)],
             ['NoValue first', new yaml.If([new yaml.Equals([new yaml.Ref('AWS::NoValue', style), ''], style), '', ''], style)],
             ['NoValue second', new yaml.If([new yaml.Equals(['', new yaml.Ref('AWS::NoValue', style)], style), '', ''], style)],
+            // '1' is considered valid for a number and string
+            ['overlapping values types', new yaml.If([true, 1, '1'], style)],
+            ['overlapping values types', new yaml.If([true, 'foo', '1'], style)],
           ])('%s %j', (s, i) => {
             expect(lintWithProperty('Conditions.C', i)).toEqual([]);
           });
           test.each([
             ['invalid input', new yaml.If([new yaml.Equals(['', ''], style)], style)],
             ['invalid ref', new yaml.If([new yaml.Equals([new yaml.Ref('foo', style), ''], style), '', ''], style)],
+            ['different values types', new yaml.If([true, 1, false], style)],
           ])('%s %j', (s, i) => {
             expect(lintWithProperty('Conditions.C', i)).toMatchSnapshot();
           });

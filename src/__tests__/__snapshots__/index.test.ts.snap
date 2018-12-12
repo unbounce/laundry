@@ -29,6 +29,20 @@ Array [
 ]
 `;
 
+exports[`lint Conditions If Object If different values types {"Fn::If":[true,1,false]} 1`] = `
+Array [
+  Object {
+    "message": "branches contain different data types",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "Fn::If",
+    ],
+  },
+]
+`;
+
 exports[`lint Conditions If Object If invalid input {"Fn::If":[{"Fn::Equals":["",""]}]} 1`] = `
 Array [
   Object {
@@ -147,6 +161,20 @@ Array [
       "Conditions",
       "C",
       "And",
+    ],
+  },
+]
+`;
+
+exports[`lint Conditions If YAMLTag If different values types {"If":[true,1,false]} 1`] = `
+Array [
+  Object {
+    "message": "branches contain different data types",
+    "path": Array [
+      "Root",
+      "Conditions",
+      "C",
+      "If",
     ],
   },
 ]
