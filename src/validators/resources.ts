@@ -11,7 +11,8 @@ import {
   ResourceTypes,
   PropertyTypes,
   AtLeastOne,
-  Exclusive
+  Exclusive,
+  Inclusive,
 } from '../spec';
 
 export class ResourceTypeValidator extends Validator {
@@ -97,7 +98,6 @@ export class ResourceExclusivePropertyValidator extends Validator {
 
           _.forEach(resourceProperties, (propertyValue, propertyName) => {
             const propertySpec = Exclusive.PropertyTypes[`${resourceType}.${propertyName}`];
-            console.log(`${resourceType}.${propertyName}`, propertySpec);
             if (propertySpec) {
               _.forEach(propertySpec, (forbiddenProperties) => {
                 if (_.isArray(propertyValue)) {
@@ -141,6 +141,30 @@ export class ResourceAtLeastOnePropertyValidator extends Validator {
             // If none of the properties are set, thats an error
             if (!_.some(properties, (property) => _.has(resource, ['Properties', property]))) {
               this.errors.push({ path, message: `one of ${properties.join(', ')} must be provided` });
+            }
+          });
+        }
+      });
+    }
+  }
+
+}
+
+export class ResourceInclusivePropertyValidator extends Validator {
+
+  Resources(path: Path, resources: any) {
+    if (_.isObject(resources)) {
+      this.forEachWithPath(path, resources, (path, resource) => {
+        const resourceProperties = _.get(resource, 'Properties');
+        if (_.isObject(resourceProperties)) {
+          const resourceType = _.get(resource, 'Type');
+          const spec = _.get(Inclusive.ResourceTypes, resourceType);
+          _.forEach(resourceProperties, (valuve, name) => {
+            const properties = _.get(spec, name);
+            if (properties) {
+              if (!_.some(properties, (property) => _.has(resourceProperties, property))) {
+                this.errors.push({ path, message: `${properties.join(', ')} must be provided when ${name} is provided` });
+              }
             }
           });
         }

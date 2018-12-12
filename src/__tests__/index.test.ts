@@ -454,6 +454,38 @@ describe('lint', () => {
       });
     });
 
+    describe('inclusive', () => {
+      test('valid', () => {
+        const template = yaml.dump({
+          Resources: {
+            NACL: {
+              Type: 'AWS::RDS::DBCluster',
+              Properties: {
+                Engine: '',
+                MasterUsername: '',
+                MasterUserPassword: ''
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('missing', () => {
+        const template = yaml.dump({
+          Resources: {
+            NACL: {
+              Type: 'AWS::RDS::DBCluster',
+              Properties: {
+                Engine: '',
+                MasterUsername: ''
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchSnapshot();
+      });
+    });
+
     describe('exclusive', () => {
       describe('resource type', () => {
         test('valid', () => {

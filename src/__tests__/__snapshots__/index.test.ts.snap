@@ -1270,6 +1270,19 @@ Array [
 ]
 `;
 
+exports[`lint Resources inclusive missing 1`] = `
+Array [
+  Object {
+    "message": "MasterUserPassword must be provided when MasterUsername is provided",
+    "path": Array [
+      "Root",
+      "Resources",
+      "NACL",
+    ],
+  },
+]
+`;
+
 exports[`lint Split Object extra input {"Fn::Split":["",[""],""]} 1`] = `
 Array [
   Object {
