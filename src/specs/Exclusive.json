@@ -1,0 +1,84 @@
+{
+  "PropertyTypes": {
+    "AWS::EC2::Instance.BlockDeviceMapping": {
+      "VirtualName": [
+        "Ebs"
+      ]
+    },
+    "AWS::EC2::SpotFleet.BlockDeviceMapping": {
+      "VirtualName": [
+        "Ebs"
+      ]
+    },
+    "AWS::AutoScaling::LaunchConfiguration.BlockDeviceMapping": {
+      "VirtualName": [
+        "Ebs"
+      ]
+    },
+    "AWS::EC2::LaunchTemplate.BlockDeviceMapping": {
+      "VirtualName": [
+        "Ebs"
+      ]
+    },
+    "AWS::OpsWorks::Instance.BlockDeviceMapping": {
+      "VirtualName": [
+        "Ebs"
+      ]
+    },
+    "AWS::EC2::SecurityGroup.Ingress": {
+      "CidrIp": [
+        "SourceSecurityGroupName",
+        "SourceSecurityGroupId",
+        "CidrIpv6"
+      ],
+      "CidrIpv6": [
+        "SourceSecurityGroupName",
+        "SourceSecurityGroupId"
+      ],
+      "SourceSecurityGroupId": [
+        "SourceSecurityGroupName"
+      ]
+    }
+  },
+  "ResourceTypes": {
+    "AWS::EC2::Instance": {
+      "NetworkInterfaces": [
+        "SubnetId"
+      ]
+    },
+    "AWS::RDS::DBCluster": {
+      "SnapshotIdentifier": [
+        "MasterUsername",
+        "MasterUserPassword"
+      ]
+    },
+    "AWS::RDS::DBInstance": {
+      "SourceDBInstanceIdentifier": [
+        "CharacterSetName",
+        "MasterUsername",
+        "MasterUserPassword",
+        "StorageEncrypted"
+      ],
+      "DBClusterIdentifier": [
+        "StorageEncrypted"
+      ]
+    },
+    "AWS::EC2::SecurityGroupIngress": {
+      "GroupId": [
+        "GroupName"
+      ],
+      "CidrIp": [
+        "SourceSecurityGroupName",
+        "SourceSecurityGroupId",
+        "CidrIpv6"
+      ],
+      "CidrIpv6": [
+        "SourceSecurityGroupName",
+        "SourceSecurityGroupId"
+      ],
+      "SourceSecurityGroupId": [
+        "SourceSecurityGroupName"
+      ]
+    }
+  }
+}

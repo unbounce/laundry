@@ -1,0 +1,25 @@
+{
+  "PropertyTypes": {
+  },
+  "ResourceTypes": {
+    "AWS::IAM::Policy": [
+      [
+        "Roles",
+        "Groups",
+        "Users"
+      ]
+    ],
+    "AWS::EC2::Instance": [
+      [
+        "ImageId",
+        "LaunchTemplate"
+      ]
+    ],
+    "AWS::EC2::NetworkAclEntry": [
+      [
+        "Ipv6CidrBlock",
+        "CidrBlock"
+      ]
+    ]
+  }
+}
