@@ -408,6 +408,7 @@ describe('lint', () => {
         });
       });
     });
+
     describe('DependsOn', () => {
       test('valid resource', () => {
         expect(lintWithProperty('Resources.A.DependsOn', 'B')).toEqual([]);
@@ -416,7 +417,25 @@ describe('lint', () => {
         expect(lintWithProperty('Resources.A.DependsOn', 'Foo')).toMatchSnapshot();
       });
     });
+
     describe('at least one of', () => {
+      test('valid', () => {
+        const template = yaml.dump({
+          Resources: {
+            NACL: {
+              Type: 'AWS::EC2::NetworkAclEntry',
+              Properties: {
+                NetworkAclId: 'abc-122',
+                Protocol: '-1',
+                RuleAction: 'allow',
+                RuleNumber: 100,
+                CidrBlock: ''
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
       test('missing', () => {
         const template = yaml.dump({
           Resources: {
@@ -430,11 +449,90 @@ describe('lint', () => {
               }
             }
           }
-
         });
         expect(lint(template)).toMatchSnapshot();
-      })
+      });
+    });
 
+    describe('exclusive', () => {
+      describe('resource type', () => {
+        test('valid', () => {
+          const template = yaml.dump({
+            Resources: {
+              SGIngress: {
+                Type: 'AWS::EC2::SecurityGroupIngress',
+                Properties: {
+                  FromPort: 0,
+                  ToPort: 0,
+                  IpProtocol: '',
+                  CidrIp: ''
+                }
+              }
+            }
+          });
+          expect(lint(template)).toEqual([]);
+        });
+        test('with exclusive properties', () => {
+          const template = yaml.dump({
+            Resources: {
+              SGIngress: {
+                Type: 'AWS::EC2::SecurityGroupIngress',
+                Properties: {
+                  FromPort: 0,
+                  ToPort: 0,
+                  IpProtocol: '',
+                  CidrIp: '',
+                  CidrIpv6: ''
+                }
+              }
+            }
+          });
+          expect(lint(template)).toMatchSnapshot();
+        });
+      })
+      describe('property type', () => {
+        test('valid', () => {
+          const template = yaml.dump({
+            Resources: {
+              SecurityGroup: {
+                Type: 'AWS::EC2::SecurityGroup',
+                Properties: {
+                  GroupDescription: '',
+                  VpcId: '',
+                  SecurityGroupIngress: [{
+                    FromPort: 0,
+                    ToPort: 0,
+                    IpProtocol: '',
+                    CidrIp: ''
+                  }]
+                }
+              }
+            }
+          });
+          expect(lint(template)).toEqual([]);
+        });
+        test('with exclusive properties', () => {
+          const template = yaml.dump({
+            Resources: {
+              SecurityGroup: {
+                Type: 'AWS::EC2::SecurityGroup',
+                Properties: {
+                  GroupDescription: '',
+                  VpcId: '',
+                  SecurityGroupIngress: [{
+                    FromPort: 0,
+                    ToPort: 0,
+                    IpProtocol: '',
+                    CidrIp: '',
+                    CidrIpv6: ''
+                  }]
+                }
+              }
+            }
+          });
+          expect(lint(template)).toMatchSnapshot();
+        });
+      })
     });
   });
 

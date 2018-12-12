@@ -1240,6 +1240,36 @@ Array [
 ]
 `;
 
+exports[`lint Resources exclusive property type with exclusive properties 1`] = `
+Array [
+  Object {
+    "message": "CidrIpv6 can not be set when SecurityGroupIngress is set",
+    "path": Array [
+      "Root",
+      "Resources",
+      "SecurityGroup",
+      "Properties",
+      "CidrIpv6",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources exclusive resource type with exclusive properties 1`] = `
+Array [
+  Object {
+    "message": "CidrIpv6 can not be set when CidrIp is set",
+    "path": Array [
+      "Root",
+      "Resources",
+      "SGIngress",
+      "Properties",
+      "CidrIpv6",
+    ],
+  },
+]
+`;
+
 exports[`lint Split Object extra input {"Fn::Split":["",[""],""]} 1`] = `
 Array [
   Object {

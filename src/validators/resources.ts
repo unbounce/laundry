@@ -10,7 +10,8 @@ import {
   PropertyType,
   ResourceTypes,
   PropertyTypes,
-  AtLeastOne
+  AtLeastOne,
+  Exclusive
 } from '../spec';
 
 export class ResourceTypeValidator extends Validator {
@@ -69,6 +70,65 @@ export class ResourcePropertyValidator extends Validator {
   }
 }
 
+export class ResourceExclusivePropertyValidator extends Validator {
+
+  Resources(path: Path, resources: any) {
+    if (_.isObject(resources)) {
+      this.forEachWithPath(path, resources, (path, resource) => {
+        const resourceType = _.get(resource, 'Type');
+        const resourceProperties = _.get(resource, 'Properties');
+
+        if (_.isObject(resourceProperties)) {
+          const resourceSpec = _.get(Exclusive.ResourceTypes, resourceType);
+          if (resourceSpec) {
+            _.forEach(resourceSpec, (forbiddenProperties, propertyName) => {
+              if (_.has(resourceProperties, propertyName)) {
+                _.forEach(forbiddenProperties, (forbiddenProperty) => {
+                  if (_.has(resourceProperties, forbiddenProperty)) {
+                    this.errors.push({
+                      path: path.concat(['Properties', forbiddenProperty]),
+                      message: `${forbiddenProperty} can not be set when ${propertyName} is set`
+                    });
+                  }
+                });
+              }
+            });
+          }
+
+          _.forEach(resourceProperties, (propertyValue, propertyName) => {
+            const propertySpec = Exclusive.PropertyTypes[`${resourceType}.${propertyName}`];
+            console.log(`${resourceType}.${propertyName}`, propertySpec);
+            if (propertySpec) {
+              _.forEach(propertySpec, (forbiddenProperties) => {
+                if (_.isArray(propertyValue)) {
+                  _.forEach(propertyValue, (value) => {
+                    if (_.isObject(value)) {
+                      this.validateResourceProperty(path, propertyName, value, forbiddenProperties)
+                    }
+                  });
+                } else if (_.isObject(propertyValue)) {
+                  this.validateResourceProperty(path, propertyName, propertyValue, forbiddenProperties)
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+
+  validateResourceProperty(path: Path, name: string, value: object, forbiddenProperties: string[]) {
+    _.forEach(forbiddenProperties, (forbiddenProperty) => {
+      if (_.has(value, forbiddenProperty)) {
+        this.errors.push({
+          path: path.concat(['Properties', forbiddenProperty]),
+          message: `${forbiddenProperty} can not be set when ${name} is set`
+        });
+      }
+    })
+  }
+}
+
 export class ResourceAtLeastOnePropertyValidator extends Validator {
 
   Resources(path: Path, resources: any) {
@@ -79,7 +139,7 @@ export class ResourceAtLeastOnePropertyValidator extends Validator {
         if (spec) {
           _.forEach(spec, (properties) => {
             // If none of the properties are set, thats an error
-            if (!_.some(properties, (property) => _.has(resource, property))) {
+            if (!_.some(properties, (property) => _.has(resource, ['Properties', property]))) {
               this.errors.push({ path, message: `one of ${properties.join(', ')} must be provided` });
             }
           });

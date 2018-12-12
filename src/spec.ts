@@ -4,6 +4,7 @@ import CloudFormationResourceSpecification from './specs/CloudFormationResourceS
 import ServerlessResourceSpecification from './specs/ServerlessResourceSpecification.json';
 import CloudFormationResourceSpecificationOverrides from './specs/CloudFormationResourceSpecificationOverrides.json';
 import AtLeastOneSpec from './specs/AtLeastOne.json';
+import ExclusiveSpec from './specs/Exclusive.json';
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
@@ -44,6 +45,18 @@ export type AtLeastOne = {
     [key: string]: string[][]
   }
 }
+export type Exclusive = {
+  PropertyTypes: {
+    [key: string]: {
+      [key: string]: string[]
+    }
+  }
+  ResourceTypes: {
+    [key: string]: {
+      [key: string]: string[]
+    }
+  }
+}
 
 const spec = _.merge(
   {},
@@ -55,3 +68,4 @@ const spec = _.merge(
 export const ResourceTypes: { [resourceType: string]: ResourceType } = spec.ResourceTypes;
 export const PropertyTypes: { [propertyType: string]: PropertyType } = spec.PropertyTypes;
 export const AtLeastOne: AtLeastOne = AtLeastOneSpec;
+export const Exclusive: Exclusive = ExclusiveSpec;
