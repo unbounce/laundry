@@ -408,6 +408,14 @@ describe('lint', () => {
         });
       });
     });
+    describe('DependsOn', () => {
+      test('valid resource', () => {
+        expect(lintWithProperty('Resources.A.DependsOn', 'B')).toEqual([]);
+      });
+      test('invalid resource', () => {
+        expect(lintWithProperty('Resources.A.DependsOn', 'Foo')).toMatchSnapshot();
+      });
+    });
   });
 
   describe('Split', () => {

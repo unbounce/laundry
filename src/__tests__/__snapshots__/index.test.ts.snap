@@ -650,6 +650,19 @@ Array [
 ]
 `;
 
+exports[`lint Resources DependsOn invalid resource 1`] = `
+Array [
+  Object {
+    "message": "Foo is not a valid Resource",
+    "path": Array [
+      "Root",
+      "Resources",
+      "A",
+    ],
+  },
+]
+`;
+
 exports[`lint Resources GetAtt invalid attribute YAMLTag {"GetAtt":"A.Bar"} 1`] = `
 Array [
   Object {

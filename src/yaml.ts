@@ -106,7 +106,7 @@ export class Sub extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html';
   [returnSpec] = [{ PrimitiveType: 'String' }];
   [supportedFns]: SupportedFns = [
-    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref, Condition, Sub
+    Base64, FindInMap, GetAtt, GetAZs, If, ImportValue, Join, Select, Ref, Condition, ImplicitCondition, Sub
   ];
 }
 
