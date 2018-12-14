@@ -6,6 +6,7 @@ import CloudFormationResourceSpecificationOverrides from './specs/CloudFormation
 import AtLeastOneSpec from './specs/AtLeastOne.json';
 import ExclusiveSpec from './specs/Exclusive.json';
 import InclusiveSpec from './specs/Inclusive.json';
+import OnlyOneSpec from './specs/OnlyOne.json';
 
 export type PrimitiveType = string; //'Boolean' | 'Double' | 'Integer' | 'Json' | 'Long' | 'String' | 'Timestamp';
 type UpdateType = string; // 'Immutable' | 'Mutable' | 'Conditional';
@@ -66,6 +67,12 @@ export type Inclusive = {
     }
   }
 }
+export type OnlyOne = {
+  PropertyTypes: {
+    [key: string]: string[][]
+  }
+  ResourceTypes: {}
+}
 
 const spec = _.merge(
   {},
@@ -79,3 +86,4 @@ export const PropertyTypes: { [propertyType: string]: PropertyType } = spec.Prop
 export const AtLeastOne: AtLeastOne = AtLeastOneSpec;
 export const Exclusive: Exclusive = ExclusiveSpec;
 export const Inclusive: Inclusive = InclusiveSpec;
+export const OnlyOne: OnlyOne = OnlyOneSpec;

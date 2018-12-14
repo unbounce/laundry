@@ -6,7 +6,9 @@ import {
   PropertyTypes,
   PropertyValueType,
   PrimitiveType,
-  Type
+  Type,
+  Exclusive,
+  OnlyOne
 } from './spec';
 import * as yaml from './yaml';
 import { isNoValue, isStringNumber, isStringBoolean, cfnFnName } from './util';
@@ -274,30 +276,97 @@ function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, 
   validator.call(undefined, path, property, errors);
 }
 
-function complexType(path: Path, resourceType: string, type: Type, properties: any, errors: Error[]) {
+function onlyOnePropertySpec(
+  path: Path,
+  propertyName: string,
+  property: object,
+  resourceType: string,
+  errors: Error[]) {
+  const propertySpec = OnlyOne.PropertyTypes[`${resourceType}.${propertyName}`];
+  if (propertySpec) {
+    _.forEach(propertySpec, (propertyNames) => {
+      const properties = _.reduce(propertyNames, (acc, propertyName) => {
+        if (_.has(property, propertyName)) {
+          acc.push(propertyName);
+        }
+        return acc;
+      }, [] as string[]);
+      if (properties.length > 1) {
+        errors.push({
+          path,
+          message: `only one of ${properties.join(', ')} can be provided`
+        });
+      }
+    });
+  }
+}
+
+function exclusivePropertySpec(
+  path: Path,
+  propertyName: string,
+  property: object,
+  resourceType: string,
+  errors: Error[]) {
+  const propertySpec = Exclusive.PropertyTypes[`${resourceType}.${propertyName}`];
+  if (propertySpec) {
+    _.forEach(propertySpec, (forbiddenProperties, propertyName) => {
+      if (_.has(property, propertyName)) {
+        _.forEach(forbiddenProperties, (forbiddenPropertyName) => {
+          if (_.has(property, forbiddenPropertyName)) {
+            errors.push({
+              path: path.concat(forbiddenPropertyName),
+              message: `${forbiddenPropertyName} can not be set if ${propertyName} is set`
+            });
+          }
+        });
+      }
+    });
+  }
+}
+
+function complexType(
+  path: Path,
+  propertyName: string,
+  resourceType: string,
+  type: Type,
+  properties: any, errors: Error[]) {
   // TODO check that resourceType is valid
   const propertyType = _.get(PropertyTypes, `${resourceType}.${type}`) || _.get(PropertyTypes, type);
   if (propertyType) {
     if (object(path, properties, errors)) {
+      exclusivePropertySpec(path, propertyName, properties, resourceType, errors);
+      onlyOnePropertySpec(path, propertyName, properties, type, errors);
       forEach(path, properties, (path, property, name) => {
         const s = _.get(propertyType.Properties, name);
         if (s) {
           if (s.PrimitiveType) {
             primitiveType(path, s.PrimitiveType, property, errors);
           } else if (s.Type === 'Map') {
-            object(path, property, errors);
-          } else if (s.Type === 'List') {
-            if (list(path, property, errors)) {
-              forEach(path, property, (path, v, k) => {
+            if (object(path, property, errors)) {
+              forEach(path, property, (p, v, k) => {
                 if (s.PrimitiveItemType) {
-                  primitiveType(path, s.PrimitiveItemType, v, errors);
+                  primitiveType(p, s.PrimitiveItemType, v, errors);
                 } else if (s.ItemType) {
-                  complexType(path, resourceType, s.ItemType, v, errors);
+                  complexType(p, k.toString(), resourceType, s.ItemType, v, errors);
                 } else {
-                  throw new ResourceSpecificationError(`Unknown List Type '${s.PrimitiveItemType}'`, path)
+                  throw new ResourceSpecificationError(`Unknown Map Type '${s}'`, p)
                 }
               });
             }
+          } else if (s.Type === 'List') {
+            if (list(path, property, errors)) {
+              forEach(path, property, (p, v, k) => {
+                if (s.PrimitiveItemType) {
+                  primitiveType(p, s.PrimitiveItemType, v, errors);
+                } else if (s.ItemType) {
+                  complexType(p, propertyName, resourceType, s.ItemType, v, errors);
+                } else {
+                  throw new ResourceSpecificationError(`Unknown List Type '${s}'`, p)
+                }
+              });
+            }
+          } else if (s.Type) {
+            complexType(path, propertyName, resourceType, s.Type, property, errors);
           }
         } else {
           errors.push({ path, message: `invalid property for ${type}` });
@@ -309,7 +378,13 @@ function complexType(path: Path, resourceType: string, type: Type, properties: a
   }
 }
 
-export function spec(path: Path, resourceType: string, propertyType: PropertyValueType, property: any, errors: Error[]) {
+export function spec(
+  path: Path,
+  propertyName: string,
+  resourceType: string,
+  propertyType: PropertyValueType,
+  property: any,
+  errors: Error[]) {
   if (propertyType.PrimitiveType) {
     primitiveType(path, propertyType.PrimitiveType, property, errors);
   } else if (propertyType.Type === 'Map') {
@@ -318,7 +393,7 @@ export function spec(path: Path, resourceType: string, propertyType: PropertyVal
         if (propertyType.PrimitiveItemType) {
           primitiveType(p, propertyType.PrimitiveItemType, v, errors);
         } else if (propertyType.ItemType) {
-          complexType(p, resourceType, propertyType.ItemType, v, errors);
+          complexType(p, i.toString(), resourceType, propertyType.ItemType, v, errors);
         } else {
           throw new ResourceSpecificationError('No property type', p);
         }
@@ -330,14 +405,14 @@ export function spec(path: Path, resourceType: string, propertyType: PropertyVal
         if (propertyType.PrimitiveItemType) {
           primitiveType(p, propertyType.PrimitiveItemType, v, errors);
         } else if (propertyType.ItemType) {
-          complexType(p, resourceType, propertyType.ItemType, v, errors);
+          complexType(p, propertyName, resourceType, propertyType.ItemType, v, errors);
         } else {
           throw new ResourceSpecificationError('No property type', p);
         }
       });
     }
   } else if (propertyType.Type) {
-    complexType(path, resourceType, propertyType.Type, property, errors);
+    complexType(path, propertyName, resourceType, propertyType.Type, property, errors);
   } else {
     throw new ResourceSpecificationError('No property type', path);
   }

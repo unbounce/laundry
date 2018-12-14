@@ -1235,6 +1235,7 @@ Array [
       "Root",
       "Resources",
       "NACL",
+      "Properties",
     ],
   },
 ]
@@ -1243,12 +1244,14 @@ Array [
 exports[`lint Resources exclusive property type with exclusive properties 1`] = `
 Array [
   Object {
-    "message": "CidrIpv6 can not be set when SecurityGroupIngress is set",
+    "message": "CidrIpv6 can not be set if CidrIp is set",
     "path": Array [
       "Root",
       "Resources",
       "SecurityGroup",
       "Properties",
+      "SecurityGroupIngress",
+      "0",
       "CidrIpv6",
     ],
   },
@@ -1278,6 +1281,23 @@ Array [
       "Root",
       "Resources",
       "NACL",
+      "Properties",
+      "MasterUsername",
+    ],
+  },
+]
+`;
+
+exports[`lint Resources only one invalid 1`] = `
+Array [
+  Object {
+    "message": "invalid property",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Bucket",
+      "Properties",
+      "RoutingRules",
     ],
   },
 ]

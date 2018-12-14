@@ -115,7 +115,7 @@ export default class CfnFnsInputsValidator extends Validator {
       if (_.isFunction(paramSpec)) {
         paramSpec(path, cfnFn, this.errors);
       } else if (_.isObject(paramSpec)) {
-        validate.spec(path, this.resourceType, paramSpec as PropertyValueType, cfnFn.data, this.errors);
+        validate.spec(path, '', this.resourceType, paramSpec as PropertyValueType, cfnFn.data, this.errors);
       }
     }
   }

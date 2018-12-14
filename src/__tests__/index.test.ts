@@ -418,6 +418,48 @@ describe('lint', () => {
       });
     });
 
+    describe('only one', () => {
+      test('valid', () => {
+        const template = yaml.dump({
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                WebsiteConfiguration: {
+                  RoutingRules: [{
+                    RoutingRuleCondition: {
+                      HttpErrorCodeReturnedEquals: ''
+                    }
+                  }]
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toEqual([]);
+      });
+      test('invalid', () => {
+        const template = yaml.dump({
+          Resources: {
+            Bucket: {
+              Type: 'AWS::S3::Bucket',
+              Properties: {
+                WebsiteConfiguration: {
+                  RoutingRules: [{
+                    RoutingRuleCondition: {
+                      HttpErrorCodeReturnedEquals: '',
+                      KeyPrefixEquals: ''
+                    }
+                  }]
+                }
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchSnapshot();
+      });
+    });
+
     describe('at least one of', () => {
       test('valid', () => {
         const template = yaml.dump({
@@ -543,7 +585,7 @@ describe('lint', () => {
           });
           expect(lint(template)).toEqual([]);
         });
-        test('with exclusive properties', () => {
+        test.only('with exclusive properties', () => {
           const template = yaml.dump({
             Resources: {
               SecurityGroup: {
@@ -678,7 +720,11 @@ describe('lint', () => {
                     {
                       Role: '',
                       Rules: [
-                        { Destination: { Bucket: '', Prefix: '', Status: 'Enabled' } }
+                        {
+                          Destination: { Bucket: '' },
+                          Prefix: '',
+                          Status: 'Enabled'
+                        }
                       ]
                     },
                     { 'Ref': 'AWS::NoValue' }

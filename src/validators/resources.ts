@@ -43,7 +43,11 @@ export class RequriedResourcePropertyValidator extends Validator {
       if (s) {
         _.forEach(s.Properties, (property, name) => {
           if (property.Required) {
-            validate.required(path.concat(['Properties', name]), _.get(resource, ['Properties', name]), this.errors);
+            validate.required(
+              path.concat(['Properties', name]),
+              _.get(resource, ['Properties', name]),
+              this.errors
+            );
           }
         });
       }
@@ -60,8 +64,9 @@ export class ResourcePropertyValidator extends Validator {
           this.forEachWithPath(path.concat('Properties'), resource.Properties, (path, property, name) => {
             const propertyType = resourceType.Properties[name];
             if (propertyType) {
-              validate.spec(path, resource.Type, propertyType, property, this.errors);
+              validate.spec(path, name.toString(), resource.Type, propertyType, property, this.errors);
             } else {
+              // TODO did you mean?
               this.errors.push({ path, message: 'invalid property' });
             }
           });
@@ -95,37 +100,9 @@ export class ResourceExclusivePropertyValidator extends Validator {
               }
             });
           }
-
-          _.forEach(resourceProperties, (propertyValue, propertyName) => {
-            const propertySpec = Exclusive.PropertyTypes[`${resourceType}.${propertyName}`];
-            if (propertySpec) {
-              _.forEach(propertySpec, (forbiddenProperties) => {
-                if (_.isArray(propertyValue)) {
-                  _.forEach(propertyValue, (value) => {
-                    if (_.isObject(value)) {
-                      this.validateResourceProperty(path, propertyName, value, forbiddenProperties)
-                    }
-                  });
-                } else if (_.isObject(propertyValue)) {
-                  this.validateResourceProperty(path, propertyName, propertyValue, forbiddenProperties)
-                }
-              });
-            }
-          });
         }
       });
     }
-  }
-
-  validateResourceProperty(path: Path, name: string, value: object, forbiddenProperties: string[]) {
-    _.forEach(forbiddenProperties, (forbiddenProperty) => {
-      if (_.has(value, forbiddenProperty)) {
-        this.errors.push({
-          path: path.concat(['Properties', forbiddenProperty]),
-          message: `${forbiddenProperty} can not be set when ${name} is set`
-        });
-      }
-    })
   }
 }
 
@@ -140,7 +117,35 @@ export class ResourceAtLeastOnePropertyValidator extends Validator {
           _.forEach(spec, (properties) => {
             // If none of the properties are set, thats an error
             if (!_.some(properties, (property) => _.has(resource, ['Properties', property]))) {
-              this.errors.push({ path, message: `one of ${properties.join(', ')} must be provided` });
+              this.errors.push({
+                path: path.concat('Properties'),
+                message: `one of ${properties.join(', ')} must be provided`
+              });
+            }
+          });
+        }
+      });
+    }
+  }
+
+}
+
+export class ResourceOnlyOnePropertyValidator extends Validator {
+
+  Resources(path: Path, resources: any) {
+    if (_.isObject(resources)) {
+      this.forEachWithPath(path, resources, (path, resource) => {
+        const resourceType = _.get(resource, 'Type');
+        const spec = _.get(AtLeastOne.ResourceTypes, resourceType);
+        if (spec) {
+          _.forEach(spec, (properties) => {
+            // If none of the properties are set, thats an error
+            const present = _.filter(properties, (property) => _.has(resource, ['Properties', property]));
+            if (present.length > 1) {
+              this.errors.push({
+                path: path.concat('Properties'),
+                message: `only one of ${properties.join(', ')} may be provided`
+              });
             }
           });
         }
@@ -163,7 +168,10 @@ export class ResourceInclusivePropertyValidator extends Validator {
             const properties = _.get(spec, name);
             if (properties) {
               if (!_.some(properties, (property) => _.has(resourceProperties, property))) {
-                this.errors.push({ path, message: `${properties.join(', ')} must be provided when ${name} is provided` });
+                this.errors.push({
+                  path: path.concat(['Properties', name]),
+                  message: `${properties.join(', ')} must be provided when ${name} is provided`
+                });
               }
             }
           });

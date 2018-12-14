@@ -17,6 +17,7 @@ import {
   ResourceAtLeastOnePropertyValidator,
   ResourceExclusivePropertyValidator,
   ResourceInclusivePropertyValidator,
+  ResourceOnlyOnePropertyValidator,
 } from './validators/resources';
 import { Visitor, Walker } from './ast';
 import { Error } from './types';
@@ -73,6 +74,7 @@ export function lint(template: string, parameters: object = {}) {
     new ResourceAtLeastOnePropertyValidator(errors),
     new ResourceExclusivePropertyValidator(errors),
     new ResourceInclusivePropertyValidator(errors),
+    new ResourceOnlyOnePropertyValidator(errors),
   ];
   const validate = new Walker(validators);
   validate.Root(input);
