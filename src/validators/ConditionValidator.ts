@@ -18,7 +18,7 @@ export default class ConditionsValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, value: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     if (value instanceof yaml.Condition && _.isString(value.data)) {
       if (!_.includes(this.conditions, value.data)) {
         this.errors.push({

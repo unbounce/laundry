@@ -152,7 +152,7 @@ export default class CfnFnPreparer extends Visitor {
     }
   }
 
-  CfnFn(path: Path, cfnFn: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, cfnFn: yaml.CfnFn) {
     if (cfnFn instanceof yaml.Ref) {
       // Update Ref returnSpec based on parameter Type
       const parameterType = _.get(this.parameterTypes, cfnFn.data);

@@ -17,7 +17,7 @@ const FN_NAME = '__FN_NAME__';
 export default class CfnFnsSupportedFnsValidator extends Validator {
   supportedFns: SupportedFns = {};
 
-  CfnFn(path: Path, cfnFn: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, cfnFn: yaml.CfnFn) {
     // Iterate over each segment of the path to determine if we're nested within
     // any functions that would not allow this ${cfnFn} to be used here
     _.reduce(path, (currentPath: string[], p: string) => {

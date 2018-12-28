@@ -29,7 +29,7 @@ export default class GetAttValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, value: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     if (value instanceof yaml.GetAtt) {
       let resource, attribute, parts;
       if (value.isYamlTag() && _.isString(value.data)) {

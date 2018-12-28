@@ -69,7 +69,7 @@ class SomethingValidator extends Validator {
   Mapping(path: Path, mapping: any): void { }
   Condition(path: Path, condition: any): void { }
   Resource(path: Path, resource: any): void { }
-  CfnFn(path: Path, value: CfnFn): void { }
+  CfnFn(path: Path, propertyName: string, value: CfnFn): void { }
   Output(path: Path, output: any): void { }
 }
 ```

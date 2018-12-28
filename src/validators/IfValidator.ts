@@ -9,7 +9,7 @@ import { valueToSpecs } from '../util';
 
 export default class IfValidator extends Validator {
 
-  CfnFn(path: Path, value: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     if (value instanceof yaml.If && _.isArray(value.data) && value.data.length === 3) {
       const a = valueToSpecs(value.data[1]);
       const b = valueToSpecs(value.data[2]);

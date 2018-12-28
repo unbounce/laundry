@@ -38,7 +38,7 @@ export default class RefsValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, value: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     if (value instanceof yaml.Ref && _.isString(value.data)) {
       if (!_.includes(this.refs, value.data)) {
         this.errors.push({

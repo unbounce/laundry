@@ -109,13 +109,20 @@ export default class CfnFnsInputsValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, cfnFn: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, cfnFn: yaml.CfnFn) {
     const paramSpec = cfnFnParamSpec(cfnFn);
     if (paramSpec) {
       if (_.isFunction(paramSpec)) {
         paramSpec(path, cfnFn, this.errors);
       } else if (_.isObject(paramSpec)) {
-        validate.spec(path, '', this.resourceType, paramSpec as PropertyValueType, cfnFn.data, this.errors);
+        validate.spec(
+          path,
+          propertyName,
+          this.resourceType,
+          paramSpec as PropertyValueType,
+          cfnFn.data,
+          this.errors
+        );
       }
     }
   }

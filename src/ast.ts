@@ -19,7 +19,7 @@ export class Visitor {
   Mapping(path: Path, mapping: any): void { }
   Condition(path: Path, condition: any): void { }
   Resource(path: Path, resource: any): void { }
-  CfnFn(path: Path, value: CfnFn): void { }
+  CfnFn(path: Path, propertyName: string, value: CfnFn): void { }
   Output(path: Path, output: any): void { }
 }
 
@@ -113,7 +113,7 @@ export class Walker {
       _.forEach(conditions, (condition, name) => {
         const path = this.pushPath(name);
         _.forEach(this.visitors, (v) => v.Condition(path, condition));
-        this.recursivelyVisitCfnFn(path, condition);
+        this.recursivelyVisitCfnFn(path, '', condition);
         this.popPath();
       });
     }
@@ -139,7 +139,7 @@ export class Walker {
           const path = this.pushPath('Properties');
           _.forEach(properties, (value, key) => {
             const path = this.pushPath(key);
-            this.recursivelyVisitCfnFn(path, value);
+            this.recursivelyVisitCfnFn(path, key, value);
             this.popPath();
           });
           this.popPath();
@@ -156,16 +156,16 @@ export class Walker {
   // You can use intrinsic functions only in specific parts of a template.
   // Currently, you can use intrinsic functions in resource properties, outputs,
   // metadata attributes, and update policy attributes.
-  private recursivelyVisitCfnFn(path: Path, value: any) {
+  private recursivelyVisitCfnFn(path: Path, name: string, value: any) {
     if (value instanceof CfnFn) {
       path = this.pushPath(cfnFnName(value));
-      _.forEach(this.visitors, (v) => v.CfnFn(path, value));
-      this.recursivelyVisitCfnFn(path, value.data);
+      _.forEach(this.visitors, (v) => v.CfnFn(path, name, value));
+      this.recursivelyVisitCfnFn(path, name, value.data);
       this.popPath();
     } else if (_.isObject(value)) {
       _.forEach(value, (v, i) => {
         path = this.pushPath(i.toString());
-        this.recursivelyVisitCfnFn(path, v);
+        this.recursivelyVisitCfnFn(path, name, v);
         this.popPath();
       });
     }

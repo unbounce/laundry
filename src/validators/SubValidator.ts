@@ -45,7 +45,7 @@ export default class SubValidator extends Validator {
     }
   }
 
-  CfnFn(path: Path, value: yaml.CfnFn) {
+  CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     // If you specify template parameter names or resource logical IDs, such as
     // ${InstanceTypeParameter}, AWS CloudFormation returns the same values as if
     // you used the Ref intrinsic function. If you specify resource attributes,
