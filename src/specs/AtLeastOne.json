@@ -1,5 +1,11 @@
 {
   "PropertyTypes": {
+    "AWS::EC2::TaskDefinition.ContainerDefinitions": [
+      [
+        "Memory",
+        "MemoryReservation"
+      ]
+    ]
   },
   "ResourceTypes": {
     "AWS::IAM::Policy": [

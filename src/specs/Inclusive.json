@@ -1,5 +1,32 @@
 {
   "PropertyTypes": {
+    "AWS::S3::Bucket.ReplicationConfiguration.Rules.Destination": {
+      "AccessControlTranslation": [
+        "Account"
+      ]
+    },
+    "AWS::Config::ConfigRule.Scope": {
+      "ComplianceResourceId": [
+        "ComplianceResourceTypes"
+      ],
+      "TagKey": [
+        "TagValue"
+      ],
+      "TagValue": [
+        "TagKey"
+      ]
+    },
+    "AWS::ElasticBeanstalk::Application.ResourceLifecycleConfig": {
+      "VersionLifecycleConfig": [
+        "ServiceRole"
+      ]
+    },
+    "AWS::KinesisFirehose::DeliveryStream.CloudWatchLoggingOptions": {
+      "Enabled": [
+        "LogGroupName",
+        "LogStreamName"
+      ]
+    }
   },
   "ResourceTypes": {
     "AWS::RDS::DBCluster": {
@@ -8,6 +35,9 @@
       ],
       "MasterUserPassword": [
         "MasterUsername"
+      ],
+      "KMSKeyId": [
+        "StorageEncrypted"
       ]
     },
     "AWS::RDS::DBInstance": {
@@ -16,11 +46,86 @@
       ],
       "MasterUserPassword": [
         "MasterUsername"
+      ],
+      "MonitoringRoleArn": [
+        "MonitoringInterval"
+      ],
+      "MonitoringInterval": [
+        "MonitoringRoleArn"
+      ],
+      "KMSKeyId": [
+        "StorageEncrypted"
       ]
     },
     "AWS::OpsWorks::Stack": {
       "VpcId": [
         "DefaultSubnetId"
+      ]
+    },
+    "AWS::Neptune::DBCluster": {
+      "KMSKeyId": [
+        "StorageEncrypted"
+      ]
+    },
+    "AWS::Neptune::DBInstance": {
+      "KMSKeyId": [
+        "StorageEncrypted"
+      ]
+    },
+    "AWS::DMS::EventSubscription": {
+      "SourceIds": [
+        "SourceType"
+      ],
+      "EventCategories": [
+        "SourceType"
+      ]
+    },
+    "AWS::RDS::EventSubscription": {
+      "SourceIds": [
+        "SourceType"
+      ],
+      "EventCategories": [
+        "SourceType"
+      ]
+    },
+    "AWS::EC2::Subnet": {
+      "AssignIpv6AddressOnCreation": [
+        "Ipv6CidrBlock"
+      ]
+    },
+    "AWS::Redshift::ClusterSecurityGroupIngress": {
+      "EC2SecurityGroupName": [
+        "EC2SecurityGroupOwnerId"
+      ]
+    },
+    "AWS::EMR::Custer": {
+      "Applications": [
+        "ReleaseLabel"
+      ]
+    },
+    "AWS::EC2::EIPAssociation": {
+      "EIP": [
+        "InstanceId"
+      ]
+    },
+    "AWS::AutoScaling::LaunchConfiguration": {
+      "ClassicLinkVPCId": [
+        "ClassicLinkVPCSecurityGroups"
+      ]
+    },
+    "AWS::EC2::Volume": {
+      "KmsKeyId": [
+        "Encrypted"
+      ]
+    },
+    "AWS::Redshift::Cluster": {
+      "SnapshotClusterIdentifier": [
+        "SnapshotIdentifier"
+      ]
+    },
+    "AWS::ElastiCache::CacheCluster": {
+      "VpcSecurityGroupIds": [
+        "CacheSubnetGroupName"
       ]
     }
   }

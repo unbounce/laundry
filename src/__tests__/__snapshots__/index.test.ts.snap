@@ -1244,15 +1244,13 @@ Array [
 exports[`lint Resources exclusive property type with exclusive properties 1`] = `
 Array [
   Object {
-    "message": "CidrIpv6 can not be set if CidrIp is set",
+    "message": "TTL can not be set when AliasTarget is set",
     "path": Array [
       "Root",
       "Resources",
-      "SecurityGroup",
+      "Record",
       "Properties",
-      "SecurityGroupIngress",
-      "0",
-      "CidrIpv6",
+      "TTL",
     ],
   },
 ]
@@ -1288,20 +1286,7 @@ Array [
 ]
 `;
 
-exports[`lint Resources only one invalid 1`] = `
-Array [
-  Object {
-    "message": "invalid property",
-    "path": Array [
-      "Root",
-      "Resources",
-      "Bucket",
-      "Properties",
-      "RoutingRules",
-    ],
-  },
-]
-`;
+exports[`lint Resources only one invalid 1`] = `Array []`;
 
 exports[`lint Split Object extra input {"Fn::Split":["",[""],""]} 1`] = `
 Array [

@@ -585,21 +585,16 @@ describe('lint', () => {
           });
           expect(lint(template)).toEqual([]);
         });
-        test.only('with exclusive properties', () => {
+        test('with exclusive properties', () => {
           const template = yaml.dump({
             Resources: {
-              SecurityGroup: {
-                Type: 'AWS::EC2::SecurityGroup',
+              Record: {
+                Type: 'AWS::Route53::RecordSet',
                 Properties: {
-                  GroupDescription: '',
-                  VpcId: '',
-                  SecurityGroupIngress: [{
-                    FromPort: 0,
-                    ToPort: 0,
-                    IpProtocol: '',
-                    CidrIp: '',
-                    CidrIpv6: ''
-                  }]
+                  Type: '',
+                  Name: '',
+                  AliasTarget: {},
+                  TTL: 1
                 }
               }
             }

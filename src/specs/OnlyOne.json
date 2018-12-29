@@ -1,42 +1,47 @@
 {
   "PropertyTypes": {
-    "AWS::EC2::Instance.BlockDeviceMapping": [
+    "AWS::EC2::SecurityGroup.SecurityGroupEgress": [
       [
-        "VirtualName",
-        "Ebs"
+        "CidrIp",
+        "CidrIpv6",
+        "DestinationPrefixListId",
+        "DestinationSecurityGroupId"
       ]
     ],
-    "AWS::EC2::SpotFleet.BlockDeviceMapping": [
+    "AWS::EC2::SecurityGroup.SecurityGroupIngress": [
       [
-        "VirtualName",
-        "Ebs"
+        "CidrIp",
+        "CidrIpv6",
+        "SourceSecurityGroupName",
+        "SourceSecurityGroupId"
       ]
     ],
-    "AWS::AutoScaling::LaunchConfiguration.BlockDeviceMapping": [
+    "AWS::EC2::Route.EgressOnlyInternetGatewayId": [
       [
-        "VirtualName",
-        "Ebs"
+        "GatewayId",
+        "InstanceId",
+        "NatGatewayId",
+        "NetworkInterfaceId",
+        "VpcPeeringConnectionId"
       ]
     ],
-    "AWS::EC2::LaunchTemplate.BlockDeviceMapping": [
+    "AWS::KinesisFirehose::DeliveryStream.S3DestinationConfiguration": [
       [
-        "VirtualName",
-        "Ebs"
+        "RedshiftDestinationConfiguration",
+        "ExtendedS3DestinationConfiguration",
+        "ElasticsearchDestinationConfiguration"
       ]
     ],
-    "AWS::OpsWorks::Instance.BlockDeviceMapping": [
+    "AWS::Route53::RecordSet.HostedZoneName": [
       [
-        "VirtualName",
-        "Ebs"
+        "HostedZoneId"
       ]
     ],
-    "AWS::S3::Bucket.RoutingRuleCondition": [
+    "AWS::Route53::RecordSetGroup.HostedZoneName": [
       [
-        "HttpErrorCodeReturnedEquals",
-        "KeyPrefixEquals"
+        "HostedZoneId"
       ]
     ]
   },
-  "ResourceTypes": {
-  }
+  "ResourceTypes": {}
 }

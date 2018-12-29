@@ -41,6 +41,14 @@
     }
   },
   "ResourceTypes": {
+    "AWS::Route53::RecordSet": {
+      "AliasTarget": [
+        "TTL"
+      ],
+      "HostedZoneName": [
+        "HostedZoneId"
+      ]
+    },
     "AWS::EC2::Instance": {
       "NetworkInterfaces": [
         "SubnetId"
