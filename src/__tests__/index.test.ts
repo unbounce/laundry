@@ -494,6 +494,21 @@ describe('lint', () => {
         });
         expect(lint(template)).toMatchSnapshot();
       });
+      test('missing for property', () => {
+        const template = yaml.dump({
+          Resources: {
+            TaskDef: {
+              Type: 'AWS::ECS::TaskDefinition',
+              Properties: {
+                ContainerDefinitions: [
+                  {}
+                ]
+              }
+            }
+          }
+        });
+        expect(lint(template)).toMatchSnapshot();
+      });
     });
 
     describe('inclusive', () => {

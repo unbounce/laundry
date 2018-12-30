@@ -1,6 +1,6 @@
 {
   "PropertyTypes": {
-    "AWS::EC2::TaskDefinition.ContainerDefinitions": [
+    "AWS::ECS::TaskDefinition.ContainerDefinitions": [
       [
         "Memory",
         "MemoryReservation"

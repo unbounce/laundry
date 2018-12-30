@@ -1241,6 +1241,22 @@ Array [
 ]
 `;
 
+exports[`lint Resources at least one of missing for property 1`] = `
+Array [
+  Object {
+    "message": "at least one of Memory, MemoryReservation must be provided",
+    "path": Array [
+      "Root",
+      "Resources",
+      "TaskDef",
+      "Properties",
+      "ContainerDefinitions",
+      "0",
+    ],
+  },
+]
+`;
+
 exports[`lint Resources exclusive property type with exclusive properties 1`] = `
 Array [
   Object {

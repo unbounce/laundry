@@ -8,7 +8,8 @@ import {
   PrimitiveType,
   Type,
   Exclusive,
-  OnlyOne
+  OnlyOne,
+  AtLeastOne
 } from './spec';
 import * as yaml from './yaml';
 import { isNoValue, isStringNumber, isStringBoolean, cfnFnName } from './util';
@@ -276,6 +277,26 @@ function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, 
   validator.call(undefined, path, property, errors);
 }
 
+function atLeastOnePropertySpec(
+  path: Path,
+  propertyName: string,
+  property: object,
+  resourceType: string,
+  errors: Error[]) {
+  const propertySpec = AtLeastOne.PropertyTypes[`${resourceType}.${propertyName}`];
+  if (propertySpec) {
+    _.forEach(propertySpec, (propertyNames) => {
+      const present = _.filter(propertyNames, (property) => _.has(property, propertyName));
+      if (present.length === 0) {
+        errors.push({
+          path: path,
+          message: `at least one of ${propertyNames.join(', ')} must be provided`
+        });
+      }
+    });
+  }
+}
+
 function onlyOnePropertySpec(
   path: Path,
   propertyName: string,
@@ -285,16 +306,11 @@ function onlyOnePropertySpec(
   const propertySpec = OnlyOne.PropertyTypes[`${resourceType}.${propertyName}`];
   if (propertySpec) {
     _.forEach(propertySpec, (propertyNames) => {
-      const properties = _.reduce(propertyNames, (acc, propertyName) => {
-        if (_.has(property, propertyName)) {
-          acc.push(propertyName);
-        }
-        return acc;
-      }, [] as string[]);
-      if (properties.length > 1) {
+      const present = _.filter(propertyNames, (property) => _.has(property, propertyName));
+      if (present.length > 1) {
         errors.push({
           path,
-          message: `only one of ${properties.join(', ')} can be provided`
+          message: `only one of ${propertyNames.join(', ')} can be provided`
         });
       }
     });
@@ -335,7 +351,8 @@ function complexType(
   if (propertyType) {
     if (object(path, properties, errors)) {
       exclusivePropertySpec(path, propertyName, properties, resourceType, errors);
-      onlyOnePropertySpec(path, propertyName, properties, type, errors);
+      onlyOnePropertySpec(path, propertyName, properties, resourceType, errors);
+      atLeastOnePropertySpec(path, propertyName, properties, resourceType, errors);
       forEach(path, properties, (path, property, name) => {
         const s = _.get(propertyType.Properties, name);
         if (s) {

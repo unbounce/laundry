@@ -42,7 +42,9 @@ export type PropertyType = {
   }
 }
 export type AtLeastOne = {
-  PropertyTypes: {},
+  PropertyTypes: {
+    [key: string]: string[][]
+  },
   ResourceTypes: {
     [key: string]: string[][]
   }

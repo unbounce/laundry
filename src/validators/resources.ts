@@ -114,12 +114,14 @@ export class ResourceAtLeastOnePropertyValidator extends Validator {
         const resourceType = _.get(resource, 'Type');
         const spec = _.get(AtLeastOne.ResourceTypes, resourceType);
         if (spec) {
-          _.forEach(spec, (properties) => {
-            // If none of the properties are set, thats an error
-            if (!_.some(properties, (property) => _.has(resource, ['Properties', property]))) {
+          _.forEach(spec, (propertyNames) => {
+            const present = _.filter(propertyNames, (propertyName) => {
+              return _.has(resource, ['Properties', propertyName]);
+            });
+            if (present.length === 0) {
               this.errors.push({
                 path: path.concat('Properties'),
-                message: `one of ${properties.join(', ')} must be provided`
+                message: `one of ${propertyNames.join(', ')} must be provided`
               });
             }
           });
@@ -139,7 +141,7 @@ export class ResourceOnlyOnePropertyValidator extends Validator {
         const spec = _.get(AtLeastOne.ResourceTypes, resourceType);
         if (spec) {
           _.forEach(spec, (properties) => {
-            // If none of the properties are set, thats an error
+            // If more than one is set, thats an error
             const present = _.filter(properties, (property) => _.has(resource, ['Properties', property]));
             if (present.length > 1) {
               this.errors.push({
