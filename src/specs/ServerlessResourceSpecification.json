@@ -22,7 +22,7 @@
         },
         "CodeUri": {
           "Documentation": "https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction",
-          "PrimitiveType": "Json",
+          "PrimitiveType": "String",
           "Required": false,
           "UpdateType": ""
         },
