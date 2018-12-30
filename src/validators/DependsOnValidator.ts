@@ -20,10 +20,25 @@ export default class DependsOnValidator extends Validator {
 
   Resource(path: Path, resource: any) {
     if (_.isObject(resource) && _.has(resource, 'DependsOn')) {
-      const dependsOn = _.get(resource, 'DependsOn');
-      if (!_.includes(this.resources, dependsOn)) {
-        this.errors.push({ path, message: `${dependsOn} is not a valid Resource` });
+      const dependsOn = _.flatten([_.get(resource, 'DependsOn')]);
+      let resourceNames = [];
+
+      // DependsOn can be a resource or a list of resources
+      if (_.isArray(dependsOn)) {
+        if (validate.list(path, dependsOn, this.errors, validate.string)) {
+          resourceNames = dependsOn;
+        }
+      } else {
+        if (validate.string(path, dependsOn, this.errors)) {
+          resourceNames = [dependsOn];
+        }
       }
+
+      _.forEach(resourceNames, (resourceName) => {
+        if (!_.includes(this.resources, resourceName)) {
+          this.errors.push({ path, message: `${resourceName} is not a valid Resource` });
+        }
+      });
     }
   }
 
