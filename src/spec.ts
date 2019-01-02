@@ -79,7 +79,7 @@ export type OnlyOne = {
 const spec = _.merge(
   {},
   CloudFormationResourceSpecification,
-  ServerlessResourceSpecification,
+  // ServerlessResourceSpecification,
   CloudFormationResourceSpecificationOverrides
 );
 
