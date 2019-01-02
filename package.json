@@ -1,4 +1,10 @@
 {
+  "name": "laundry",
+  "version": "1.0.0-rc1",
+  "description": "A CloudFormation template linter.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": "bin/laundry",
   "scripts": {
     "start": "jest --watch",
     "build": "tsc -p .",
