@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import { Visitor } from './ast';
 import { Path } from './types';
-import { PrimitiveType, PropertyValueType } from './spec';
+import { PrimitiveType, PropertyValueType, ResourceTypes, Attributes } from './spec';
 import { valueToSpecs, isStringBoolean, isStringNumber, subVariables } from './util';
 import * as yaml from './yaml';
 
@@ -69,10 +69,10 @@ function parameterToPrimitiveTypes(
 }
 
 export default class CfnFnPreparer extends Visitor {
-  parameterTypes: { [key: string]: PropertyValueType[] } = {};
-  parameters: object;
-
-  mappings: {
+  private parameterTypes: { [key: string]: PropertyValueType[] } = {};
+  private parameters: object;
+  private resources: { [name: string]: string[] } = {}
+  private mappings: {
     [key1: string]: {
       [key2: string]: {
         [key3: string]: PropertyValueType[]
@@ -83,6 +83,15 @@ export default class CfnFnPreparer extends Visitor {
   constructor(p: object) {
     super();
     this.parameters = p;
+  }
+
+  Resources(path: Path, resources: any) {
+    if (_.isObject(resources)) {
+      _.forEach(resources, (resource, name) => {
+        const type = _.get(resource, 'Type');
+        this.resources[name] = _.get(ResourceTypes, [type, 'Attributes'], {});
+      });
+    }
   }
 
   Parameters(path: Path, o: any) {
@@ -169,6 +178,38 @@ export default class CfnFnPreparer extends Visitor {
         const parameterType = _.get(this.parameterTypes, variable);
         if (parameterType) {
           cfnFn.returnSpec = parameterType;
+        }
+      }
+    } else if (cfnFn instanceof yaml.GetAtt) {
+      let resource, parts;
+      if (cfnFn.isYamlTag() && _.isString(cfnFn.data)) {
+        // !GetAtt A.Att
+        // !GetAtt A.Att.Nested
+        [resource, ...parts] = cfnFn.data.split('.');
+      } else if (_.isArray(cfnFn.data) && cfnFn.data.length > 1 && _.isString(cfnFn.data[0])) {
+        // !GetAtt [A, Att]
+        // !GetAtt [A, Att.Nested]
+        resource = cfnFn.data[0];
+        parts = cfnFn.data[1].split('.');
+      } else {
+        return;
+      }
+
+      // Some resources, like `AWS::ElasticLoadBalancing::LoadBalancer` have
+      // Attributes with a dot in them, like `SourceSecurityGroup.GroupName`
+      const fullAttribute = parts.join('.');
+      if (_.has(this.resources, [resource, fullAttribute])) {
+        cfnFn.returnSpec = [_.get(this.resources, [resource, fullAttribute])];
+      }
+
+      const attribute = parts[0];
+      if (_.has(this.resources, [resource, attribute])) {
+        const spec = _.get(this.resources, [resource, attribute]);
+        if (_.isEqual(spec, { PrimitiveType: 'Json'}) && parts.length > 1) {
+          // If this is a nested lookup of a JSON type, assume it is a String
+          cfnFn.returnSpec = [{ PrimitiveType: 'String' }];
+        } else {
+          cfnFn.returnSpec = [spec];
         }
       }
     } else if (cfnFn instanceof yaml.FindInMap) {
