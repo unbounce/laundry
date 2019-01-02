@@ -1,5 +1,5 @@
 {
-  "name": "laundry",
+  "name": "laundry-cfn",
   "version": "1.0.0-rc1",
   "description": "A CloudFormation template linter.",
   "main": "lib/index.js",
