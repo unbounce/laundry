@@ -5,9 +5,27 @@
         "Memory",
         "MemoryReservation"
       ]
+    ],
+    "AWS::EC2::SpotFleet.NetworkInterfaces": [
+      [
+        "SubnetId",
+        "NetworkInterfaceId"
+      ]
     ]
   },
   "ResourceTypes": {
+    "AWS::AutoScaling::Group": [
+      [
+        "AvailabilityZones",
+        "VPCZoneIdentifier"
+      ]
+    ],
+    "AWS::Route53::RecordSet": [
+      [
+        "TTL",
+        "AliasTarget"
+      ]
+    ],
     "AWS::IAM::Policy": [
       [
         "Roles",
@@ -25,6 +43,20 @@
       [
         "Ipv6CidrBlock",
         "CidrBlock"
+      ]
+    ],
+    "AWS::EC2::Volume": [
+      [
+        "Size",
+        "SnapshotId"
+      ]
+    ],
+    "AWS::ApplicationAutoScaling::ScalingPolicy": [
+      [
+        "ScalingTargetId",
+        "ResourceId",
+        "ScalableDimension",
+        "ServiceNamespace"
       ]
     ]
   }
