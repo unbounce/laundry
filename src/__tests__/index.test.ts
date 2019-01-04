@@ -131,7 +131,7 @@ describe('lint', () => {
         message: expect.stringMatching(/required/)
       }];
       const template = yaml.dump({
-        Resources: { RecordSet: { Type: 'AWS::Route53::RecordSet', Properties: { Type: 'A' } } }
+        Resources: { RecordSet: { Type: 'AWS::Route53::RecordSet', Properties: { Type: 'A', TTL: 1 } } }
       });
       expect(lint(template)).toMatchObject(expected);
     });
@@ -145,7 +145,7 @@ describe('lint', () => {
         Resources: {
           RecordSet: {
             Type: 'AWS::Route53::RecordSet',
-            Properties: { Type: 'A', Name: new yaml.Ref('AWS::NoValue', 'YAMLTag') }
+            Properties: { Type: 'A', TTL: 1, Name: new yaml.Ref('AWS::NoValue', 'YAMLTag') }
           }
         }
       });

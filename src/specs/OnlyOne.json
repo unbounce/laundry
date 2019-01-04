@@ -31,16 +31,6 @@
         "ExtendedS3DestinationConfiguration",
         "ElasticsearchDestinationConfiguration"
       ]
-    ],
-    "AWS::Route53::RecordSet.HostedZoneName": [
-      [
-        "HostedZoneId"
-      ]
-    ],
-    "AWS::Route53::RecordSetGroup.HostedZoneName": [
-      [
-        "HostedZoneId"
-      ]
     ]
   },
   "ResourceTypes": {}

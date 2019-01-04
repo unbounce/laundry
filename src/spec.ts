@@ -73,7 +73,9 @@ export type OnlyOne = {
   PropertyTypes: {
     [key: string]: string[][]
   }
-  ResourceTypes: {}
+  ResourceTypes: {
+    [key: string]: string[][]
+  }
 }
 
 const spec = _.merge(

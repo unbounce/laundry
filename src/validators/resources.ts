@@ -11,6 +11,7 @@ import {
   ResourceTypes,
   PropertyTypes,
   AtLeastOne,
+  OnlyOne,
   Exclusive,
   Inclusive,
 } from '../spec';
@@ -138,15 +139,15 @@ export class ResourceOnlyOnePropertyValidator extends Validator {
     if (_.isObject(resources)) {
       this.forEachWithPath(path, resources, (path, resource) => {
         const resourceType = _.get(resource, 'Type');
-        const spec = _.get(AtLeastOne.ResourceTypes, resourceType);
+        const spec = _.get(OnlyOne.ResourceTypes, resourceType);
         if (spec) {
-          _.forEach(spec, (properties) => {
+          _.forEach(spec, (propertyNames) => {
             // If more than one is set, thats an error
-            const present = _.filter(properties, (property) => _.has(resource, ['Properties', property]));
+            const present = _.filter(propertyNames, (property) => _.has(resource, ['Properties', property]));
             if (present.length > 1) {
               this.errors.push({
                 path: path.concat('Properties'),
-                message: `only one of ${properties.join(', ')} may be provided`
+                message: `only one of ${propertyNames.join(', ')} may be provided`
               });
             }
           });
