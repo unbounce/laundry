@@ -5,7 +5,7 @@ import * as yaml from '../yaml';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
 import { ResourceTypes, Attributes } from '../spec';
-import { cfnFnName } from '../util';
+import { cfnFnName, withSuggestion } from '../util';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -67,13 +67,28 @@ export default class GetAttValidator extends Validator {
         if (_.has(this.resources, [resource, attribute])) {
           // Only `Json` type attributes can have a nested attribute
           if (parts.length > 1 && _.get(this.resources, [resource, attribute, 'PrimitiveType']) !== 'Json') {
-            this.errors.push({ path, message: `${fullAttribute} is not a valid attribute of ${resource}` });
+            const message = withSuggestion(
+              `${fullAttribute} is not a valid attribute of ${resource}`,
+              _.keys(_.get(this.resources, resource)),
+              attribute
+            );
+            this.errors.push({path, message});
           }
         } else {
-          this.errors.push({ path, message: `${attribute} is not a valid attribute of ${resource}` });
+          const message = withSuggestion(
+            `${attribute} is not a valid attribute of ${resource}`,
+            _.keys(_.get(this.resources, resource)),
+            attribute
+          );
+          this.errors.push({path, message});
         }
       } else {
-        this.errors.push({ path, message: `${resource} is not a valid Resource` });
+        const message = withSuggestion(
+          `${resource} is not a valid Resource`,
+          _.keys(this.resources),
+          resource
+        );
+        this.errors.push({path, message});
       }
     }
   }

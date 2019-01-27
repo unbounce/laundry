@@ -5,6 +5,9 @@ import * as yaml from '../yaml';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
 import { ResourceTypes, Attributes } from '../spec';
+import {
+  withSuggestion
+} from '../util';
 
 export default class ConditionsValidator extends Validator {
 
@@ -23,7 +26,7 @@ export default class ConditionsValidator extends Validator {
       if (!_.includes(this.conditions, value.data)) {
         this.errors.push({
           path,
-          message: `${value.data} is not a valid Condition`
+          message: withSuggestion(`${value.data} is not a valid Condition`, this.conditions, value.data)
         });
       }
     }

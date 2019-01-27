@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import didYouMean from 'didyoumean2';
 
 import { PropertyValueType } from './spec';
 import { Path } from './types';
@@ -156,4 +157,14 @@ export function subVariables(sub: yaml.Sub) {
     variables.push(_.trim(match[1]));
   }
   return variables;
+}
+
+
+export function withSuggestion(message: string, matchList: string[], input: string) {
+  const suggestion = didYouMean(input, matchList);
+  if (suggestion) {
+    return `${message}, did you mean ${suggestion}?`;
+  } else {
+    return message;
+  }
 }

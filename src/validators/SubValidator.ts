@@ -5,7 +5,7 @@ import * as yaml from '../yaml';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
 import { ResourceTypes, Attributes } from '../spec';
-import { toCfnFn, subVariables } from '../util';
+import { toCfnFn, subVariables, withSuggestion } from '../util';
 
 type Parameters = {
   [name: string]: 'String' | 'List' | 'Number'
@@ -67,14 +67,27 @@ export default class SubValidator extends Validator {
         if (attribute) {
           if (_.includes(_.keys(this.resources), resource)) {
             if (!_.includes(_.get(this.resources, resource), attribute)) {
-              this.errors.push({ path, message: `${attribute} is not a valid Attribute of ${resource}` });
+              this.errors.push({
+                path,
+                message: withSuggestion(
+                  `${attribute} is not a valid Attribute of ${resource}`,
+                  _.get(this.resources, resource),
+                  resource
+                )
+              });
             }
           } else {
-            this.errors.push({ path, message: `${resource} is not a valid Resource` });
+            const message = withSuggestion(
+              `${resource} is not a valid Resource`,
+              _.keys(this.resources),
+              resource
+            );
+            this.errors.push({ path, message });
           }
         } else {
           if (!_.includes(this.refs, resource)) {
-            this.errors.push({ path, message: `${resource} not a valid Parameter or Resource` });
+            const message = withSuggestion(`${resource} not a valid Parameter or Resource`, this.refs, resource);
+            this.errors.push({path, message});
           }
         }
       });
