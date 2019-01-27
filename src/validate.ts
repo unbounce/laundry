@@ -12,7 +12,7 @@ import {
   AtLeastOne
 } from './spec';
 import * as yaml from './yaml';
-import { isNoValue, isStringNumber, isStringBoolean, cfnFnName } from './util';
+import { isNoValue, isStringNumber, isStringBoolean, cfnFnName, withSuggestion } from './util';
 
 // `_.forEach` which tracks the `Path` and understands how to step into `CfnFn`s
 export function forEach(
@@ -386,7 +386,8 @@ function complexType(
             complexType(path, propertyName, resourceType, s.Type, property, errors);
           }
         } else {
-          errors.push({ path, message: `invalid property for ${type}` });
+          const message = withSuggestion(`invalid property for ${type}`, _.keys(propertyType.Properties), name as string);
+          errors.push({ path, message });
         }
       });
     }

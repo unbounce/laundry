@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as validate from '../validate';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
+import { withSuggestion } from '../util';
 
 // Based on https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html
 
@@ -167,7 +168,9 @@ export default class ParametersValidator extends Validator {
             if (s) {
               s(path.concat(key), parameter, value, this.errors);
             } else if (!_.includes(_.keys(required), key)) {
-              this.errors.push({ path: path.concat(key), message: 'invalid property' });
+              const validKeys = _.concat(_.keys(optional), _.keys(required));
+              const message = withSuggestion('invalid property', validKeys, key);
+              this.errors.push({ path: path.concat(key), message });
             }
           });
           _.forEach(required, (fn, key) => {

@@ -241,11 +241,11 @@ describe('lint', () => {
       test('invalid condition', () => {
         const expected = [{
           path: ['Root', 'Resources', 'Bucket', 'Condition'],
-          message: expect.stringMatching(/Foo/)
+          message: expect.stringMatching(/Butter.*did you mean Batter/)
         }];
         const template = yaml.dump({
-          Conditions: { C: true },
-          Resources: { Bucket: { Condition: 'Foo', Type: 'AWS::S3::Bucket' } }
+          Conditions: { Batter: true },
+          Resources: { Bucket: { Condition: 'Butter', Type: 'AWS::S3::Bucket' } }
         });
         expect(lint(template)).toMatchObject(expected);
       });

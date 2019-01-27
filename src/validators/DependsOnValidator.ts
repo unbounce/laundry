@@ -5,6 +5,7 @@ import * as yaml from '../yaml';
 import { Validator } from '../validate';
 import { Path, Error } from '../types';
 import { ResourceTypes, Attributes } from '../spec';
+import { withSuggestion } from '../util';
 
 export default class DependsOnValidator extends Validator {
 
@@ -36,7 +37,10 @@ export default class DependsOnValidator extends Validator {
 
       _.forEach(resourceNames, (resourceName) => {
         if (!_.includes(this.resources, resourceName)) {
-          this.errors.push({ path, message: `${resourceName} is not a valid Resource` });
+          this.errors.push({
+            path,
+            message: withSuggestion(`${resourceName} is not a valid Resource`, this.resources, resourceName)
+          });
         }
       });
     }

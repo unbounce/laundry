@@ -15,6 +15,9 @@ import {
   Exclusive,
   Inclusive,
 } from '../spec';
+import {
+  withSuggestion
+} from '../util';
 
 export class ResourceTypeValidator extends Validator {
   Resource(path: Path, resource: any) {
@@ -26,10 +29,8 @@ export class ResourceTypeValidator extends Validator {
           || _.startsWith(resourceType, 'AWS::Serverless'))) {
           const s: ResourceType = _.get(ResourceTypes, resourceType);
           if (!s) {
-            this.errors.push({
-              path: path.concat('Type'),
-              message: `invalid type ${resource.Type}`
-            });
+            const message = withSuggestion(`invalid type ${resource.Type}`, _.keys(ResourceTypes), resourceType);
+            this.errors.push({path: path.concat('Type'), message});
           }
         }
       }
@@ -67,8 +68,8 @@ export class ResourcePropertyValidator extends Validator {
             if (propertyType) {
               validate.spec(path, name.toString(), resource.Type, propertyType, property, this.errors);
             } else {
-              // TODO did you mean?
-              this.errors.push({ path, message: 'invalid property' });
+              const message = withSuggestion('invalid property', _.keys(resourceType.Properties), name as string);
+              this.errors.push({ path, message });
             }
           });
         }
@@ -206,7 +207,11 @@ export class ResourceConditionValidator extends Validator {
         if (!_.includes(this.conditions, condition)) {
           this.errors.push({
             path,
-            message: `${condition} is not a valid Condition`
+            message: withSuggestion(
+              `${condition} is not a valid Condition`,
+              this.conditions,
+              condition
+            )
           });
         }
       }
