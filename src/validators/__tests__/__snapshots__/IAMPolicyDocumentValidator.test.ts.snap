@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IAMPolicyDocumentValidator invalid types 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Sid",
+    ],
+  },
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Effect",
+    ],
+  },
+  Object {
+    "message": "must be a String, got {} or must be a List, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+    ],
+  },
+  Object {
+    "message": "must be a String, got {} or must be a List, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Resource",
+    ],
+  },
+  Object {
+    "message": "must be an Object, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Condition",
+    ],
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator missing required properties 1`] = `
+Array [
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Effect",
+    ],
+  },
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+    ],
+  },
+  Object {
+    "message": "is required",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Action",
+    ],
+  },
+]
+`;

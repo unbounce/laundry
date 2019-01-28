@@ -79,7 +79,7 @@ export function forEach(
 //   }
 //
 
-interface ValidationFn {
+export interface ValidationFn {
   (path: Path, o: any, errors: Error[]): boolean
 }
 
@@ -137,6 +137,15 @@ export function object(path: Path,
       const p = path.concat(key);
       _.find(fns, (fn) => !fn(p, _.get(o, key), errors));
     });
+
+    // Check for unknown keys
+    const validKeys = _.keys(properties);
+    if (!_.isEmpty(validKeys)) {
+      const invalidKeys = _.difference(_.keys(o), validKeys);
+      if (!_.isEmpty(invalidKeys)) {
+        errors.push({ path, message: `invalid properties: ${invalidKeys.join(', ')}`});
+      }
+    }
     return true;
   } else {
     errors.push({ path, message: `must be an Object, got ${JSON.stringify(o)}` });
@@ -225,6 +234,18 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
   } else {
     errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
     return false;
+  }
+}
+
+export function or(...fns: ValidationFn[]): ValidationFn {
+  return (path: Path, value: any, errors: Error[]) => {
+    const errs: Error[] = [];
+    const success = _.some(fns, (fn) => fn(path, value, errs));
+    if (!success) {
+      const message = _.join(_.map(errs, (e) => e.message), ' or ');
+      errors.push({ path, message });
+    }
+    return success;
   }
 }
 
