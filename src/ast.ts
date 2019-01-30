@@ -19,6 +19,7 @@ export class Visitor {
   Mapping(path: Path, mapping: any): void { }
   Condition(path: Path, condition: any): void { }
   Resource(path: Path, resource: any): void { }
+  ResourceProperty(path: Path, name: string, value: any): void { }
   CfnFn(path: Path, propertyName: string, value: CfnFn): void { }
   Output(path: Path, output: any): void { }
 }
@@ -139,6 +140,7 @@ export class Walker {
           const path = this.pushPath('Properties');
           _.forEach(properties, (value, key) => {
             const path = this.pushPath(key);
+            this.recursivelyVisitProperty(path, key, value);
             this.recursivelyVisitCfnFn(path, key, value);
             this.popPath();
           });
@@ -149,6 +151,18 @@ export class Walker {
     }
 
     this.popPath();
+  }
+
+  private recursivelyVisitProperty(path: Path, name: string, value: any) {
+    _.forEach(this.visitors, (v) => v.ResourceProperty(path, name, value));
+    if (_.isObject(value) && !(value instanceof CfnFn)) {
+      _.forEach(value, (v, k) => {
+        const key = k.toString();
+        path = this.pushPath(key);
+        this.recursivelyVisitProperty(path, key, v);
+        this.popPath();
+      });
+    }
   }
 
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html

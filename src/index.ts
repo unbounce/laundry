@@ -9,6 +9,7 @@ import GetAttValidator from './validators/GetAttValidator';
 import SubValidator from './validators/SubValidator';
 import IfValidator from './validators/IfValidator';
 import DependsOnValidator from './validators/DependsOnValidator'
+import IAMPolicyDocumentValidator from './validators/IAMPolicyDocumentValidator';
 import {
   ResourceTypeValidator,
   RequriedResourcePropertyValidator,
@@ -75,6 +76,7 @@ export function lint(template: string, parameters: object = {}) {
     new ResourceExclusivePropertyValidator(errors),
     new ResourceInclusivePropertyValidator(errors),
     new ResourceOnlyOnePropertyValidator(errors),
+    new IAMPolicyDocumentValidator(errors),
   ];
   const validate = new Walker(validators);
   validate.Root(input);
