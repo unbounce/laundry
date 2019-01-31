@@ -195,16 +195,25 @@ export function list(
   }
 }
 
-export function string(path: Path, o: any, errors: Error[]): boolean {
+export function string(path: Path, o: any, errors: Error[], allowedValues: string[] = []): boolean {
   if (o instanceof yaml.CfnFn
     && (cfnFn(o, { PrimitiveType: 'String' }) || cfnFn(o, { PrimitiveType: 'Number' }))) {
     return true;
-  } else if (_.isString(o)) {
-    return true;
-  } else if (_.isBoolean(o)) { // TODO better support 'true'/'false' in string values
-    return true;
-  } else if (_.isNumber(o)) { // YAML interprets number only strings as numbers
-    return true;
+  } else if (_.isString(o)
+             || _.isBoolean(o) // TODO better support 'true'/'false' in string values
+             || _.isNumber(o) // YAML interprets number only strings as numbers
+            ) {
+    if(_.some(allowedValues)) {
+      const str = o.toString();
+      if(_.find(allowedValues, (v) => new RegExp(v, 'i').test(str))) {
+        return true;
+      } else {
+        errors.push({ path, message: `must be one of ${allowedValues.join(', ')}, got ${JSON.stringify(o)}` });
+        return false;
+      }
+    } else {
+      return true;
+    }
   } else {
     errors.push({ path, message: `must be a String, got ${JSON.stringify(o)}` });
     return false;

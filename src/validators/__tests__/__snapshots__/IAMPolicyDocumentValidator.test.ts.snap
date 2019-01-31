@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`IAMPolicyDocumentValidator invalid effect 1`] = `
+Array [
+  Object {
+    "message": "must be one of Allow, Deny, got \\"foo\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Effect",
+    ],
+  },
+]
+`;
+
 exports[`IAMPolicyDocumentValidator invalid types 1`] = `
 Array [
   Object {
@@ -95,21 +115,6 @@ Array [
       "Statement",
       "0",
       "Effect",
-    ],
-  },
-  Object {
-    "message": "is required",
-    "path": Array [
-      "Root",
-      "Resources",
-      "Role",
-      "Properties",
-      "Policies",
-      "0",
-      "PolicyDocument",
-      "Statement",
-      "0",
-      "Principal",
     ],
   },
   Object {

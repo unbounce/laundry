@@ -9,11 +9,18 @@ const listOf = (fn: ValidationFn): ValidationFn => {
   }
 }
 
+const stringOf = (allowedValues: string[]): ValidationFn => {
+  return (path: Path, value: any, errors: Error[]) => {
+    return validate.string(path, value, errors, allowedValues);
+  }
+}
+
 const validateStatement = (path: Path, value: any, errors: Error[]): boolean => {
   const spec = {
     Sid: [validate.optional, validate.string],
-    Effect: [validate.required, validate.string], // One of: Allow, Deny
-    Principal: [validate.required, validate.or(validate.string, listOf(validate.string))],
+    Effect: [validate.required, stringOf(['Allow', 'Deny'])],
+    // Principal can not be specified for inline policies
+    Principal: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Action: [validate.required, validate.or(validate.string, listOf(validate.string))],
     Resource: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Condition: [validate.optional, validate.object],

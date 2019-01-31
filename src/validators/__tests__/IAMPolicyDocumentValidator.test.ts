@@ -16,7 +16,7 @@ describe('IAMPolicyDocumentValidator', () => {
                   {
                     Sid: '',
                     Action: '',
-                    Effect: '',
+                    Effect: 'Allow',
                     Principal: '',
                     Resource: '',
                     Condition: {}
@@ -46,7 +46,7 @@ describe('IAMPolicyDocumentValidator', () => {
                   {
                     Sid: '',
                     Action: '',
-                    Effect: '',
+                    Effect: 'Deny',
                     Principal: [''],
                     Resource: [''],
                     Condition: {}
@@ -113,4 +113,35 @@ describe('IAMPolicyDocumentValidator', () => {
     });
     expect(lint(template)).toMatchSnapshot();
   });
+
+  test('invalid effect', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: [
+                  {
+                    Sid: '',
+                    Action: '',
+                    Effect: 'foo',
+                    Principal: '',
+                    Resource: '',
+                    Condition: {}
+                  }
+                ]
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
 });
