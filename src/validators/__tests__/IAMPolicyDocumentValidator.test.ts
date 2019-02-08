@@ -19,7 +19,7 @@ describe('IAMPolicyDocumentValidator', () => {
                     Effect: 'Allow',
                     Principal: '',
                     Resource: '',
-                    Condition: {}
+                    Condition: { Bool: { 'aws:SecureTransport': true } }
                   }
                 ]
               }
@@ -44,12 +44,10 @@ describe('IAMPolicyDocumentValidator', () => {
                 Version: '',
                 Statement: [
                   {
-                    Sid: '',
                     Action: '',
                     Effect: 'Deny',
                     Principal: [''],
                     Resource: [''],
-                    Condition: {}
                   }
                 ]
               }
@@ -74,6 +72,62 @@ describe('IAMPolicyDocumentValidator', () => {
                 Version: '',
                 Statement: [
                   {}
+                ]
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
+  test('invalid conditional', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: [
+                  {
+                    Action: '',
+                    Effect: 'Allow',
+                    Resource: '',
+                    Condition: { Foo: { 'aws:SecureTransport': true } }
+                  }
+                ]
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
+  test('invalid condition key', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: [
+                  {
+                    Action: '',
+                    Effect: 'Allow',
+                    Resource: '',
+                    Condition: { Bool: { 'cats': 'dogs' } }
+                  }
                 ]
               }
             }]
@@ -127,12 +181,9 @@ describe('IAMPolicyDocumentValidator', () => {
                 Version: '',
                 Statement: [
                   {
-                    Sid: '',
                     Action: '',
                     Effect: 'foo',
-                    Principal: '',
                     Resource: '',
-                    Condition: {}
                   }
                 ]
               }
