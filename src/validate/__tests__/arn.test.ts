@@ -15,7 +15,7 @@ describe('arn', () => {
     ['arn:aws-cn:ec2:us-east-1:123456789012:instance/*'],
   ])('valid %s', (value) => {
     const errors: Error[] = [];
-    expect(arn([], value, errors)).toBeTruthy();
+    expect(arn([], value, (path, message) => { errors.push({ path, message, source: '' }) })).toBeTruthy();
     expect(errors).toEqual([]);
   });
 
@@ -35,7 +35,7 @@ describe('arn', () => {
     ['arn:aws:ec2:us-east-1:instance/*'],
   ])('invalid %s', (value) => {
     const errors: Error[] = [];
-    expect(arn([], value, errors)).toBeFalsy();
+    expect(arn([], value, (path, message) => { errors.push({ path, message, source: '' }) })).toBeFalsy();
     expect(errors.length).toBeGreaterThan(0);
   });
 });

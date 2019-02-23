@@ -19,6 +19,7 @@ const returnSpec = Symbol('returnSpec');
 const supportedFns = Symbol('supportedFns');
 const data = Symbol('data');
 const doc = Symbol('doc');
+const resolvedValue = Symbol('resolvedValue');
 
 export class CfnFn {
   public [data]: any;
@@ -26,6 +27,7 @@ export class CfnFn {
   public [doc]: string = 'http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html';
   public [returnSpec]: PropertyValueType[] | PropertyValueTypeFn = [];
   public [style]: Style;
+  public [resolvedValue]: any;
 
   constructor(d: any, s: Style) {
     this[data] = d;
@@ -57,6 +59,14 @@ export class CfnFn {
 
   get supportedFns(): SupportedFns {
     return this[supportedFns];
+  }
+
+  set resolvedValue(v: any) {
+    this[resolvedValue] = v;
+  }
+
+  get resolvedValue(): any {
+    return this[resolvedValue];
   }
 
   isYamlTag() {

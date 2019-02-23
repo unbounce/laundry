@@ -12,6 +12,7 @@ import SubValidator from './validators/SubValidator';
 import IfValidator from './validators/IfValidator';
 import DependsOnValidator from './validators/DependsOnValidator'
 import IAMPolicyDocumentValidator from './validators/IAMPolicyDocumentValidator';
+import ARNFormatValidator from './validators/ARNFormatValidator';
 import {
   ResourceTypeValidator,
   RequriedResourcePropertyValidator,
@@ -22,6 +23,7 @@ import {
   ResourceInclusivePropertyValidator,
   ResourceOnlyOnePropertyValidator,
 } from './validators/resources';
+import ResolveCfnFnValues from './preprocess/ResolveCfnFnValues';
 import { Walker } from './ast';
 import { Error } from './types';
 
@@ -79,7 +81,10 @@ export function lint(template: string, parameters: object = {}) {
   const input = convertCfnFns(yaml.load(template));
   const ignoredValidators: IgnoredValidator[] = [];
 
-  const prewalk = new Walker([new CfnFnPreparer(parameters)]);
+  const prewalk = new Walker([
+    new CfnFnPreparer(parameters),
+    new ResolveCfnFnValues(parameters)
+  ]);
   // Mutates input
   prewalk.Root(input);
 
@@ -103,6 +108,7 @@ export function lint(template: string, parameters: object = {}) {
     new ResourceInclusivePropertyValidator(errors),
     new ResourceOnlyOnePropertyValidator(errors),
     new IAMPolicyDocumentValidator(errors),
+    new ARNFormatValidator(errors),
     new LaundryIgnore(ignoredValidators, errors),
   ];
   const validate = new Walker(validators);

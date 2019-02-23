@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { Path, Error } from '../types';
+import { Path, ErrorFn } from '../types';
 import { withSuggestion } from '../util';
 
 const services = [
@@ -177,7 +177,7 @@ const noAccountServices = [
 ]
 
 // https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-const arn = (path: Path, value: any, errors: Error[]): boolean => {
+const arn = (path: Path, value: any, addError: ErrorFn): boolean => {
   let valid = true;
   if (_.isString(value)) {
     if((value.match(/:/g) || []).length === 5) {
@@ -193,32 +193,32 @@ const arn = (path: Path, value: any, errors: Error[]): boolean => {
       const resource = resourceParts.join(':');
 
       if (prefix !== 'arn') {
-        errors.push({ path, message: `ARN must start with 'arn', got ${prefix}` });
+        addError(path, `ARN must start with 'arn', got ${prefix}`);
         valid = false;
       }
 
       if (!/^aws(-[a-z]+)?$/.test(partition)) {
-        errors.push({ path, message: `ARN must start with 'arn:aws' or 'arn:aws-cn', got ${partition}` });
+        addError(path, `ARN must start with 'arn:aws' or 'arn:aws-cn', got ${partition}`);
         valid = false;
       }
 
       if (!_.includes(services, service)) {
         const message = withSuggestion(
-          "ARN service must one of ${services.join(', ')}, got ${service}",
+          `ARN service must one of ${services.join(', ')}, got ${service}`,
           services,
           service
         );
-        errors.push({ path, message });
+        addError(path, message);
         valid = false;
       }
 
       if (_.includes(noRegionServices, service)) {
         if (_.some(region)) {
-          errors.push({ path, message: `region should not be provided for ${service} ARNs` });
+          addError(path, `region should not be provided for ${service} ARNs`);
           valid = false;
         }
       } else if (_.isEmpty(region)) {
-        errors.push({ path, message: 'region must be provided in ARN' });
+        addError(path, 'region must be provided in ARN');
         valid = false;
       }
 
@@ -227,19 +227,17 @@ const arn = (path: Path, value: any, errors: Error[]): boolean => {
           if (service === 'route53' && _.startsWith(resource, 'domain')) {
             // Special case for route53 domain
           } else {
-            errors.push({ path, message: `account should not be provided for ${service} ARNs` });
+            addError(path, `account should not be provided for ${service} ARNs`);
             valid = false;
           }
         }
       } else if (_.isEmpty(account)) {
-        errors.push({ path, message: 'account must be provided in ARN' });
+        addError(path, 'account must be provided in ARN');
         valid = false;
       }
     } else {
-      errors.push({
-        path,
-        message: 'ARN must be in the format: arn:partition:service:region:account-id:resource'
-      });
+      const message = 'ARN must be in the format: arn:partition:service:region:account-id:resource';
+      addError(path, message);
       valid = false;
     }
   }
