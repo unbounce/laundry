@@ -3,7 +3,7 @@
 exports[`IAMPolicyDocumentValidator invalid condition key 1`] = `
 Array [
   Object {
-    "message": "key must be one of aws:CurrentTime, aws:EpochTime, aws:MultiFactorAuthAge, aws:MultiFactorAuthPresent, aws:SecureTransport, aws:UserAgent, aws:PrincipalOrgID, aws:PrincipalTag, aws:PrincipalType, aws:Referer, aws:RequestedRegion, aws:RequestTag, aws:SourceAccount, aws:SourceArn, aws:SourceIp, aws:SourceVpc, aws:SourceVpce, aws:TagKeys, aws:TokenIssueTime, aws:userid, aws:username, got cats",
+    "message": "key must be one of aws:CurrentTime, aws:EpochTime, aws:MultiFactorAuthAge, aws:MultiFactorAuthPresent, aws:SecureTransport, aws:UserAgent, aws:PrincipalOrgID, aws:PrincipalTag, aws:PrincipalType, aws:Referer, aws:RequestedRegion, aws:RequestTag, aws:SourceAccount, aws:SourceArn, aws:SourceIp, aws:SourceVpc, aws:SourceVpce, aws:TagKeys, aws:TokenIssueTime, aws:userid, aws:username, s:, got cats",
     "path": Array [
       "Root",
       "Resources",
@@ -96,7 +96,7 @@ Array [
     ],
   },
   Object {
-    "message": "must be a String, got {} or must be a List, got {}",
+    "message": "must be a String, got [] or must be an Object, got []",
     "path": Array [
       "Root",
       "Resources",
@@ -158,21 +158,6 @@ Array [
       "Statement",
       "0",
       "Effect",
-    ],
-  },
-  Object {
-    "message": "is required",
-    "path": Array [
-      "Root",
-      "Resources",
-      "Role",
-      "Properties",
-      "Policies",
-      "0",
-      "PolicyDocument",
-      "Statement",
-      "0",
-      "Action",
     ],
   },
 ]

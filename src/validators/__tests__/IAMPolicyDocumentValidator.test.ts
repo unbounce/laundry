@@ -33,7 +33,7 @@ describe('IAMPolicyDocumentValidator', () => {
     });
     expect(lint(template)).toEqual([]);
   });
-  test('valid, with lists', () => {
+  test('valid, with resource list', () => {
     const template = JSON.stringify({
       Resources: {
         Role: {
@@ -48,7 +48,7 @@ describe('IAMPolicyDocumentValidator', () => {
                   {
                     Action: '',
                     Effect: 'Deny',
-                    Principal: [''],
+                    Principal: '',
                     Resource: [''],
                   }
                 ]
@@ -156,7 +156,7 @@ describe('IAMPolicyDocumentValidator', () => {
                     Sid: [],
                     Action: [],
                     Effect: [],
-                    Principal: {},
+                    Principal: [],
                     Resource: {},
                     Condition: '',
                   }

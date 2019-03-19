@@ -113,13 +113,25 @@ const validateCondition = (path: Path, condition: any, errors: Error[]): boolean
   }
 }
 
+const validatePrincipal = (path: Path, value: any, errors: Error[]): boolean => {
+  // https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html
+  const spec = {
+    AWS: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    Service: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    Federated: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    CanonicalUser: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+  }
+  return validate.or(validate.string, (p, v, e) => validate.object(p, v, e, spec))(path, value, errors);
+}
+
 const validateStatement = (path: Path, value: any, errors: Error[]): boolean => {
   const spec = {
     Sid: [validate.optional, validate.string],
     Effect: [validate.required, stringOf(['Allow', 'Deny'])],
-    // Principal can not be specified for inline policies
-    Principal: [validate.optional, validate.or(validate.string, listOf(validate.string))],
-    Action: [validate.required, validate.or(validate.string, listOf(validate.string))],
+    // TODO Principal can not be specified for inline policies
+    Principal: [validate.optional, validatePrincipal],
+    Action: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    NotAction: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Resource: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Condition: [validate.optional, validateCondition],
   };
