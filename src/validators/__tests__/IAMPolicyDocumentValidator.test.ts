@@ -1,7 +1,10 @@
 import { lint } from '../../index';
 
 describe('IAMPolicyDocumentValidator', () => {
-  test('valid', () => {
+  test.each([
+    [{ Bool: { 'aws:SecureTransport': true } }],
+    [{ StringEquals: { 'aws:RequestTag/foo': ['bar'] } }],
+  ])('valid %s', (condition) => {
     const template = JSON.stringify({
       Resources: {
         Role: {
@@ -19,7 +22,7 @@ describe('IAMPolicyDocumentValidator', () => {
                     Effect: 'Allow',
                     Principal: '',
                     Resource: '',
-                    Condition: { Bool: { 'aws:SecureTransport': true } }
+                    Condition: condition
                   }
                 ]
               }
@@ -30,7 +33,6 @@ describe('IAMPolicyDocumentValidator', () => {
     });
     expect(lint(template)).toEqual([]);
   });
-
   test('valid, with lists', () => {
     const template = JSON.stringify({
       Resources: {

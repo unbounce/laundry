@@ -86,7 +86,7 @@ const validateCondition = (path: Path, condition: any, errors: Error[]): boolean
       }
       if (validate.object(path, value, errors)) {
         _.forEach(value, (conditionValue, conditionKey) => {
-          if(!_.includes(conditionKeys, conditionKey)) {
+          if(!_.some(conditionKeys, (k) => conditionKey.match(k))) {
             const keys = _.map(conditionKeys, (c) => String(c).replace(/[^A-Za-z:]/g, ''));
             const message = withSuggestion(
               `key must be one of ${keys.join(', ')}, got ${conditionKey}`,
