@@ -63,6 +63,7 @@ export default class RootValidator extends Validator {
     // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html
     const properties = {
       Description: [validate.optional, validate.string],
+      Condition: [validate.optional, validate.string],
       Value: [validate.required, validate.string],
       Export: [
         validate.optional,
