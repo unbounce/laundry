@@ -181,12 +181,12 @@ export class Select extends CfnFn {
 export class And extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-and';
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, And, Equals, If, Not, Or, Condition, ImplicitCondition];
 }
 export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, And, Equals, If, Not, Or, Condition, ImplicitCondition];
 }
 export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
@@ -223,12 +223,12 @@ export class If extends CfnFn {
 }
 export class Not extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-not';
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, And, Equals, If, Not, Or, Condition, ImplicitCondition];
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 export class Or extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or';
-  [supportedFns]: SupportedFns = [FindInMap, Ref, And, Equals, If, Not, Or, Condition, ImplicitCondition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, And, Equals, If, Not, Or, Condition, ImplicitCondition];
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
 }
 
