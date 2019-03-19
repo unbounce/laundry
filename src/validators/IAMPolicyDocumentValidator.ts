@@ -70,6 +70,7 @@ const conditionKeys = [
   'aws:TokenIssueTime',
   'aws:userid',
   'aws:username',
+  /^s3:/,
 ];
 
 const validateCondition = (path: Path, condition: any, errors: Error[]): boolean => {
