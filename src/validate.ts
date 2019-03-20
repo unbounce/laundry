@@ -148,7 +148,7 @@ export function object(path: Path,
     }
     return true;
   } else {
-    errors.push({ path, message: `must be an Object, got ${JSON.stringify(o)}` });
+    errors.push({ path, message: `must be an Object`, value: JSON.stringify(o) });
     return false;
   }
 }
@@ -190,7 +190,7 @@ export function list(
     }
     return true;
   } else {
-    errors.push({ path, message: `must be a List, got ${JSON.stringify(o)}` });
+    errors.push({ path, message: `must be a List`, value: JSON.stringify(o) });
     return false;
   }
 }
@@ -208,14 +208,14 @@ export function string(path: Path, o: any, errors: Error[], allowedValues: strin
       if(_.find(allowedValues, (v) => new RegExp(v, 'i').test(str))) {
         return true;
       } else {
-        errors.push({ path, message: `must be one of ${allowedValues.join(', ')}, got ${JSON.stringify(o)}` });
+        errors.push({ path, message: `must be one of ${allowedValues.join(', ')}`, value: JSON.stringify(o) });
         return false;
       }
     } else {
       return true;
     }
   } else {
-    errors.push({ path, message: `must be a String, got ${JSON.stringify(o)}` });
+    errors.push({ path, message: `must be a String`, value: JSON.stringify(o) });
     return false;
   }
 }
@@ -228,7 +228,7 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
   } else if (isStringNumber(o)) {
     return true;
   } else {
-    errors.push({ path, message: `must be a Number, got ${o}` });
+    errors.push({ path, message: `must be a Number`, value: JSON.stringify(o) });
     return false;
   }
 }
@@ -241,7 +241,7 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
   } else if (_.isBoolean(o)) {
     return true;
   } else {
-    errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
+    errors.push({ path, message: `must be a Boolean`, value: JSON.stringify(o) });
     return false;
   }
 }
@@ -252,7 +252,7 @@ export function or(...fns: ValidationFn[]): ValidationFn {
     const success = _.some(fns, (fn) => fn(path, value, errs));
     if (!success) {
       const message = _.join(_.map(errs, (e) => e.message), ' or ');
-      errors.push({ path, message });
+      errors.push({ path, message, value: JSON.stringify(value) });
     }
     return success;
   }

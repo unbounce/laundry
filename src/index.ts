@@ -80,5 +80,12 @@ export function lint(template: string, parameters: object = {}) {
   ];
   const validate = new Walker(validators);
   validate.Root(input);
-  return errors;
+
+  return _.map(errors, (e) => {
+    if ('value' in e) {
+      return {...e, message: `${e.message}, got ${e.value}`};
+    } else {
+      return e;
+    }
+  });
 }

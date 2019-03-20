@@ -59,6 +59,7 @@ Array [
       "0",
       "Effect",
     ],
+    "value": "\\"foo\\"",
   },
 ]
 `;
@@ -79,6 +80,7 @@ Array [
       "0",
       "Sid",
     ],
+    "value": "[]",
   },
   Object {
     "message": "must be a String, got []",
@@ -94,9 +96,10 @@ Array [
       "0",
       "Effect",
     ],
+    "value": "[]",
   },
   Object {
-    "message": "must be a String, got [] or must be an Object, got []",
+    "message": "must be a String or must be an Object, got []",
     "path": Array [
       "Root",
       "Resources",
@@ -109,9 +112,10 @@ Array [
       "0",
       "Principal",
     ],
+    "value": "[]",
   },
   Object {
-    "message": "must be a String, got {} or must be a List, got {}",
+    "message": "must be a String or must be a List, got {}",
     "path": Array [
       "Root",
       "Resources",
@@ -124,6 +128,7 @@ Array [
       "0",
       "Resource",
     ],
+    "value": "{}",
   },
   Object {
     "message": "must be an Object, got \\"\\"",
@@ -139,6 +144,7 @@ Array [
       "0",
       "Condition",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
