@@ -11,6 +11,7 @@ Array [
       "Fn::And",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -25,6 +26,7 @@ Array [
       "C",
       "Fn::And",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -86,6 +88,7 @@ Array [
       "Fn::Not",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -100,6 +103,7 @@ Array [
       "C",
       "Fn::Not",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -119,6 +123,7 @@ Array [
       "Fn::Or",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -133,6 +138,7 @@ Array [
       "C",
       "Fn::Or",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -148,6 +154,7 @@ Array [
       "And",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -162,6 +169,7 @@ Array [
       "C",
       "And",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -223,6 +231,7 @@ Array [
       "Not",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -237,6 +246,7 @@ Array [
       "C",
       "Not",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -256,6 +266,7 @@ Array [
       "Or",
       "0",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -270,6 +281,7 @@ Array [
       "C",
       "Or",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -390,6 +402,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "value": "[\\"\\",[\\"\\"],\\"\\"]",
   },
 ]
 `;
@@ -406,6 +419,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "value": "[[],\\"\\"]",
   },
 ]
 `;
@@ -422,6 +436,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "value": "{\\"a\\":\\"\\"}",
   },
 ]
 `;
@@ -438,6 +453,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "value": "[\\"\\"]",
   },
 ]
 `;
@@ -454,6 +470,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "value": "[\\"\\",[\\"\\"],\\"\\"]",
   },
 ]
 `;
@@ -470,6 +487,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "value": "[[],\\"\\"]",
   },
 ]
 `;
@@ -486,6 +504,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "value": "{\\"a\\":\\"\\"}",
   },
 ]
 `;
@@ -502,6 +521,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "value": "[\\"\\"]",
   },
 ]
 `;
@@ -518,6 +538,7 @@ Array [
       "Root",
       "Mappings",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -532,6 +553,7 @@ Array [
       "a",
       "b",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -552,6 +574,7 @@ Array [
       "Root",
       "Outputs",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -566,6 +589,7 @@ Array [
       "O",
       "Description",
     ],
+    "value": "{}",
   },
 ]
 `;
@@ -581,6 +605,7 @@ Array [
       "Export",
       "Name",
     ],
+    "value": "{}",
   },
 ]
 `;
@@ -595,6 +620,7 @@ Array [
       "O",
       "Value",
     ],
+    "value": "{}",
   },
 ]
 `;
@@ -819,6 +845,7 @@ Array [
       "BucketName",
       "Fn::Join",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -836,6 +863,7 @@ Array [
       "Fn::Join",
       "0",
     ],
+    "value": "[]",
   },
   Object {
     "message": "must be a List, got \\"\\"",
@@ -848,6 +876,7 @@ Array [
       "Fn::Join",
       "1",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -896,6 +925,7 @@ Array [
       "BucketName",
       "Join",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -913,6 +943,7 @@ Array [
       "Join",
       "0",
     ],
+    "value": "[]",
   },
   Object {
     "message": "must be a List, got \\"\\"",
@@ -925,6 +956,7 @@ Array [
       "Join",
       "1",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -973,6 +1005,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "value": "[\\"A\\"]",
   },
 ]
 `;
@@ -1005,6 +1038,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "value": "[\\"A\\"]",
   },
 ]
 `;
@@ -1070,6 +1104,7 @@ Array [
       "Fn::Sub",
       "0",
     ],
+    "value": "{}",
   },
   Object {
     "message": "must be an Object, got \\"\${A}\\"",
@@ -1082,6 +1117,7 @@ Array [
       "Fn::Sub",
       "1",
     ],
+    "value": "\\"\${A}\\"",
   },
 ]
 `;
@@ -1179,6 +1215,7 @@ Array [
       "Sub",
       "0",
     ],
+    "value": "{}",
   },
   Object {
     "message": "must be an Object, got \\"\${A}\\"",
@@ -1191,6 +1228,7 @@ Array [
       "Sub",
       "1",
     ],
+    "value": "\\"\${A}\\"",
   },
 ]
 `;
@@ -1411,7 +1449,7 @@ Array [
 exports[`lint with parameters string values invalid default 1`] = `
 Array [
   Object {
-    "message": "must be a Number, got Ref ExpirationInDays",
+    "message": "must be a Number, got {\\"Ref\\":\\"ExpirationInDays\\"}",
     "path": Array [
       "Root",
       "Resources",
@@ -1422,6 +1460,7 @@ Array [
       "0",
       "ExpirationInDays",
     ],
+    "value": "{\\"Ref\\":\\"ExpirationInDays\\"}",
   },
 ]
 `;
@@ -1429,7 +1468,7 @@ Array [
 exports[`lint with parameters string values invalid value 1`] = `
 Array [
   Object {
-    "message": "must be a Number, got Ref ExpirationInDays",
+    "message": "must be a Number, got {\\"Ref\\":\\"ExpirationInDays\\"}",
     "path": Array [
       "Root",
       "Resources",
@@ -1440,6 +1479,7 @@ Array [
       "0",
       "ExpirationInDays",
     ],
+    "value": "{\\"Ref\\":\\"ExpirationInDays\\"}",
   },
 ]
 `;

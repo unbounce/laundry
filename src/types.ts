@@ -4,6 +4,7 @@ export type Error = {
   path: Path,
   message: string,
   source?: string,
+  value?: string,
 };
 
 export class ResourceSpecificationError extends Error {

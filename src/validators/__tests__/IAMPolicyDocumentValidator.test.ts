@@ -1,7 +1,10 @@
 import { lint } from '../../index';
 
 describe('IAMPolicyDocumentValidator', () => {
-  test('valid', () => {
+  test.each([
+    [{ Bool: { 'aws:SecureTransport': true } }],
+    [{ StringEquals: { 'aws:RequestTag/foo': ['bar'] } }],
+  ])('valid %s', (condition) => {
     const template = JSON.stringify({
       Resources: {
         Role: {
@@ -19,7 +22,7 @@ describe('IAMPolicyDocumentValidator', () => {
                     Effect: 'Allow',
                     Principal: '',
                     Resource: '',
-                    Condition: {}
+                    Condition: condition
                   }
                 ]
               }
@@ -30,8 +33,7 @@ describe('IAMPolicyDocumentValidator', () => {
     });
     expect(lint(template)).toEqual([]);
   });
-
-  test('valid, with lists', () => {
+  test('valid, with resource list', () => {
     const template = JSON.stringify({
       Resources: {
         Role: {
@@ -44,12 +46,10 @@ describe('IAMPolicyDocumentValidator', () => {
                 Version: '',
                 Statement: [
                   {
-                    Sid: '',
                     Action: '',
                     Effect: 'Deny',
-                    Principal: [''],
+                    Principal: '',
                     Resource: [''],
-                    Condition: {}
                   }
                 ]
               }
@@ -84,6 +84,62 @@ describe('IAMPolicyDocumentValidator', () => {
     expect(lint(template)).toMatchSnapshot();
   });
 
+  test('invalid conditional', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: [
+                  {
+                    Action: '',
+                    Effect: 'Allow',
+                    Resource: '',
+                    Condition: { Foo: { 'aws:SecureTransport': true } }
+                  }
+                ]
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
+  test('invalid condition key', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: [
+                  {
+                    Action: '',
+                    Effect: 'Allow',
+                    Resource: '',
+                    Condition: { Bool: { 'cats': 'dogs' } }
+                  }
+                ]
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
   test('invalid types', () => {
     const template = JSON.stringify({
       Resources: {
@@ -100,7 +156,7 @@ describe('IAMPolicyDocumentValidator', () => {
                     Sid: [],
                     Action: [],
                     Effect: [],
-                    Principal: {},
+                    Principal: [],
                     Resource: {},
                     Condition: '',
                   }
@@ -127,12 +183,9 @@ describe('IAMPolicyDocumentValidator', () => {
                 Version: '',
                 Statement: [
                   {
-                    Sid: '',
                     Action: '',
                     Effect: 'foo',
-                    Principal: '',
                     Resource: '',
-                    Condition: {}
                   }
                 ]
               }

@@ -1,5 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`IAMPolicyDocumentValidator invalid condition key 1`] = `
+Array [
+  Object {
+    "message": "key must be one of aws:CurrentTime, aws:EpochTime, aws:MultiFactorAuthAge, aws:MultiFactorAuthPresent, aws:SecureTransport, aws:UserAgent, aws:PrincipalOrgID, aws:PrincipalTag, aws:PrincipalType, aws:Referer, aws:RequestedRegion, aws:RequestTag, aws:SourceAccount, aws:SourceArn, aws:SourceIp, aws:SourceVpc, aws:SourceVpce, aws:TagKeys, aws:TokenIssueTime, aws:userid, aws:username, s:, got cats",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Condition",
+      "Bool",
+      "cats",
+    ],
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid conditional 1`] = `
+Array [
+  Object {
+    "message": "key must be one of StringEquals, StringNotEquals, StringEqualsIgnoreCase, StringNotEqualsIgnoreCase, StringLike, StringNotLike, NumericEquals, NumericNotEquals, NumericLessThan, NumericLessThanEquals, NumericGreaterThan, NumericGreaterThanEquals, DateEquals, DateNotEquals, DateLessThan, DateLessThanEquals, DateGreaterThan, DateGreaterThanEquals, Bool, Null, BinaryEquals, IpAddress, NotIpAddress, ArnEquals, ArnLike, ArnNotEquals, ArnNotLike, got Foo, did you mean Bool?",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Condition",
+      "Foo",
+    ],
+  },
+]
+`;
+
 exports[`IAMPolicyDocumentValidator invalid effect 1`] = `
 Array [
   Object {
@@ -16,6 +59,7 @@ Array [
       "0",
       "Effect",
     ],
+    "value": "\\"foo\\"",
   },
 ]
 `;
@@ -36,6 +80,7 @@ Array [
       "0",
       "Sid",
     ],
+    "value": "[]",
   },
   Object {
     "message": "must be a String, got []",
@@ -51,9 +96,10 @@ Array [
       "0",
       "Effect",
     ],
+    "value": "[]",
   },
   Object {
-    "message": "must be a String, got {} or must be a List, got {}",
+    "message": "must be a String or must be an Object, got []",
     "path": Array [
       "Root",
       "Resources",
@@ -66,9 +112,10 @@ Array [
       "0",
       "Principal",
     ],
+    "value": "[]",
   },
   Object {
-    "message": "must be a String, got {} or must be a List, got {}",
+    "message": "must be a String or must be a List, got {}",
     "path": Array [
       "Root",
       "Resources",
@@ -81,6 +128,7 @@ Array [
       "0",
       "Resource",
     ],
+    "value": "{}",
   },
   Object {
     "message": "must be an Object, got \\"\\"",
@@ -96,6 +144,7 @@ Array [
       "0",
       "Condition",
     ],
+    "value": "\\"\\"",
   },
 ]
 `;
@@ -115,21 +164,6 @@ Array [
       "Statement",
       "0",
       "Effect",
-    ],
-  },
-  Object {
-    "message": "is required",
-    "path": Array [
-      "Root",
-      "Resources",
-      "Role",
-      "Properties",
-      "Policies",
-      "0",
-      "PolicyDocument",
-      "Statement",
-      "0",
-      "Action",
     ],
   },
 ]
