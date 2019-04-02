@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import { Visitor } from './ast';
-import { Path, Error, ResourceSpecificationError } from './types';
+import { Path, Error, ErrorFn, ResourceSpecificationError } from './types';
 import {
   PropertyTypes,
   PropertyValueType,
@@ -80,7 +80,7 @@ export function forEach(
 //
 
 export interface ValidationFn {
-  (path: Path, o: any, errors: Error[]): boolean
+  (path: Path, o: any, addError: ErrorFn): boolean
 }
 
 export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
@@ -103,13 +103,13 @@ export function cfnFn(cfnFn: yaml.CfnFn, spec: PropertyValueType): boolean {
 //
 //  validate.optional(value) && validate.string(value);
 //
-export function optional(path: Path, o: any, errors: Error[]): boolean {
+export function optional(_path: Path, o: any, _addError: ErrorFn): boolean {
   return !_.isUndefined(o);
 }
 
-export function required(path: Path, o: any, errors: Error[]): boolean {
+export function required(path: Path, o: any, addError: ErrorFn): boolean {
   if (_.isNil(o) || isNoValue(o)) {
-    errors.push({ path, message: 'is required' });
+    addError(path, 'is required');
     return false;
   } else {
     return true;
@@ -127,7 +127,7 @@ export function required(path: Path, o: any, errors: Error[]): boolean {
 //
 export function object(path: Path,
   o: any,
-  errors: Error[],
+  addError: ErrorFn,
   properties: { [key: string]: ValidationFn[] } = {}): boolean {
   if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Json' })) {
     return true;
@@ -135,7 +135,7 @@ export function object(path: Path,
     // Validate the objects properties
     _.forEach(properties, (fns, key) => {
       const p = path.concat(key);
-      _.find(fns, (fn) => !fn(p, _.get(o, key), errors));
+      _.find(fns, (fn) => !fn(p, _.get(o, key), addError));
     });
 
     // Check for unknown keys
@@ -143,12 +143,12 @@ export function object(path: Path,
     if (!_.isEmpty(validKeys)) {
       const invalidKeys = _.difference(_.keys(o), validKeys);
       if (!_.isEmpty(invalidKeys)) {
-        errors.push({ path, message: `invalid properties: ${invalidKeys.join(', ')}`});
+        addError(path, `invalid properties: ${invalidKeys.join(', ')}`);
       }
     }
     return true;
   } else {
-    errors.push({ path, message: `must be an Object, got ${JSON.stringify(o)}` });
+    addError(path, `must be an Object, got ${JSON.stringify(o)}`);
     return false;
   }
 }
@@ -170,7 +170,7 @@ export function object(path: Path,
 export function list(
   path: Path,
   o: any,
-  errors: Error[],
+  addError: ErrorFn,
   items?: ValidationFn[] | ValidationFn): o is Array<any> {
   if (o instanceof yaml.CfnFn && cfnFn(o, { Type: 'List' })) {
     return true
@@ -178,24 +178,24 @@ export function list(
     if (_.isArray(items)) {
       if (items.length === o.length) {
         _.forEach(items, (fn, i) => {
-          fn(path.concat(i.toString()), o[i], errors);
+          fn(path.concat(i.toString()), o[i], addError);
         });
       } else {
-        errors.push({ path, message: `must be a List with ${items.length} items` });
+        addError(path, `must be a List with ${items.length} items`);
       }
     } else if (items) {
       _.forEach(o, (item, i) => {
-        items(path.concat(i.toString()), item, errors);
+        items(path.concat(i.toString()), item, addError);
       });
     }
     return true;
   } else {
-    errors.push({ path, message: `must be a List, got ${JSON.stringify(o)}` });
+    addError(path, `must be a List, got ${JSON.stringify(o)}`);
     return false;
   }
 }
 
-export function string(path: Path, o: any, errors: Error[], allowedValues: string[] = []): boolean {
+export function string(path: Path, o: any, addError: ErrorFn, allowedValues: string[] = []): boolean {
   if (o instanceof yaml.CfnFn
     && (cfnFn(o, { PrimitiveType: 'String' }) || cfnFn(o, { PrimitiveType: 'Number' }))) {
     return true;
@@ -208,19 +208,19 @@ export function string(path: Path, o: any, errors: Error[], allowedValues: strin
       if(_.find(allowedValues, (v) => new RegExp(v, 'i').test(str))) {
         return true;
       } else {
-        errors.push({ path, message: `must be one of ${allowedValues.join(', ')}, got ${JSON.stringify(o)}` });
+        addError(path, `must be one of ${allowedValues.join(', ')}, got ${JSON.stringify(o)}`);
         return false;
       }
     } else {
       return true;
     }
   } else {
-    errors.push({ path, message: `must be a String, got ${JSON.stringify(o)}` });
+    addError(path, `must be a String, got ${JSON.stringify(o)}`);
     return false;
   }
 }
 
-export function number(path: Path, o: any, errors: Error[]): boolean {
+export function number(path: Path, o: any, addError: ErrorFn): boolean {
   if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Number' })) {
     return true;
   } else if (_.isNumber(o)) {
@@ -228,12 +228,12 @@ export function number(path: Path, o: any, errors: Error[]): boolean {
   } else if (isStringNumber(o)) {
     return true;
   } else {
-    errors.push({ path, message: `must be a Number, got ${o}` });
+    addError(path, `must be a Number, got ${o}`);
     return false;
   }
 }
 
-export function boolean(path: Path, o: any, errors: Error[]): boolean {
+export function boolean(path: Path, o: any, addError: ErrorFn): boolean {
   if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Boolean' })) {
     return true;
   } else if (isStringBoolean(o)) {
@@ -241,18 +241,21 @@ export function boolean(path: Path, o: any, errors: Error[]): boolean {
   } else if (_.isBoolean(o)) {
     return true;
   } else {
-    errors.push({ path, message: `must be a Boolean, got ${JSON.stringify(o)}` });
+    addError(path, `must be a Boolean, got ${JSON.stringify(o)}`);
     return false;
   }
 }
 
 export function or(...fns: ValidationFn[]): ValidationFn {
-  return (path: Path, value: any, errors: Error[]) => {
+  return (path: Path, value: any, addError: ErrorFn) => {
     const errs: Error[] = [];
-    const success = _.some(fns, (fn) => fn(path, value, errs));
+    const f = (path: Path, message: string) => {
+      errs.push({ path, message });
+    }
+    const success = _.some(fns, (fn) => fn(path, value, f));
     if (!success) {
       const message = _.join(_.map(errs, (e) => e.message), ' or ');
-      errors.push({ path, message });
+      addError(path, message);
     }
     return success;
   }
@@ -264,6 +267,12 @@ export class Validator extends Visitor {
   constructor(errors: Error[]) {
     super();
     this.errors = errors;
+    this.addError = this.addError.bind(this);
+  }
+
+  protected addError(path: Path, message: string) {
+    const source = this.constructor.name;
+    this.errors.push({ path, message, source });
   }
 
   protected forEachWithPath<T>(
@@ -278,8 +287,8 @@ export class Validator extends Visitor {
 
 }
 
-function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, errors: Error[]) {
-  let validator: (path: Path, o: any, errors: Error[]) => boolean;
+function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, addError: ErrorFn) {
+  let validator: (path: Path, o: any, addError: ErrorFn) => boolean;
   switch (primitiveType) {
     case 'Boolean':
       validator = boolean;
@@ -304,7 +313,7 @@ function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, 
     default:
       throw new ResourceSpecificationError(`Unknown PrimitiveType '${primitiveType}'`, path);
   }
-  validator.call(undefined, path, property, errors);
+  validator.call(undefined, path, property, addError);
 }
 
 function atLeastOnePropertySpec(
@@ -312,16 +321,13 @@ function atLeastOnePropertySpec(
   propertyName: string,
   property: object,
   resourceType: string,
-  errors: Error[]) {
+  addError: ErrorFn) {
   const propertySpec = AtLeastOne.PropertyTypes[`${resourceType}.${propertyName}`];
   if (propertySpec) {
     _.forEach(propertySpec, (propertyNames) => {
       const present = _.filter(propertyNames, (property) => _.has(property, propertyName));
       if (present.length === 0) {
-        errors.push({
-          path: path,
-          message: `at least one of ${propertyNames.join(', ')} must be provided`
-        });
+        addError(path, `at least one of ${propertyNames.join(', ')} must be provided`);
       }
     });
   }
@@ -332,16 +338,13 @@ function onlyOnePropertySpec(
   propertyName: string,
   property: object,
   resourceType: string,
-  errors: Error[]) {
+  addError: ErrorFn) {
   const propertySpec = OnlyOne.PropertyTypes[`${resourceType}.${propertyName}`];
   if (propertySpec) {
     _.forEach(propertySpec, (propertyNames) => {
       const present = _.filter(propertyNames, (property) => _.has(property, propertyName));
       if (present.length > 1) {
-        errors.push({
-          path,
-          message: `only one of ${propertyNames.join(', ')} can be provided`
-        });
+        addError(path, `only one of ${propertyNames.join(', ')} can be provided`);
       }
     });
   }
@@ -352,17 +355,14 @@ function exclusivePropertySpec(
   propertyName: string,
   property: object,
   resourceType: string,
-  errors: Error[]) {
+  addError: ErrorFn) {
   const propertySpec = Exclusive.PropertyTypes[`${resourceType}.${propertyName}`];
   if (propertySpec) {
     _.forEach(propertySpec, (forbiddenProperties, propertyName) => {
       if (_.has(property, propertyName)) {
         _.forEach(forbiddenProperties, (forbiddenPropertyName) => {
           if (_.has(property, forbiddenPropertyName)) {
-            errors.push({
-              path: path.concat(forbiddenPropertyName),
-              message: `${forbiddenPropertyName} can not be set if ${propertyName} is set`
-            });
+            addError(path, `${forbiddenPropertyName} can not be set if ${propertyName} is set`);
           }
         });
       }
@@ -375,49 +375,50 @@ function complexType(
   propertyName: string,
   resourceType: string,
   type: Type,
-  properties: any, errors: Error[]) {
+  properties: any,
+  addError: ErrorFn) {
   // TODO check that resourceType is valid
   const propertyType = _.get(PropertyTypes, `${resourceType}.${type}`) || _.get(PropertyTypes, type);
   if (propertyType) {
-    if (object(path, properties, errors)) {
-      exclusivePropertySpec(path, propertyName, properties, resourceType, errors);
-      onlyOnePropertySpec(path, propertyName, properties, resourceType, errors);
-      atLeastOnePropertySpec(path, propertyName, properties, resourceType, errors);
+    if (object(path, properties, addError)) {
+      exclusivePropertySpec(path, propertyName, properties, resourceType, addError);
+      onlyOnePropertySpec(path, propertyName, properties, resourceType, addError);
+      atLeastOnePropertySpec(path, propertyName, properties, resourceType, addError);
       forEach(path, properties, (path, property, name) => {
         const s = _.get(propertyType.Properties, name);
         if (s) {
           if (s.PrimitiveType) {
-            primitiveType(path, s.PrimitiveType, property, errors);
+            primitiveType(path, s.PrimitiveType, property, addError);
           } else if (s.Type === 'Map') {
-            if (object(path, property, errors)) {
+            if (object(path, property, addError)) {
               forEach(path, property, (p, v, k) => {
                 if (s.PrimitiveItemType) {
-                  primitiveType(p, s.PrimitiveItemType, v, errors);
+                  primitiveType(p, s.PrimitiveItemType, v, addError);
                 } else if (s.ItemType) {
-                  complexType(p, k.toString(), resourceType, s.ItemType, v, errors);
+                  complexType(p, k.toString(), resourceType, s.ItemType, v, addError);
                 } else {
                   throw new ResourceSpecificationError(`Unknown Map Type '${s}'`, p)
                 }
               });
             }
           } else if (s.Type === 'List') {
-            if (list(path, property, errors)) {
+            if (list(path, property, addError)) {
               forEach(path, property, (p, v, k) => {
                 if (s.PrimitiveItemType) {
-                  primitiveType(p, s.PrimitiveItemType, v, errors);
+                  primitiveType(p, s.PrimitiveItemType, v, addError);
                 } else if (s.ItemType) {
-                  complexType(p, propertyName, resourceType, s.ItemType, v, errors);
+                  complexType(p, propertyName, resourceType, s.ItemType, v, addError);
                 } else {
                   throw new ResourceSpecificationError(`Unknown List Type '${s}'`, p)
                 }
               });
             }
           } else if (s.Type) {
-            complexType(path, propertyName, resourceType, s.Type, property, errors);
+            complexType(path, propertyName, resourceType, s.Type, property, addError);
           }
         } else {
           const message = withSuggestion(`invalid property for ${type}`, _.keys(propertyType.Properties), name as string);
-          errors.push({ path, message });
+          addError(path, message);
         }
       });
     }
@@ -432,35 +433,35 @@ export function spec(
   resourceType: string,
   propertyType: PropertyValueType,
   property: any,
-  errors: Error[]) {
+  addError: ErrorFn) {
   if (propertyType.PrimitiveType) {
-    primitiveType(path, propertyType.PrimitiveType, property, errors);
+    primitiveType(path, propertyType.PrimitiveType, property, addError);
   } else if (propertyType.Type === 'Map') {
-    if (object(path, property, errors)) {
+    if (object(path, property, addError)) {
       forEach(path, property, (p, v, i) => {
         if (propertyType.PrimitiveItemType) {
-          primitiveType(p, propertyType.PrimitiveItemType, v, errors);
+          primitiveType(p, propertyType.PrimitiveItemType, v, addError);
         } else if (propertyType.ItemType) {
-          complexType(p, i.toString(), resourceType, propertyType.ItemType, v, errors);
+          complexType(p, i.toString(), resourceType, propertyType.ItemType, v, addError);
         } else {
           throw new ResourceSpecificationError('No property type', p);
         }
       });
     }
   } else if (propertyType.Type === 'List') {
-    if (list(path, property, errors)) {
+    if (list(path, property, addError)) {
       forEach(path, property, (p, v, i) => {
         if (propertyType.PrimitiveItemType) {
-          primitiveType(p, propertyType.PrimitiveItemType, v, errors);
+          primitiveType(p, propertyType.PrimitiveItemType, v, addError);
         } else if (propertyType.ItemType) {
-          complexType(p, propertyName, resourceType, propertyType.ItemType, v, errors);
+          complexType(p, propertyName, resourceType, propertyType.ItemType, v, addError);
         } else {
           throw new ResourceSpecificationError('No property type', p);
         }
       });
     }
   } else if (propertyType.Type) {
-    complexType(path, propertyName, resourceType, propertyType.Type, property, errors);
+    complexType(path, propertyName, resourceType, propertyType.Type, property, addError);
   } else {
     throw new ResourceSpecificationError('No property type', path);
   }

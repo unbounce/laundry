@@ -36,7 +36,7 @@ export default class GetAttValidator extends Validator {
         // !GetAtt A.Att
         // !GetAtt A.Att.Nested
         if (!value.data.match(/^([A-Za-z0-9]+\.[A-Za-z0-9]+)+$/)) {
-          this.errors.push({ path, message: 'must be in the format `Resource.Attribute`' });
+          this.addError(path, 'must be in the format `Resource.Attribute`');
           return;
         }
         [resource, ...parts] = value.data.split('.');
@@ -72,7 +72,7 @@ export default class GetAttValidator extends Validator {
               _.keys(_.get(this.resources, resource)),
               attribute
             );
-            this.errors.push({path, message});
+            this.addError(path, message);
           }
         } else {
           const message = withSuggestion(
@@ -80,7 +80,7 @@ export default class GetAttValidator extends Validator {
             _.keys(_.get(this.resources, resource)),
             attribute
           );
-          this.errors.push({path, message});
+          this.addError(path, message);
         }
       } else {
         const message = withSuggestion(
@@ -88,7 +88,7 @@ export default class GetAttValidator extends Validator {
           _.keys(this.resources),
           resource
         );
-        this.errors.push({path, message});
+        this.addError(path, message);
       }
     }
   }

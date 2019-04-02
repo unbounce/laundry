@@ -19,7 +19,7 @@ export default class IfValidator extends Validator {
         // the data. If types of `a` and `b` have no overlap in their types,
         // that is an issue.
         if (_.isEmpty(_.intersectionWith(a, b, _.isEqual))) {
-          this.errors.push({ path, message: 'branches contain different data types' });
+          this.addError(path, 'branches contain different data types');
         }
       }
     }

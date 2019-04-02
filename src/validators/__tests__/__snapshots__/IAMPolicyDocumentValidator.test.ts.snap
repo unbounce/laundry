@@ -16,6 +16,7 @@ Array [
       "0",
       "Effect",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
 ]
 `;
@@ -36,6 +37,7 @@ Array [
       "0",
       "Sid",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
   Object {
     "message": "must be a String, got []",
@@ -51,6 +53,7 @@ Array [
       "0",
       "Effect",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
   Object {
     "message": "must be a String, got {} or must be a List, got {}",
@@ -66,6 +69,7 @@ Array [
       "0",
       "Principal",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
   Object {
     "message": "must be a String, got {} or must be a List, got {}",
@@ -81,6 +85,7 @@ Array [
       "0",
       "Resource",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
   Object {
     "message": "must be an Object, got \\"\\"",
@@ -96,6 +101,7 @@ Array [
       "0",
       "Condition",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
 ]
 `;
@@ -116,6 +122,7 @@ Array [
       "0",
       "Effect",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
   Object {
     "message": "is required",
@@ -131,6 +138,7 @@ Array [
       "0",
       "Action",
     ],
+    "source": "IAMPolicyDocumentValidator",
   },
 ]
 `;

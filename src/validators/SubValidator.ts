@@ -1,15 +1,10 @@
 import * as _ from 'lodash';
 
-import * as validate from '../validate';
 import * as yaml from '../yaml';
 import { Validator } from '../validate';
-import { Path, Error } from '../types';
-import { ResourceTypes, Attributes } from '../spec';
-import { toCfnFn, subVariables, withSuggestion } from '../util';
-
-type Parameters = {
-  [name: string]: 'String' | 'List' | 'Number'
-};
+import { Path } from '../types';
+import { ResourceTypes } from '../spec';
+import { subVariables, withSuggestion } from '../util';
 
 // Validates that !Sub reference a valid resource or parameter
 // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html
@@ -67,14 +62,14 @@ export default class SubValidator extends Validator {
         if (attribute) {
           if (_.includes(_.keys(this.resources), resource)) {
             if (!_.includes(_.get(this.resources, resource), attribute)) {
-              this.errors.push({
+              this.addError(
                 path,
-                message: withSuggestion(
+                withSuggestion(
                   `${attribute} is not a valid Attribute of ${resource}`,
                   _.get(this.resources, resource),
                   resource
                 )
-              });
+              );
             }
           } else {
             const message = withSuggestion(
@@ -82,12 +77,12 @@ export default class SubValidator extends Validator {
               _.keys(this.resources),
               resource
             );
-            this.errors.push({ path, message });
+            this.addError(path, message);
           }
         } else {
           if (!_.includes(this.refs, resource)) {
             const message = withSuggestion(`${resource} not a valid Parameter or Resource`, this.refs, resource);
-            this.errors.push({path, message});
+            this.addError(path, message);
           }
         }
       });

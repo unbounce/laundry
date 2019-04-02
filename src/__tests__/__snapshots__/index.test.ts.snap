@@ -11,6 +11,7 @@ Array [
       "Fn::And",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -25,6 +26,7 @@ Array [
       "C",
       "Fn::And",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -39,6 +41,7 @@ Array [
       "C",
       "Fn::If",
     ],
+    "source": "IfValidator",
   },
 ]
 `;
@@ -53,6 +56,7 @@ Array [
       "C",
       "Fn::If",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -71,6 +75,7 @@ Array [
       "0",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -86,6 +91,7 @@ Array [
       "Fn::Not",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -100,6 +106,7 @@ Array [
       "C",
       "Fn::Not",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -119,6 +126,7 @@ Array [
       "Fn::Or",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -133,6 +141,7 @@ Array [
       "C",
       "Fn::Or",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -148,6 +157,7 @@ Array [
       "And",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -162,6 +172,7 @@ Array [
       "C",
       "And",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -176,6 +187,7 @@ Array [
       "C",
       "If",
     ],
+    "source": "IfValidator",
   },
 ]
 `;
@@ -190,6 +202,7 @@ Array [
       "C",
       "If",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -208,6 +221,7 @@ Array [
       "0",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -223,6 +237,7 @@ Array [
       "Not",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -237,6 +252,7 @@ Array [
       "C",
       "Not",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -256,6 +272,7 @@ Array [
       "Or",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -270,6 +287,7 @@ Array [
       "C",
       "Or",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -283,6 +301,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -296,6 +315,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -309,6 +329,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -322,6 +343,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -335,6 +357,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -348,6 +371,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -361,6 +385,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -374,6 +399,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -390,6 +416,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -406,6 +433,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -422,6 +450,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -438,6 +467,7 @@ Array [
       "BucketName",
       "Fn::ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -454,6 +484,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -470,6 +501,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -486,6 +518,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -502,6 +535,7 @@ Array [
       "BucketName",
       "ImportValue",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -518,6 +552,7 @@ Array [
       "Root",
       "Mappings",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -532,6 +567,7 @@ Array [
       "a",
       "b",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -552,6 +588,7 @@ Array [
       "Root",
       "Outputs",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -566,6 +603,7 @@ Array [
       "O",
       "Description",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -581,6 +619,7 @@ Array [
       "Export",
       "Name",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -595,6 +634,7 @@ Array [
       "O",
       "Value",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -610,6 +650,7 @@ Array [
       "Export",
       "Name",
     ],
+    "source": "RootValidator",
   },
 ]
 `;
@@ -629,6 +670,7 @@ Array [
       "Fn::Base64",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -646,6 +688,7 @@ Array [
       "Base64",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -659,6 +702,7 @@ Array [
       "Resources",
       "A",
     ],
+    "source": "DependsOnValidator",
   },
 ]
 `;
@@ -675,6 +719,7 @@ Array [
       "BucketName",
       "GetAtt",
     ],
+    "source": "GetAttValidator",
   },
 ]
 `;
@@ -691,6 +736,7 @@ Array [
       "BucketName",
       "Fn::GetAtt",
     ],
+    "source": "GetAttValidator",
   },
 ]
 `;
@@ -707,6 +753,7 @@ Array [
       "BucketName",
       "GetAtt",
     ],
+    "source": "GetAttValidator",
   },
 ]
 `;
@@ -723,6 +770,7 @@ Array [
       "BucketName",
       "GetAtt",
     ],
+    "source": "GetAttValidator",
   },
 ]
 `;
@@ -739,6 +787,7 @@ Array [
       "BucketName",
       "Fn::GetAtt",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -755,6 +804,7 @@ Array [
       "BucketName",
       "Fn::GetAtt",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -771,6 +821,7 @@ Array [
       "BucketName",
       "Fn::GetAtt",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -787,6 +838,7 @@ Array [
       "BucketName",
       "GetAtt",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -803,6 +855,7 @@ Array [
       "BucketName",
       "Fn::Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -819,6 +872,7 @@ Array [
       "BucketName",
       "Fn::Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -836,6 +890,7 @@ Array [
       "Fn::Join",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
   Object {
     "message": "must be a List, got \\"\\"",
@@ -848,6 +903,7 @@ Array [
       "Fn::Join",
       "1",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -864,6 +920,7 @@ Array [
       "BucketName",
       "Fn::Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -880,6 +937,7 @@ Array [
       "BucketName",
       "Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -896,6 +954,7 @@ Array [
       "BucketName",
       "Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -913,6 +972,7 @@ Array [
       "Join",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
   Object {
     "message": "must be a List, got \\"\\"",
@@ -925,6 +985,7 @@ Array [
       "Join",
       "1",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -941,6 +1002,7 @@ Array [
       "BucketName",
       "Join",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -957,6 +1019,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -973,6 +1036,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -989,6 +1053,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "source": "RefsValidator",
   },
 ]
 `;
@@ -1005,6 +1070,7 @@ Array [
       "BucketName",
       "Ref",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1021,6 +1087,7 @@ Array [
       "BucketName",
       "Fn::Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1037,6 +1104,7 @@ Array [
       "BucketName",
       "Fn::Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1053,6 +1121,7 @@ Array [
       "BucketName",
       "Fn::Sub",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1070,6 +1139,7 @@ Array [
       "Fn::Sub",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
   Object {
     "message": "must be an Object, got \\"\${A}\\"",
@@ -1082,6 +1152,7 @@ Array [
       "Fn::Sub",
       "1",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1098,6 +1169,7 @@ Array [
       "BucketName",
       "Fn::Sub",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1114,6 +1186,7 @@ Array [
       "BucketName",
       "Fn::Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1130,6 +1203,7 @@ Array [
       "BucketName",
       "Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1146,6 +1220,7 @@ Array [
       "BucketName",
       "Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1162,6 +1237,7 @@ Array [
       "BucketName",
       "Sub",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1179,6 +1255,7 @@ Array [
       "Sub",
       "0",
     ],
+    "source": "CfnFnsInputsValidator",
   },
   Object {
     "message": "must be an Object, got \\"\${A}\\"",
@@ -1191,6 +1268,7 @@ Array [
       "Sub",
       "1",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1207,6 +1285,7 @@ Array [
       "BucketName",
       "Sub",
     ],
+    "source": "CfnFnsInputsValidator",
   },
 ]
 `;
@@ -1223,6 +1302,7 @@ Array [
       "BucketName",
       "Sub",
     ],
+    "source": "SubValidator",
   },
 ]
 `;
@@ -1237,6 +1317,7 @@ Array [
       "NACL",
       "Properties",
     ],
+    "source": "ResourceAtLeastOnePropertyValidator",
   },
 ]
 `;
@@ -1253,6 +1334,7 @@ Array [
       "ContainerDefinitions",
       "0",
     ],
+    "source": "ResourcePropertyValidator",
   },
 ]
 `;
@@ -1268,6 +1350,7 @@ Array [
       "Properties",
       "TTL",
     ],
+    "source": "ResourceExclusivePropertyValidator",
   },
 ]
 `;
@@ -1283,6 +1366,7 @@ Array [
       "Properties",
       "CidrIpv6",
     ],
+    "source": "ResourceExclusivePropertyValidator",
   },
 ]
 `;
@@ -1298,6 +1382,7 @@ Array [
       "Properties",
       "MasterUsername",
     ],
+    "source": "ResourceInclusivePropertyValidator",
   },
 ]
 `;
@@ -1313,6 +1398,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1326,6 +1412,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1339,6 +1426,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1352,6 +1440,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1365,6 +1454,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1378,6 +1468,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1391,6 +1482,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1404,6 +1496,7 @@ Array [
       "Resources",
       "Certificate",
     ],
+    "source": "ResourceTypeValidator",
   },
 ]
 `;
@@ -1422,6 +1515,7 @@ Array [
       "0",
       "ExpirationInDays",
     ],
+    "source": "ResourcePropertyValidator",
   },
 ]
 `;
@@ -1440,6 +1534,7 @@ Array [
       "0",
       "ExpirationInDays",
     ],
+    "source": "ResourcePropertyValidator",
   },
 ]
 `;

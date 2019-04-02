@@ -3,8 +3,10 @@ export type Path = string[];
 export type Error = {
   path: Path,
   message: string,
-  source?: string,
+  source: string,
 };
+
+export type ErrorFn = (path: Path, message: string) => void;
 
 export class ResourceSpecificationError extends Error {
   constructor(message: string, path: string[]) {
