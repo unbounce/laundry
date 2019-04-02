@@ -1,10 +1,8 @@
 import * as _ from 'lodash';
 
 import * as validate from '../validate';
-import * as yaml from '../yaml';
 import { Validator } from '../validate';
-import { Path, Error } from '../types';
-import { ResourceTypes, Attributes } from '../spec';
+import { Path } from '../types';
 import { withSuggestion } from '../util';
 
 export default class DependsOnValidator extends Validator {
@@ -26,21 +24,21 @@ export default class DependsOnValidator extends Validator {
 
       // DependsOn can be a resource or a list of resources
       if (_.isArray(dependsOn)) {
-        if (validate.list(path, dependsOn, this.errors, validate.string)) {
+        if (validate.list(path, dependsOn, this.addError, validate.string)) {
           resourceNames = dependsOn;
         }
       } else {
-        if (validate.string(path, dependsOn, this.errors)) {
+        if (validate.string(path, dependsOn, this.addError)) {
           resourceNames = [dependsOn];
         }
       }
 
       _.forEach(resourceNames, (resourceName) => {
         if (!_.includes(this.resources, resourceName)) {
-          this.errors.push({
+          this.addError(
             path,
-            message: withSuggestion(`${resourceName} is not a valid Resource`, this.resources, resourceName)
-          });
+            withSuggestion(`${resourceName} is not a valid Resource`, this.resources, resourceName)
+          );
         }
       });
     }

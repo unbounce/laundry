@@ -24,10 +24,8 @@ export default class ConditionsValidator extends Validator {
   CfnFn(path: Path, propertyName: string, value: yaml.CfnFn) {
     if (value instanceof yaml.Condition && _.isString(value.data)) {
       if (!_.includes(this.conditions, value.data)) {
-        this.errors.push({
-          path,
-          message: withSuggestion(`${value.data} is not a valid Condition`, this.conditions, value.data)
-        });
+        const message = withSuggestion(`${value.data} is not a valid Condition`, this.conditions, value.data);
+        this.addError(path, message);
       }
     }
   }

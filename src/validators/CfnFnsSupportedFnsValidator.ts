@@ -32,7 +32,7 @@ export default class CfnFnsSupportedFnsValidator extends Validator {
       if (_.isArray(supportedFns)) {
         if (!_.includes(supportedFns, cfnFn.constructor)) {
           const fnName = _.get(this.supportedFns, currentPath.concat(FN_NAME))
-          this.errors.push({ path, message: `can not be used within ${fnName}` });
+          this.addError(path, `can not be used within ${fnName}`);
         }
       }
       return currentPath;

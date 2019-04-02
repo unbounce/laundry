@@ -43,7 +43,7 @@ export default class RefsValidator extends Validator {
     if (value instanceof yaml.Ref && _.isString(value.data)) {
       if (!_.includes(this.refs, value.data)) {
         const message = withSuggestion(`${value.data} is not a valid Parameter or Resource`, this.refs, value.data);
-        this.errors.push({path, message});
+        this.addError(path, message);
       }
     }
   }
