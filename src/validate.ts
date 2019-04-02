@@ -250,7 +250,7 @@ export function or(...fns: ValidationFn[]): ValidationFn {
   return (path: Path, value: any, addError: ErrorFn) => {
     const errs: Error[] = [];
     const f = (path: Path, message: string) => {
-      errs.push({ path, message });
+      errs.push({ path, message, source: '-unused-' });
     }
     const success = _.some(fns, (fn) => fn(path, value, f));
     if (!success) {
