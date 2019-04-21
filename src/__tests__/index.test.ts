@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 
-import { Error } from '../types';
-import { lint } from '../index';
+import { lint, ignoredErrorMatcher } from '../index';
 import * as yaml from '../yaml';
 
 const testTemplate = {
@@ -1291,4 +1290,88 @@ describe('lint', () => {
       });
     });
   })
+
+  describe('LaundryIgnore', () => {
+    test('top-level metadata', () => {
+      const template = yaml.dump({
+        Metadata: {
+          LaundryIgnore: {
+            Resources: ['RootValidator']
+          }
+        },
+        Resources: ''
+      });
+      expect(lint(template)).toEqual([]);
+    });
+    test('Resource metadata', () => {
+      const template = yaml.dump({
+        Resources: {
+          A: {
+            Type: 'AWS::S3::Bucket',
+            Metadata: {
+              LaundryIgnore: [
+                'ResourcePropertyValidator'
+              ]
+            },
+            Properties: {
+              Foo: 'bar'
+            }
+          }
+        }
+      });
+      expect(lint(template)).toEqual([]);
+    });
+    test('top-level metadata for resource exact', () => {
+      const template = yaml.dump({
+        Metadata: {
+          LaundryIgnore: {
+            'Resources.A.Properties.Foo': ['ResourcePropertyValidator']
+          }
+        },
+        Resources: {
+          A: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              Foo: 'bar'
+            }
+          }
+        }
+      });
+      expect(lint(template)).toEqual([]);
+    });
+    test('top-level metadata for resource glob', () => {
+      const template = yaml.dump({
+        Metadata: {
+          LaundryIgnore: {
+            'Resources.A.*': ['ResourcePropertyValidator']
+          }
+        },
+        Resources: {
+          A: {
+            Type: 'AWS::S3::Bucket',
+            Properties: {
+              Foo: 'bar'
+            }
+          }
+        }
+      });
+      expect(lint(template)).toEqual([]);
+    });
+  });
+});
+
+describe('ignoredErrorMatcher', () => {
+  test.each([
+    [[], ['A', 'B'], false],
+    [[['Not', 'Match']], ['A', 'B'], false],
+    [[['*']], ['A', 'B'], true],
+    [[['*'], ['Not', 'Match']], ['A', 'B'], true],
+    [[['A', '*']], ['A', 'B', 'C'], true],
+    [[['*', 'B']], ['A', 'B'], true],
+    [[['*', 'B']], ['A', 'B', 'C'], false],
+    [[['A', 'B', '*']], ['A', 'B'], false],
+  ])('%s %s', (ignoredValidators, error, expected) => {
+    const isIgnored = ignoredErrorMatcher(_.map(ignoredValidators, (path) => ({ path, source: '' })));
+    expect(isIgnored({ path: error, message: '', source: '' })).toEqual(expected)
+  });
 });
