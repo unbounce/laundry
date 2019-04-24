@@ -15,6 +15,13 @@ Options:
   --help     Show help                                                 [boolean]
 ```
 
+```
+$ cat test.yaml
+Resources: ''
+$ laundry lint test.yaml
+Root.Resources: must be an Object, got "" [RootValidator]
+```
+
 ## Library
 
 ```javascript
@@ -35,6 +42,43 @@ Better validation can be done if parameter values are provided:
 
 ```javascript
 lint('...', { ParamA: 1, ParamB: 'two'});
+```
+
+## Ignoring Errors
+
+Errors can be ignored via the `LaundryIgnore` `Metadata` property. The top-level
+`Metadata` property is specified as a map of paths within the CloudFormation
+template, written in dot notation. The `*` character can be used as a glob to
+match any value at that point in the path. For example, `Resources.MyBucket.*`
+would match all errors related to the `MyBucket` resource, and `*.BucketName`
+would ignore all errors related to properties called `BucketName`.
+
+All `LaundryIgnore` properties in this example have the same effect:
+
+```
+Metadata:
+  LaundryIgnore:
+    # Match ResourcePropertyValidator errors for a specific property
+    'Resources.A.Properties.Foo':
+      - ResourcePropertyValidator
+    # Match any ResourcePropertyValidator errors under "Resources.A"
+    'Resources.A.*':
+      - ResourcePropertyValidator
+    # Match any ResourcePropertyValidator errors for properties named "Foo"
+    '*.Foo':
+      - ResourcePropertyValidator
+    # Ignore all ResourcePropertyValidator errors
+    '*':
+      - ResourcePropertyValidator
+Resources:
+  A:
+    Metadata:
+      # Ignore ResourcePropertyValidator errors for this resource
+      LaundryIgnore:
+        - ResourcePropertyValidator
+    Type: AWS::S3::Bucket
+    Properties:
+      Foo: bar
 ```
 
 ## Development
