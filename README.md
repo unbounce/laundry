@@ -15,6 +15,13 @@ Options:
   --help     Show help                                                 [boolean]
 ```
 
+```
+$ cat test.yaml
+Resources: ''
+$ laundry lint test.yaml
+Root.Resources: must be an Object, got "" [RootValidator]
+```
+
 ## Library
 
 ```javascript

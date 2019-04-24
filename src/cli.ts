@@ -21,7 +21,7 @@ export function main() {
           template = fs.readFileSync(argv.template).toString();
           const errors = lint(template);
           for (const error of errors) {
-            console.log(`${error.path.join('.')}: ${error.message}`);
+            console.log(`${error.path.join('.')}: ${error.message} [${error.source}]`);
           }
           if (errors.length > 0) {
             process.exit(1);
