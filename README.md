@@ -53,11 +53,14 @@ match any value at that point in the path. For example, `Resources.MyBucket.*`
 would match all errors related to the `MyBucket` resource, and `*.BucketName`
 would ignore all errors related to properties called `BucketName`.
 
-All LaundryIgnore properties in this example have the same effect.
+All `LaundryIgnore` properties in this example have the same effect:
 
 ```
 Metadata:
   LaundryIgnore:
+    # Match ResourcePropertyValidator errors for a specific property
+    'Resources.A.Properties.Foo':
+      - ResourcePropertyValidator
     # Match any ResourcePropertyValidator errors under "Resources.A"
     'Resources.A.*':
       - ResourcePropertyValidator
