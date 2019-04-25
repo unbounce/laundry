@@ -141,6 +141,17 @@ if (validate.required(value) && validate.string(value)) {
 
 See [`validate`](./src/validate.ts) for the full list of validation functions.
 
+
+## CloudFormation Resource Specification
+
+The majority of validation rules come from the [CloudFormation Resource
+Specification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-resource-specification.html).
+This should be updated periodically using:
+
+```
+npm run update-resource-specification
+```
+
 ## Goals
 
 The goal is to be as comprehensive as

@@ -1358,6 +1358,49 @@ describe('lint', () => {
       expect(lint(template)).toEqual([]);
     });
   });
+
+  describe('single "property types"', () => {
+    test('valid', () => {
+      const template = yaml.dump({
+        Resources: {
+          A: {
+            Type: 'AWS::CodeBuild::Project',
+            Properties: {
+              Environment: {},
+              ServiceRole: '',
+              Source: {},
+              Artifacts: {},
+              Cache: {
+                Modes: ['LOCAL_SOURCE_CACHE'] // This is a "SinglePropertyType"
+              }
+            }
+          }
+        }
+      });
+      expect(lint(template)).toEqual([]);
+    });
+
+    test('invalid', () => {
+      const template = yaml.dump({
+        Resources: {
+          A: {
+            Type: 'AWS::CodeBuild::Project',
+            Properties: {
+              Environment: {},
+              ServiceRole: '',
+              Source: {},
+              Artifacts: {},
+              Cache: {
+                Modes: ''
+              }
+            }
+          }
+        }
+      });
+      expect(lint(template)).toMatchSnapshot();
+    });
+
+  });
 });
 
 describe('ignoredErrorMatcher', () => {

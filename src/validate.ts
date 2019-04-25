@@ -9,7 +9,8 @@ import {
   Type,
   Exclusive,
   OnlyOne,
-  AtLeastOne
+  AtLeastOne,
+  isMultiplePropertyType,
 } from './spec';
 import * as yaml from './yaml';
 import { isNoValue, isStringNumber, isStringBoolean, cfnFnName, withSuggestion } from './util';
@@ -319,7 +320,7 @@ function primitiveType(path: Path, primitiveType: PrimitiveType, property: any, 
 function atLeastOnePropertySpec(
   path: Path,
   propertyName: string,
-  property: object,
+  _property: object,
   resourceType: string,
   addError: ErrorFn) {
   const propertySpec = AtLeastOne.PropertyTypes[`${resourceType}.${propertyName}`];
@@ -336,7 +337,7 @@ function atLeastOnePropertySpec(
 function onlyOnePropertySpec(
   path: Path,
   propertyName: string,
-  property: object,
+  _property: object,
   resourceType: string,
   addError: ErrorFn) {
   const propertySpec = OnlyOne.PropertyTypes[`${resourceType}.${propertyName}`];
@@ -385,7 +386,12 @@ function complexType(
       onlyOnePropertySpec(path, propertyName, properties, resourceType, addError);
       atLeastOnePropertySpec(path, propertyName, properties, resourceType, addError);
       forEach(path, properties, (path, property, name) => {
-        const s = _.get(propertyType.Properties, name);
+        let s: PropertyValueType;
+        if (isMultiplePropertyType(propertyType)) {
+          s = _.get(propertyType.Properties, name);
+        } else {
+          s = propertyType;
+        }
         if (s) {
           if (s.PrimitiveType) {
             primitiveType(path, s.PrimitiveType, property, addError);
@@ -417,7 +423,10 @@ function complexType(
             complexType(path, propertyName, resourceType, s.Type, property, addError);
           }
         } else {
-          const message = withSuggestion(`invalid property for ${type}`, _.keys(propertyType.Properties), name as string);
+          let message: string = `invalid property for ${type}`;
+          if (isMultiplePropertyType(propertyType)) {
+            message = withSuggestion(message, _.keys(propertyType.Properties), name as string);
+          }
           addError(path, message);
         }
       });

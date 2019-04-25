@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
-import { Path, Error } from './types';
 import CloudFormationResourceSpecification from './specs/CloudFormationResourceSpecification.json';
-import ServerlessResourceSpecification from './specs/ServerlessResourceSpecification.json';
+// import ServerlessResourceSpecification from './specs/ServerlessResourceSpecification.json';
 import CloudFormationResourceSpecificationOverrides from './specs/CloudFormationResourceSpecificationOverrides.json';
 import AtLeastOneSpec from './specs/AtLeastOne.json';
 import ExclusiveSpec from './specs/Exclusive.json';
@@ -31,7 +30,8 @@ export type ResourceType = {
     } & PropertyValueType
   }
 }
-export type PropertyType = {
+
+export type MultiplePropertyType = {
   Documentation: string,
   Properties: {
     [property: string]: {
@@ -41,6 +41,17 @@ export type PropertyType = {
     } & PropertyValueType
   }
 }
+
+export type SinglePropertyType = {
+  Documentation?: string,
+  Required?: boolean,
+  UpdateType?: UpdateType
+} & PropertyValueType;
+
+export type PropertyType = MultiplePropertyType | SinglePropertyType;
+
+export const isMultiplePropertyType = (p: PropertyType): p is MultiplePropertyType => 'Properties' in p;
+
 export type AtLeastOne = {
   PropertyTypes: {
     [key: string]: string[][]

@@ -8,7 +8,8 @@
   "scripts": {
     "start": "jest --watch",
     "build": "tsc -p .",
-    "test": "jest"
+    "test": "jest",
+    "update-resource-specification": "curl --output src/specs/CloudFormationResourceSpecification.json https://d1uauaxba7bl26.cloudfront.net/latest/CloudFormationResourceSpecification.json"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
