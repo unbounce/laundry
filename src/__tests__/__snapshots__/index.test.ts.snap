@@ -1501,6 +1501,23 @@ Array [
 ]
 `;
 
+exports[`lint single "property types" invalid 1`] = `
+Array [
+  Object {
+    "message": "must be a List, got \\"\\"",
+    "path": Array [
+      "Root",
+      "Resources",
+      "A",
+      "Properties",
+      "Cache",
+      "Modes",
+    ],
+    "source": "ResourcePropertyValidator",
+  },
+]
+`;
+
 exports[`lint with parameters string values invalid default 1`] = `
 Array [
   Object {
