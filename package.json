@@ -12,7 +12,7 @@
     "update-resource-specification": "curl --output src/specs/CloudFormationResourceSpecification.json https://d1uauaxba7bl26.cloudfront.net/latest/CloudFormationResourceSpecification.json",
     "version": "auto-changelog -p && git add CHANGELOG.md",
     "postversion": "git push && git push --tags",
-    "prepare": "npm run clean && npm install && npm test && npm run build",
+    "prepublishOnly": "npm run clean && npm install && npm test && npm run build",
     "clean": "rm -rf node_modules lib"
   },
   "devDependencies": {
