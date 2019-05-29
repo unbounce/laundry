@@ -34,7 +34,13 @@ export default class IAMPolicyDocumentValidator extends Validator {
     if (name === 'PolicyDocument') {
       const spec = {
         Version: [validate.optional, validate.string],
-        Statement: [validate.required, listOf(validateStatement)]
+        Statement: [validate.required, (path: Path, statement: any, addError: ErrorFn) => {
+          if(_.isArray(statement)) {
+            return listOf(validateStatement)(path, statement, addError);
+          } else {
+            return validateStatement(path, statement, addError);
+          }
+        }]
       };
       validate.object(path, value, this.addError, spec);
     }

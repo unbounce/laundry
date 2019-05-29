@@ -144,4 +144,60 @@ describe('IAMPolicyDocumentValidator', () => {
     expect(lint(template)).toMatchSnapshot();
   });
 
+  test('valid, statement single value', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: {
+                  Sid: '',
+                  Action: '',
+                  Effect: 'Allow',
+                  Principal: '',
+                  Resource: '',
+                  Condition: {}
+                }
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toEqual([]);
+  });
+
+  test('invalid, statement single value', () => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::IAM::Role',
+          Properties: {
+            AssumeRolePolicyDocument: {},
+            Policies: [{
+              PolicyName: '',
+              PolicyDocument: {
+                Version: '',
+                Statement: {
+                  Sid: '',
+                  Action: '',
+                  Effect: [],
+                  Principal: '',
+                  Resource: '',
+                  Condition: {}
+                }
+              }
+            }]
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
+
 });

@@ -106,6 +106,26 @@ Array [
 ]
 `;
 
+exports[`IAMPolicyDocumentValidator invalid, statement single value 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "Policies",
+      "0",
+      "PolicyDocument",
+      "Statement",
+      "Effect",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
 exports[`IAMPolicyDocumentValidator missing required properties 1`] = `
 Array [
   Object {
