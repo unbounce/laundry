@@ -21,6 +21,145 @@ Array [
 ]
 `;
 
+exports[`IAMPolicyDocumentValidator invalid principal: {"AWS":[{}]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [{}] or must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "AWS",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {"AWS":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {} or must be a List, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "AWS",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {"Federated":[]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got []",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "Federated",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {"Federated":[{}]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [{}]",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "Federated",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {"Service":[{}]} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got [{}] or must be a String, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "Service",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {"Service":{}} 1`] = `
+Array [
+  Object {
+    "message": "must be a String, got {} or must be a List, got {}",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+      "Service",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
+exports[`IAMPolicyDocumentValidator invalid principal: {} 1`] = `
+Array [
+  Object {
+    "message": "you must provide one of AWS, Federated, CanonicalUser, Service",
+    "path": Array [
+      "Root",
+      "Resources",
+      "Role",
+      "Properties",
+      "PolicyDocument",
+      "Statement",
+      "0",
+      "Principal",
+    ],
+    "source": "IAMPolicyDocumentValidator",
+  },
+]
+`;
+
 exports[`IAMPolicyDocumentValidator invalid types 1`] = `
 Array [
   Object {
@@ -56,7 +195,7 @@ Array [
     "source": "IAMPolicyDocumentValidator",
   },
   Object {
-    "message": "must be a String, got {} or must be a List, got {}",
+    "message": "you must provide one of AWS, Federated, CanonicalUser, Service",
     "path": Array [
       "Root",
       "Resources",

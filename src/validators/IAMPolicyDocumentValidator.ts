@@ -15,12 +15,33 @@ const stringOf = (allowedValues: string[]): ValidationFn => {
   }
 }
 
+const validatePrincipal = (path: Path, value: any, addError: ErrorFn) => {
+  if (_.isPlainObject(value)) {
+    const spec = {
+      AWS: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+      Federated: [validate.optional, validate.string],
+      CanonicalUser: [validate.optional, validate.string],
+      Service: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    };
+
+    if (_.isEmpty(value)) {
+      addError(path, `you must provide one of ${_.join(_.keys(spec), ', ')}`);
+      return false;
+    } else {
+      return validate.object(path, value, addError, spec);
+    }
+  } else {
+    return validate.string(path, value, addError);
+  }
+};
+
+// https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 const validateStatement = (path: Path, value: any, addError: ErrorFn): boolean => {
   const spec = {
     Sid: [validate.optional, validate.string],
     Effect: [validate.required, stringOf(['Allow', 'Deny'])],
     // Principal can not be specified for inline policies
-    Principal: [validate.optional, validate.or(validate.string, listOf(validate.string))],
+    Principal: [validate.optional, validatePrincipal],
     Action: [validate.required, validate.or(validate.string, listOf(validate.string))],
     Resource: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Condition: [validate.optional, validate.object],
