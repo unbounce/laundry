@@ -47,7 +47,6 @@ describe('IAMPolicyDocumentValidator', () => {
                     Sid: '',
                     Action: '',
                     Effect: 'Deny',
-                    Principal: [''],
                     Resource: [''],
                     Condition: {}
                   }
@@ -200,4 +199,68 @@ describe('IAMPolicyDocumentValidator', () => {
     expect(lint(template)).toMatchSnapshot();
   });
 
+  test.each([
+    "*",
+    { AWS: '*' },
+    { AWS: 'arn:aws:iam::123456789012:root' },
+    { AWS: ['123456789012', 'arn:aws:iam::123456789012:root'] },
+    { AWS: 'arn:aws:iam::123456789012:user/user-name' },
+    { Federated: 'www.amazon.com' },
+    { Service: "elasticmapreduce.amazonaws.com" },
+    { Service: ["elasticmapreduce.amazonaws.com", "datapipeline.amazonaws.com"] },
+  ])('valid principal: %j', (principal) => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::SQS::QueuePolicy',
+          Properties: {
+            Queues: [''],
+            PolicyDocument: {
+              Statement: [
+                {
+                  Effect: 'Allow',
+                  Principal: principal,
+                  Action: 'SQS:SendMessage',
+                  Resource: ''
+                }
+              ]
+            }
+          }
+        }
+      }
+    });
+    expect(lint(template)).toEqual([]);
+  });
+
+  test.each([
+    {},
+    { AWS: {} },
+    { AWS: [{}] },
+    { Federated: [] },
+    { Federated: [{}] },
+    { Service: {} },
+    { Service: [{}] },
+  ])('invalid principal: %j', (principal) => {
+    const template = JSON.stringify({
+      Resources: {
+        Role: {
+          Type: 'AWS::SQS::QueuePolicy',
+          Properties: {
+            Queues: [''],
+            PolicyDocument: {
+              Statement: [
+                {
+                  Effect: 'Allow',
+                  Principal: principal,
+                  Action: 'SQS:SendMessage',
+                  Resource: ''
+                }
+              ]
+            }
+          }
+        }
+      }
+    });
+    expect(lint(template)).toMatchSnapshot();
+  });
 });

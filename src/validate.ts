@@ -133,10 +133,14 @@ export function object(path: Path,
   if (o instanceof yaml.CfnFn && cfnFn(o, { PrimitiveType: 'Json' })) {
     return true;
   } else if (_.isPlainObject(o)) {
+    let valid = true;
     // Validate the objects properties
     _.forEach(properties, (fns, key) => {
       const p = path.concat(key);
-      _.find(fns, (fn) => !fn(p, _.get(o, key), addError));
+      const hasError = _.find(fns, (fn) => !fn(p, _.get(o, key), addError));
+      if(hasError) {
+        valid = false;
+      }
     });
 
     // Check for unknown keys
@@ -145,9 +149,10 @@ export function object(path: Path,
       const invalidKeys = _.difference(_.keys(o), validKeys);
       if (!_.isEmpty(invalidKeys)) {
         addError(path, `invalid properties: ${invalidKeys.join(', ')}`);
+        valid = false;
       }
     }
-    return true;
+    return valid;
   } else {
     addError(path, `must be an Object, got ${JSON.stringify(o)}`);
     return false;
@@ -176,20 +181,28 @@ export function list(
   if (o instanceof yaml.CfnFn && cfnFn(o, { Type: 'List' })) {
     return true
   } else if (_.isArray(o)) {
+    let valid = true;
     if (_.isArray(items)) {
       if (items.length === o.length) {
         _.forEach(items, (fn, i) => {
-          fn(path.concat(i.toString()), o[i], addError);
+          const s = fn(path.concat(i.toString()), o[i], addError);
+          if (!s) {
+            valid = s;
+          }
         });
       } else {
         addError(path, `must be a List with ${items.length} items`);
+        valid = false;
       }
     } else if (items) {
       _.forEach(o, (item, i) => {
-        items(path.concat(i.toString()), item, addError);
+        const s = items(path.concat(i.toString()), item, addError);
+        if(!s) {
+          valid = s;
+        }
       });
     }
-    return true;
+    return valid;
   } else {
     addError(path, `must be a List, got ${JSON.stringify(o)}`);
     return false;
