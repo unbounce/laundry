@@ -42,6 +42,7 @@ const validateStatement = (path: Path, value: any, addError: ErrorFn): boolean =
     Effect: [validate.required, stringOf(['Allow', 'Deny'])],
     // Principal can not be specified for inline policies
     Principal: [validate.optional, validatePrincipal],
+    NotPrincipal: [validate.optional, validatePrincipal],
     Action: [validate.required, validate.or(validate.string, listOf(validate.string))],
     Resource: [validate.optional, validate.or(validate.string, listOf(validate.string))],
     Condition: [validate.optional, validate.object],
