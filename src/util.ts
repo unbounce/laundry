@@ -109,6 +109,7 @@ export function valueToSpecs(o: any): PropertyValueType[] | null {
   } else if (_.isBoolean(o)) {
     return [{ PrimitiveType: 'Boolean' }];
   } else if (_.isArray(o)) {
+    // BUG? childSpecs below is unused
     const childSpecs = _.reduce(o, (acc, child) => {
       const specs = _.reduce(valueToSpecs(child), (acc, s) => {
         if (s.PrimitiveType) {
@@ -153,7 +154,7 @@ export function subVariables(sub: yaml.Sub) {
   const variables = [];
   const r = /\$\{([^!][^}]*)\}/g
   let match;
-  while (match = r.exec(template)) {
+  while (match = r.exec(template as string)) {
     variables.push(_.trim(match[1]));
   }
   return variables;

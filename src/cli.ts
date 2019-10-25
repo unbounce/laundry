@@ -18,7 +18,7 @@ export function main() {
       (argv) => {
         let template;
         try {
-          template = fs.readFileSync(argv.template).toString();
+          template = fs.readFileSync(argv.template as string).toString();
           const errors = lint(template);
           for (const error of errors) {
             console.log(`${error.path.join('.')}: ${error.message} [${error.source}]`);
