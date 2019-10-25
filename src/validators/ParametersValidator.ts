@@ -159,9 +159,10 @@ export default class ParametersValidator extends Validator {
   Parameters(path: Path, parameters: any) {
     if (validate.optional(path, parameters, this.addError)
       && validate.object(path, parameters, this.addError)) {
-      this.forEachWithPath(path, parameters, (path, parameter, name) => {
+      this.forEachWithPath(path, parameters, (path, parameter, _name) => {
         if (validate.object(path, parameter, this.addError)) {
-          _.forEach(parameter, (value, key) => {
+          // TODO tighten up the typesafety below
+          _.forEach(parameter as any, (value, key) => {
             const s = _.get(optional, key);
             if (s) {
               s(path.concat(key), parameter, value, this.addError);

@@ -3,6 +3,8 @@ import * as _ from 'lodash';
 import { lint, ignoredErrorMatcher } from '../index';
 import * as yaml from '../yaml';
 
+const Styles: yaml.Style[] = ['Object', 'YAMLTag'];
+
 const testTemplate = {
   Conditions: { C: true },
   Resources: {
@@ -251,7 +253,7 @@ describe('lint', () => {
     });
 
     describe('Sub', () => {
-      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      describe.each(Styles)('%s', (style) => {
         test.each([
           // !Sub String
           ['valid resource', new yaml.Sub('${A}', style)],
@@ -310,7 +312,7 @@ describe('lint', () => {
       });
 
       describe('CloudFormation Stack Outputs', () => {
-        describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+        describe.each(Styles)('%s', (style) => {
           test('Outputs', () => {
             const template = yaml.dump({
               Resources: {
@@ -335,7 +337,7 @@ describe('lint', () => {
     });
 
     describe('Ref', () => {
-      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      describe.each(Styles)('%s', (style) => {
         test.each([
           ['valid resource', new yaml.Ref('A', style)],
         ])('%s %j', (s, bucketName) => {
@@ -373,7 +375,7 @@ describe('lint', () => {
     });
 
     describe('Base64', () => {
-      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      describe.each(Styles)('%s', (style) => {
         test.each([
           ['string', new yaml.Base64('abc', style)],
           ['Ref', new yaml.Base64(new yaml.Ref('A', style), style)],
@@ -390,7 +392,7 @@ describe('lint', () => {
     });
 
     describe('Join', () => {
-      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      describe.each(Styles)('%s', (style) => {
         test.each([
           ['', new yaml.Join([',', ['a']], style)],
           ['Split', new yaml.Join([',', new yaml.Split([',', 'a'], style)], style)],
@@ -620,7 +622,7 @@ describe('lint', () => {
   });
 
   describe('Split', () => {
-    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+    describe.each(Styles)('%s', (style) => {
       test.each([
         ['', new yaml.Split([',', 'a'], style)],
         ['Join', new yaml.Split([',', new yaml.Join([',', ['a']], style)], style)],
@@ -658,7 +660,7 @@ describe('lint', () => {
   });
 
   describe('GetAZs', () => {
-    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+    describe.each(Styles)('%s', (style) => {
       test.each([
         ['', new yaml.GetAZs('', style)],
         ['Ref', new yaml.GetAZs(new yaml.Ref('AWS::Region', style), style)],
@@ -696,7 +698,7 @@ describe('lint', () => {
   });
 
   describe('ImportValue', () => {
-    describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+    describe.each(Styles)('%s', (style) => {
       test.each([
         ['', new yaml.ImportValue('', style)],
         ['Ref', new yaml.ImportValue(new yaml.Ref('AWS::Region', style), style)],
@@ -746,7 +748,7 @@ describe('lint', () => {
         expect(lint(template)).toEqual([]);
       });
 
-      describe.each(['Object', 'YAMLTag'])('%s', (style) => {
+      describe.each(Styles)('%s', (style) => {
         describe('If', () => {
           test.each([
             ['valid input', new yaml.If([new yaml.Equals(['', ''], style), '', ''], style)],
@@ -1231,7 +1233,7 @@ describe('lint', () => {
       ['invalid type description', { Value: 'v', Description: {} }],
       ['invalid type export', { Value: 'v', Export: { Name: {} } }],
       ['missing export name', { Value: 'v', Export: {} }],
-    ])('%s %j', (s, output) => {
+    ] as any[])('%s %j', (_s, output) => {
       expect(lintWithProperty('Outputs.O', output)).toMatchSnapshot();
     });
   });
@@ -1247,7 +1249,7 @@ describe('lint', () => {
       ['empty object', {}],
       ['object', { 'a': { 'b': { 'c': 'd' } } }],
       ['object', { 'a': { 'b': '' } }],
-    ])('%s %j', (s, mapping) => {
+    ] as any[])('%s %j', (_s, mapping) => {
       expect(lintWithProperty('Mappings', mapping)).toMatchSnapshot();
     });
   });
@@ -1414,7 +1416,8 @@ describe('ignoredErrorMatcher', () => {
     [[['*', 'B']], ['A', 'B', 'C'], false],
     [[['A', 'B', '*']], ['A', 'B'], false],
   ])('%s %s', (ignoredValidators, error, expected) => {
-    const isIgnored = ignoredErrorMatcher(_.map(ignoredValidators, (path) => ({ path, source: '' })));
-    expect(isIgnored({ path: error, message: '', source: '' })).toEqual(expected)
+      const isIgnored = ignoredErrorMatcher(_.map(ignoredValidators as string[][],
+                                                  (path) => ({ path, source: '' })));
+    expect(isIgnored({ path: error as string[], message: '', source: '' })).toEqual(expected)
   });
 });
