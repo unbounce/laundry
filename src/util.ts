@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import didYouMean from 'didyoumean2';
 
 import { PropertyValueType } from './spec';
-import { Path } from './types';
 import * as yaml from './yaml';
 
 export function isNoValue(o: any) {
@@ -25,52 +24,36 @@ export function toCfnFn(o: any): yaml.CfnFn | undefined {
       switch (name) {
         case 'Ref':
           return new yaml.Ref(value, 'Object');
-          break;
         case 'Fn::Base64':
           return new yaml.Base64(value, 'Object');
-          break;
         case 'Fn::FindInMap':
           return new yaml.FindInMap(value, 'Object');
-          break;
         case 'Fn::GetAtt':
           return new yaml.GetAtt(value, 'Object');
-          break;
         case 'Fn::GetAZs':
           return new yaml.GetAZs(value, 'Object');
-          break;
         case 'Fn::ImportValue':
           return new yaml.ImportValue(value, 'Object');
-          break;
         case 'Fn::Join':
           return new yaml.Join(value, 'Object');
-          break;
         case 'Fn::Split':
           return new yaml.Split(value, 'Object');
-          break;
         case 'Fn::Select':
           return new yaml.Select(value, 'Object');
-          break;
         case 'Fn::Sub':
           return new yaml.Sub(value, 'Object');
-          break;
         case 'Fn::And':
           return new yaml.And(value, 'Object');
-          break;
         case 'Fn::Equals':
           return new yaml.Equals(value, 'Object');
-          break;
         case 'Fn::If':
           return new yaml.If(value, 'Object');
-          break;
         case 'Fn::Not':
           return new yaml.Not(value, 'Object');
-          break;
         case 'Fn::Or':
           return new yaml.Or(value, 'Object');
-          break;
         case 'Condition':
           return new yaml.Condition(value, 'Object');
-          break;
       }
     }
   }
@@ -145,7 +128,7 @@ export function valueToSpecs(o: any): PropertyValueType[] | null {
 }
 
 export function subVariables(sub: yaml.Sub) {
-  let template;
+  let template;                 // TODO improve typesafety here
   if (_.isString(sub.data)) {
     template = sub.data;
   } else if (_.isArray(sub.data) && _.isString(sub.data[0]) && _.isArray(sub.data[1])) {
