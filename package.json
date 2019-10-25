@@ -5,6 +5,29 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": "bin/laundry",
+  "license": "MIT",
+  "homepage": "https://github.com/unbounce/laundry",
+  "author": "james@unbounce.com",
+  "keywords": [
+    "cloudformation",
+    "aws",
+    "lint"
+  ],
+  "contributors": [
+    "james@unbounce.com",
+    "tavis@unbounce.com"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unbounce/laundry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unbounce/laundry/issues"
+  },
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 5.0.0"
+  },
   "scripts": {
     "start": "jest --watch",
     "build": "tsc -p .",
