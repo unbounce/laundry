@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 
-import * as validate from '../validate';
 import * as yaml from '../yaml';
 import { Validator } from '../validate';
-import { Path, Error } from '../types';
+import { Path } from '../types';
 import { cfnFnName } from '../util';
 
 type SupportedFns = { [key: string]: yaml.CfnFn[] | SupportedFns };
@@ -17,26 +16,21 @@ const FN_NAME = '__FN_NAME__';
 export default class CfnFnsSupportedFnsValidator extends Validator {
   supportedFns: SupportedFns = {};
 
-  CfnFn(path: Path, propertyName: string, cfnFn: yaml.CfnFn) {
-    // Iterate over each segment of the path to determine if we're nested within
-    // any functions that would not allow this ${cfnFn} to be used here
-    _.reduce(path, (currentPath: string[], p: string) => {
-
-      // We're looking at:
-      //  - [Root, SUPPORTED_FNS]
-      //  - [Root, Resources, SUPPORTED_FNS]
-      //  - [Root, Resources, A, SUPPORTED_FNS], etc
-      currentPath.push(p);
+  CfnFn(path: Path, _propertyName: string, cfnFn: yaml.CfnFn) {
+    // Walk the path backwards looking for the parent CfnFn, if any.
+    // Error if it doesn't support this ${cfnFn}.
+    let currentPath: string[] = [...path];
+    while (currentPath.length) {
+      currentPath.pop();
       const supportedFns = _.get(this.supportedFns, currentPath.concat(SUPPORTED_FNS));
-
-      if (_.isArray(supportedFns)) {
+      if (_.isArray(supportedFns)) { // We've hit a CfnFn node parent
         if (!_.includes(supportedFns, cfnFn.constructor)) {
           const fnName = _.get(this.supportedFns, currentPath.concat(FN_NAME))
           this.addError(path, `can not be used within ${fnName}`);
         }
+        break; // parent found, stop searching.
       }
-      return currentPath;
-    }, []);
+    }
 
     // Update supportedFns so that we can check any nested functions
     _.set(this.supportedFns, path.concat(SUPPORTED_FNS), cfnFn.supportedFns);
