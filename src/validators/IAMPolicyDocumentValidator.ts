@@ -55,6 +55,7 @@ export default class IAMPolicyDocumentValidator extends Validator {
   ResourceProperty(path: Path, name: string, value: any) {
     if (name === 'PolicyDocument') {
       const spec = {
+        Id: [validate.optional, validate.string],
         Version: [validate.optional, validate.string],
         Statement: [validate.required, (path: Path, statement: any, addError: ErrorFn) => {
           if(_.isArray(statement)) {
