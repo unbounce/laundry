@@ -186,7 +186,7 @@ export class And extends CfnFn {
 export class Equals extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-equals';
   [returnSpec] = [{ PrimitiveType: 'Boolean' }];
-  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, Select, And, Equals, If, Not, Or, Condition, ImplicitCondition];
+  [supportedFns]: SupportedFns = [FindInMap, Ref, Sub, Select, Join, And, Equals, If, Not, Or, Condition, ImplicitCondition];
 }
 export class If extends CfnFn {
   [doc] = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-if';
