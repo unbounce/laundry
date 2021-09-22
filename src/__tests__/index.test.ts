@@ -258,13 +258,13 @@ describe('lint', () => {
           // !Sub String
           ['valid resource', new yaml.Sub('${A}', style)],
           ['multiple resources', new yaml.Sub('a${A}b${B}c', style)],
-          ['! is ignored', new yaml.Sub('${!Bar}', style), []],
+          ['! is ignored', new yaml.Sub('${!Bar}', style)],
           ['valid attribute', new yaml.Sub('${A.Arn}', style)],
 
           // !Sub [String, Object]
           ['valid resource', new yaml.Sub(['${A}', {}], style)],
           ['local ref', new yaml.Sub(['${Local}', { Local: 'a' }], style)],
-        ])('%s %j', (s, bucketName) => {
+        ])('%s %j', (_s, bucketName) => {
           expect(lint(t(bucketName))).toEqual([]);
         });
         test.each([

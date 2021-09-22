@@ -250,7 +250,7 @@ export class CfnFnData extends CfnFn {
 function tag(cls: any) {
   // Accept all 'kinds' so that js-yaml will load invalid formats and then we
   // can lint them
-  return _.map(['scalar', 'mapping', 'sequence'], (kind) => {
+  return _.map(['scalar', 'mapping', 'sequence'] as const, (kind) => {
     // @ts-ignore
     // predicate is mis-typed in the type definitions
     return new yaml.Type(`!${cls.name}`, {
